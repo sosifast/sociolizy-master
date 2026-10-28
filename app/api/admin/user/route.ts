@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { getDiscoveredRegions } from "@/lib/server-db";
 
 export async function GET() {
   try {
@@ -14,15 +15,23 @@ export async function GET() {
         level: true,
         balance: true,
         api_key: true,
+        server_area: true,
         create_at: true,
         update_at: true,
       },
       orderBy: { id: "desc" },
     });
 
+    const regions = getDiscoveredRegions().map((r) => ({
+      code: r.code,
+      name: r.name,
+      flag: r.flag,
+    }));
+
     return NextResponse.json({
       success: true,
       data: users,
+      regions,
     });
   } catch (error) {
     console.error("GET /api/admin/user error:", error);
@@ -74,6 +83,7 @@ export async function POST(request: Request) {
         level: level === "Admin" ? "Admin" : "Member",
         balance: Number(balance || 0),
         api_key: apiKey,
+        server_area: (body.server_area || body.server_region || "SG").toUpperCase(),
       },
       select: {
         id: true,
@@ -83,7 +93,9 @@ export async function POST(request: Request) {
         level: true,
         balance: true,
         api_key: true,
+        server_area: true,
         create_at: true,
+        update_at: true,
       },
     });
 

@@ -1,8 +1,16 @@
 import React from "react";
 import Link from "next/link";
-import { Zap, Wallet, ShoppingCart, User, ArrowLeft, Shield } from "lucide-react";
+import { cookies } from "next/headers";
+import { Zap, Wallet, ShoppingCart, User, Globe, LogOut, Shield } from "lucide-react";
+import { verifySessionToken } from "@/lib/auth";
 
-export default function MemberDashboardPage() {
+export const instant = false;
+
+export default async function MemberDashboardPage() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("user_session")?.value;
+  const session = await verifySessionToken(sessionCookie);
+
   return (
     <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col">
       {/* Top navbar */}
@@ -18,16 +26,26 @@ export default function MemberDashboardPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          {session?.server_area && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
+              <Globe className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="text-slate-400">Region:</span>
+              <span className="font-bold text-white">{session.server_area}</span>
+            </div>
+          )}
+
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
             <Wallet className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-slate-400">Saldo:</span>
             <span className="font-bold text-white">Rp 0</span>
           </div>
+
           <Link
-            href="/auth/login"
-            className="text-xs text-slate-400 hover:text-white transition-colors"
+            href="/api/auth/logout"
+            className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium"
           >
-            Keluar
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Keluar</span>
           </Link>
         </div>
       </header>
@@ -35,8 +53,18 @@ export default function MemberDashboardPage() {
       {/* Main dashboard body */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-6 md:p-8">
         <div className="mb-8">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              Akun Member Terverifikasi
+            </span>
+            {session?.server_area && (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Region: {session.server_area}
+              </span>
+            )}
+          </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white">
-            Selamat Datang di Member Dashboard
+            Selamat Datang, {session?.username || "Member"}!
           </h2>
           <p className="text-slate-400 text-sm mt-1">
             Pusat pemesanan layanan media sosial otomatis Anda.
@@ -59,37 +87,34 @@ export default function MemberDashboardPage() {
               <span>Total Pesanan</span>
               <ShoppingCart className="w-4 h-4 text-indigo-400" />
             </div>
-            <div className="text-2xl font-bold text-white">0 Pesanan</div>
-            <div className="text-[11px] text-slate-400 mt-2">Belum ada transaksi</div>
+            <div className="text-2xl font-bold text-white">0</div>
+            <div className="text-[11px] text-slate-400 mt-2 font-medium">Belum ada transaksi</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-[#0c1222] border border-slate-800">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
               <span>Status Akun</span>
-              <Shield className="w-4 h-4 text-cyan-400" />
+              <Shield className="w-4 h-4 text-emerald-400" />
             </div>
-            <div className="text-2xl font-bold text-white">Member Aktif</div>
-            <div className="text-[11px] text-cyan-400 mt-2 font-medium">Level Standard</div>
+            <div className="text-2xl font-bold text-emerald-400">Aktif</div>
+            <div className="text-[11px] text-slate-400 mt-2 font-medium">Level {session?.level || "Member"}</div>
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl bg-[#0c1222] border border-slate-800 flex flex-col items-center justify-center text-center py-12">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-3">
-            <ShoppingCart className="w-6 h-6" />
+        {/* Action card */}
+        <div className="p-8 rounded-3xl bg-gradient-to-r from-indigo-900/30 via-slate-900 to-[#0c1222] border border-indigo-500/20 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 className="text-lg font-bold text-white">Siap Melakukan Pemesanan Pertama?</h3>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-lg">
+              Katalog layanan SMM aktif dengan harga terjangkau dan proses instan otomatis.
+            </p>
           </div>
-          <h3 className="font-semibold text-lg text-white">Mulai Pemesanan Pertama Anda</h3>
-          <p className="text-sm text-slate-400 max-w-md mt-1 mb-6">
-            Pilih platform seperti Instagram, TikTok, YouTube, atau X dan masukkan link target untuk memproses order instan.
-          </p>
-          <div className="flex gap-3">
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Kembali ke Login
-            </Link>
-          </div>
+          <Link
+            href="/member/order"
+            className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer whitespace-nowrap"
+          >
+            Pesan Layanan Sekarang
+          </Link>
         </div>
       </main>
     </div>

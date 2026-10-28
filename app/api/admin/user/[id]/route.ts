@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { getDiscoveredRegions } from "@/lib/server-db";
 
 export async function GET(
   request: Request,
@@ -24,7 +26,9 @@ export async function GET(
         level: true,
         balance: true,
         api_key: true,
+        server_area: true,
         create_at: true,
+        update_at: true,
       },
     });
 
@@ -32,7 +36,13 @@ export async function GET(
       return NextResponse.json({ success: false, message: "Pengguna tidak ditemukan" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: user });
+    const regions = getDiscoveredRegions().map((r) => ({
+      code: r.code,
+      name: r.name,
+      flag: r.flag,
+    }));
+
+    return NextResponse.json({ success: true, data: user, regions });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error server";
     return NextResponse.json({ success: false, message }, { status: 500 });
@@ -52,15 +62,19 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { username, email, password, level, balance } = body;
+    const { username, email, password, level, balance, server_area, server_region, regenerate_api_key } = body;
 
     const dataToUpdate: any = {};
     if (username) dataToUpdate.username = username.trim();
     if (email) dataToUpdate.email = email.trim().toLowerCase();
     if (level) dataToUpdate.level = level === "Admin" ? "Admin" : "Member";
     if (balance !== undefined) dataToUpdate.balance = Number(balance);
+    if (server_area || server_region) dataToUpdate.server_area = String(server_area || server_region).toUpperCase().trim();
     if (password && password.trim().length >= 6) {
       dataToUpdate.password = await bcrypt.hash(password.trim(), 10);
+    }
+    if (regenerate_api_key) {
+      dataToUpdate.api_key = `smm_${crypto.randomBytes(16).toString("hex")}`;
     }
 
     const updated = await prisma.user.update({
@@ -74,6 +88,8 @@ export async function PUT(
         level: true,
         balance: true,
         api_key: true,
+        server_area: true,
+        create_at: true,
         update_at: true,
       },
     });

@@ -163,7 +163,7 @@ export default function AdminHeader({ onToggleSidebar }: HeaderProps) {
               <div className="my-1 border-t border-slate-100" />
 
               <Link
-                href="/auth/login"
+                href="/api/auth/logout"
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 font-semibold transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />

@@ -33,7 +33,7 @@ export default function LoginPage() {
     setSuccessMessage(null);
 
     if (!identifier.trim() || !password) {
-      setErrorMessage("Silakan lengkapi username/email dan password.");
+      setErrorMessage("Please enter both username/email and password.");
       return;
     }
 
@@ -49,44 +49,37 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        setErrorMessage(result.message || "Gagal masuk ke akun.");
+        setErrorMessage(result.message || "Failed to sign in. Please verify your credentials.");
         setIsLoading(false);
         return;
       }
 
-      setSuccessMessage(result.message || "Login berhasil! Mengalihkan...");
+      setSuccessMessage("Login successful! Redirecting to your dashboard...");
 
-      // Pengalihan berdasarkan role pengguna
+      // Redirect based on user role returned from API
       setTimeout(() => {
         router.push(result.data?.redirectUrl || "/member");
         router.refresh();
-      }, 1000);
+      }, 800);
     } catch (err) {
       console.error(err);
-      setErrorMessage("Terjadi gangguan jaringan. Silakan coba lagi.");
+      setErrorMessage("Network connection error. Please try again.");
       setIsLoading(false);
     }
   };
 
   return (
     <div className="w-full max-w-md">
-      {/* Glow outer border card */}
+      {/* Outer glow card */}
       <div className="relative rounded-3xl p-[1px] bg-gradient-to-b from-indigo-500/40 via-slate-800/60 to-transparent shadow-2xl shadow-indigo-950/50">
-        
         <div className="relative rounded-[23px] bg-[#0c1222]/90 backdrop-blur-2xl p-7 sm:p-9 border border-white/[0.06]">
-          
           {/* Card Header */}
-          <div className="mb-7">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Portal Masuk Member & Admin</span>
-            </div>
-            
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Selamat Datang Kembali
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
-              Masukkan akun Anda untuk mengelola saldo dan pesanan.
+          <div className="mb-7 text-center">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Sign In
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-2">
+              Enter your credentials to access your account
             </p>
           </div>
 
@@ -107,14 +100,13 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            
             {/* Username or Email Input */}
             <div>
               <label
                 htmlFor="identifier"
                 className="block text-xs font-semibold text-slate-300 mb-1.5"
               >
-                Username atau Email
+                Username or Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -126,7 +118,8 @@ export default function LoginPage() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Contoh: user123 atau nama@email.com"
+                  placeholder="Enter your username or email"
+                  autoComplete="username"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 bg-slate-900/70 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all"
                 />
               </div>
@@ -141,12 +134,6 @@ export default function LoginPage() {
                 >
                   Password
                 </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  Lupa password?
-                </Link>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -159,13 +146,14 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-11 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 bg-slate-900/70 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
-                  aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -185,7 +173,7 @@ export default function LoginPage() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 focus:ring-offset-0"
                 />
-                <span className="text-xs text-slate-400">Ingat saya di perangkat ini</span>
+                <span className="text-xs text-slate-400">Remember me on this device</span>
               </label>
             </div>
 
@@ -199,11 +187,11 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Sedang memverifikasi...</span>
+                    <span>Signing in...</span>
                   </>
                 ) : (
                   <>
-                    <span>Masuk ke Akun</span>
+                    <span>Sign In</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
@@ -218,7 +206,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs">
               <span className="px-3 bg-[#0c1222] text-slate-500 font-medium">
-                Belum memiliki akun?
+                Don&apos;t have an account?
               </span>
             </div>
           </div>
@@ -228,15 +216,14 @@ export default function LoginPage() {
             href="/auth/register"
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/15 hover:border-indigo-500/30 transition-all text-center"
           >
-            Daftar Akun Baru Sekarang
+            Create an Account
           </Link>
 
           {/* Security Note */}
           <div className="mt-6 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Koneksi aman terenkripsi SSL 256-Bit</span>
+            <span>Encrypted connection & 256-bit SSL protection</span>
           </div>
-
         </div>
       </div>
     </div>

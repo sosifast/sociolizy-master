@@ -2,11 +2,46 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { getDiscoveredRegions, getActiveClusterConfig } from "@/lib/server-db";
 
+/**
+ * GET: Mengambil daftar server region yang aktif dan terdeteksi di .env
+ */
+export async function GET() {
+  try {
+    const regions = getDiscoveredRegions();
+    const active = getActiveClusterConfig();
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        defaultRegion: active.group || "SG",
+        regions: regions.map((r) => ({
+          code: r.code,
+          name: r.name,
+          flag: r.flag,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("GET /api/auth/register error:", error);
+    return NextResponse.json(
+      { success: false, message: "Gagal memuat pilihan server cluster" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST: Mendaftarkan user baru dengan pilihan server area / region
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { username, email, password, confirmPassword } = body;
+    const { username, email, password, confirmPassword, server_area, server_region } = body;
+
+    // Tentukan server area yang dipilih (fallback ke SG jika kosong)
+    const selectedArea = (server_area || server_region || "SG").toUpperCase().trim();
 
     // Validasi input
     if (!username || !email || !password) {
@@ -74,7 +109,7 @@ export async function POST(request: Request) {
     // Generate API Key unik untuk user
     const apiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
 
-    // Buat user baru
+    // Buat user baru dengan pilihan server area
     const newUser = await prisma.user.create({
       data: {
         username: username.trim(),
@@ -83,6 +118,7 @@ export async function POST(request: Request) {
         balance: 0,
         level: "Member",
         api_key: apiKey,
+        server_area: selectedArea,
       },
       select: {
         id: true,
@@ -91,6 +127,7 @@ export async function POST(request: Request) {
         email: true,
         level: true,
         balance: true,
+        server_area: true,
         create_at: true,
       },
     });

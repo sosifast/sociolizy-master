@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Shield,
   HelpCircle,
+  Activity,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -76,8 +77,14 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
       ],
     },
     {
-      group: "INTEGRASI PROVIDER",
+      group: "INFRASTRUKTUR & SERVER",
       items: [
+        {
+          name: "Monitoring Server",
+          href: "/admin/server",
+          icon: Activity,
+          badge: "Cluster",
+        },
         {
           name: "API Provider",
           href: "/admin/provider",
@@ -225,7 +232,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
             </div>
 
             <Link
-              href="/auth/login"
+              href="/api/auth/logout"
               title="Keluar dari Panel Admin"
               className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
             >

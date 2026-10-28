@@ -14,8 +14,28 @@ export default function CreateUserPage() {
   const [password, setPassword] = useState("");
   const [level, setLevel] = useState("Member");
   const [balance, setBalance] = useState("0");
+  const [serverArea, setServerArea] = useState("SG");
+  const [regions, setRegions] = useState<Array<{ code: string; name: string; flag: string }>>([
+    { code: "SG", name: "Singapore", flag: "🇸🇬" },
+    { code: "DC", name: "Washington DC, USA", flag: "🇺🇸" },
+    { code: "BOMB", name: "Mumbai, India", flag: "🇮🇳" },
+    { code: "SYD", name: "Sydney, Australia", flag: "🇦🇺" },
+    { code: "SF", name: "San Francisco, USA", flag: "🇺🇸" },
+    { code: "PDX", name: "Portland, USA", flag: "🇺🇸" },
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/admin/user")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.regions && json.regions.length > 0) {
+          setRegions(json.regions);
+        }
+      })
+      .catch((err) => console.warn("Could not load regions:", err));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +62,7 @@ export default function CreateUserPage() {
           password,
           level,
           balance: Number(balance) || 0,
+          server_area: serverArea,
         }),
       });
 
@@ -156,17 +177,36 @@ export default function CreateUserPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Saldo Awal (IDR)
-            </label>
-            <input
-              type="number"
-              min={0}
-              value={balance}
-              onChange={(e) => setBalance(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Saldo Awal (IDR)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={balance}
+                onChange={(e) => setBalance(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Wilayah Server (server_area)
+              </label>
+              <select
+                value={serverArea}
+                onChange={(e) => setServerArea(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              >
+                {regions.map((reg) => (
+                  <option key={reg.code} value={reg.code}>
+                    {reg.flag} {reg.name} ({reg.code})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">

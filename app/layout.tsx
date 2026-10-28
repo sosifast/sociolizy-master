@@ -13,18 +13,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Master SMM - Solusi Social Media Marketing Terlengkap",
-  description: "Pusat layanan SMM reseller otomatis dan termurah untuk Instagram, TikTok, YouTube, dan lainnya.",
+  title: "Sociolizy - #1 Best & Cheapest SMM Panel | Automated Social Media Services",
+  description:
+    "Sociolizy is the world's most affordable automated SMM panel for creators, resellers, and agencies across Instagram, TikTok, YouTube, Facebook, and more.",
+  keywords: [
+    "SMM panel",
+    "cheapest smm panel",
+    "best smm panel",
+    "sociolizy",
+    "reseller smm panel",
+    "instagram smm panel",
+    "tiktok smm panel",
+    "youtube smm panel",
+    "facebook smm panel",
+  ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
-      lang="id"
+      lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
     >
-      <body suppressHydrationWarning className="min-h-full flex flex-col">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-indigo-500 selection:text-white"
+      >
         {children}
       </body>
     </html>
