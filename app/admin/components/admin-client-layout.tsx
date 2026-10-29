@@ -18,11 +18,11 @@ export default function AdminClientLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-slate-50/70 text-slate-800 antialiased font-sans">
+      <div className="min-h-screen bg-white text-slate-900 antialiased font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
         {/* Sidebar Component */}
         <React.Suspense
           fallback={
-            <aside className="fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200 hidden lg:block" />
+            <aside className="fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-100 hidden lg:block" />
           }
         >
           <AdminSidebar
@@ -32,16 +32,16 @@ export default function AdminClientLayout({
         </React.Suspense>
 
         {/* Main Content Area (Offset by sidebar width on large screens) */}
-        <div className="lg:pl-72 flex flex-col min-h-screen transition-all duration-300">
+        <div className="lg:pl-72 flex flex-col min-h-screen bg-white transition-all duration-300">
           {/* Header Component */}
           <AdminHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
           {/* Dynamic Page Content */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-white">
             <React.Suspense
               fallback={
                 <div className="flex items-center justify-center p-12 text-slate-400 text-xs">
-                  <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin mr-2" />
+                  <span className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mr-2" />
                   <span>Memuat halaman admin...</span>
                 </div>
               }

@@ -18,6 +18,7 @@ import {
   Globe,
   ChevronDown,
 } from "lucide-react";
+import { posthog } from "@/lib/posthog-client";
 
 interface ServerRegionOption {
   code: string;
@@ -153,6 +154,14 @@ export default function RegisterPage() {
       }
 
       setSuccessMessage("Account created successfully! Redirecting to login...");
+
+      try {
+        posthog.capture("user_registered", {
+          username,
+          email,
+          server_area: serverArea,
+        });
+      } catch {}
 
       setTimeout(() => {
         router.push("/auth/login");

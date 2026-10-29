@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { PostHogProvider } from "@/app/components/posthog-provider";
+import { PostHogErrorBoundary } from "@/app/components/posthog-error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +46,11 @@ export default function RootLayout({
         suppressHydrationWarning
         className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-indigo-500 selection:text-white"
       >
-        {children}
+        <PostHogProvider>
+          <PostHogErrorBoundary>
+            {children}
+          </PostHogErrorBoundary>
+        </PostHogProvider>
       </body>
     </html>
   );

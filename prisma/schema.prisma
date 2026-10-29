@@ -117,3 +117,44 @@ model Setting {
 
   @@map("setting")
 }
+
+model CryptomusSetting {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  merchant_id  String?
+  payment_key  String?
+  payout_key   String?
+  webhook_url  String?
+  return_url   String?
+  currency     String   @default("USD")
+  rate_usd     Decimal  @default(1) @db.Decimal(15, 4)
+  min_deposit  Decimal  @default(1) @db.Decimal(15, 2)
+  max_deposit  Decimal  @default(10000) @db.Decimal(15, 2)
+  fee_percent  Decimal  @default(0) @db.Decimal(5, 2)
+  is_active    Boolean  @default(false)
+  is_test_mode Boolean  @default(false)
+  create_at    DateTime @default(now())
+  update_at    DateTime @updatedAt
+
+  @@map("cryptomus_setting")
+}
+
+model CryptomusTransaction {
+  id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default(uuid())
+  order_id        String   @unique
+  user_id         Int?
+  merchant_id     String?
+  amount          Decimal  @db.Decimal(15, 4)
+  currency        String   @default("USD")
+  crypto_amount   Decimal? @db.Decimal(24, 8)
+  crypto_currency String?
+  payment_status  String   @default("pending")
+  invoice_url     String?
+  txid            String?
+  raw_response    String?  @db.Text
+  create_at       DateTime @default(now())
+  update_at       DateTime @updatedAt
+
+  @@map("cryptomus_transaction")
+}

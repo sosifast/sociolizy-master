@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { LogOut, Loader2 } from "lucide-react";
+import { resetPostHogUser } from "@/lib/posthog-client";
 
 interface LogoutButtonProps {
   className?: string;
@@ -33,6 +34,7 @@ export default function LogoutButton({
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
+      resetPostHogUser();
       // Perform a full hard navigation to /auth/login so that
       // cookies, React state, and Next.js router caches are completely reset.
       window.location.href = "/auth/login";

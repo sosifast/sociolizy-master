@@ -124,10 +124,7 @@ export default function ServerDetailModal({
     }
   };
 
-  const handleSetPrimary = () => {
-    onSetActive(server.group, server.id);
-    toast.success("Routing Dialihkan", `${server.id} sekarang menjadi database aktif.`);
-  };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
@@ -144,12 +141,14 @@ export default function ServerDetailModal({
                 <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   Server Node: {server.id}
                 </h2>
-                {server.isActive && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
-                    SERVER AKTIF (ROUTED)
-                  </span>
-                )}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  NODE AKTIF (MULTI-ACTIVE PARALEL)
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <Users className="w-3.5 h-3.5" />
+                  {server.assignedUsers ?? 0} Pengguna Tersegmentasi
+                </span>
                 <span
                   className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                     server.status === "online"
@@ -409,15 +408,10 @@ export default function ServerDetailModal({
           </button>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            {!server.isActive && (
-              <button
-                onClick={handleSetPrimary}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm shadow-red-600/30 active:scale-95 transition-all cursor-pointer"
-              >
-                <Radio className="w-3.5 h-3.5" />
-                <span>Jadikan Server Database Aktif</span>
-              </button>
-            )}
+            <div className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Node Aktif dalam Auto-Rolling Pool</span>
+            </div>
 
             <button
               onClick={onClose}

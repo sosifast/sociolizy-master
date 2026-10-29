@@ -115,8 +115,8 @@ export default function TablePagination({
               onClick={() => onPageChange(pageNum)}
               className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 isActive
-                  ? "bg-red-600 text-white shadow-xs shadow-red-600/30"
-                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-red-600 hover:border-red-200"
+                  ? "bg-indigo-600 text-white shadow-xs shadow-indigo-600/25"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200"
               }`}
             >
               {pageNum}

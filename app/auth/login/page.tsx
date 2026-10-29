@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   ShieldCheck,
 } from "lucide-react";
+import { identifyPostHogUser } from "@/lib/posthog-client";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
@@ -65,6 +66,10 @@ export default function LoginPage() {
       }
 
       setSuccessMessage("Login successful! Redirecting to your dashboard...");
+
+      if (result.data) {
+        identifyPostHogUser(result.data);
+      }
 
       // Determine redirect URL (respect safe internal redirect URL if present)
       let destination = result.data?.redirectUrl || "/member";

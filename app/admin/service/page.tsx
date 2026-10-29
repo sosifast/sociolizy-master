@@ -192,22 +192,22 @@ export default function AdminServicePage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Cari ID / layanan..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none transition-all"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 focus:outline-none transition-all"
               />
             </div>
 
             <button
               onClick={() => fetchServices()}
               disabled={isLoading || isRefreshing}
-              className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
+              className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 bg-slate-50 border border-slate-200 hover:border-indigo-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
             </button>
 
             <Link
               href="/admin/import"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:border-red-400 hover:text-red-600 transition-colors whitespace-nowrap cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-colors whitespace-nowrap cursor-pointer shadow-xs"
             >
               <FileDown className="w-3.5 h-3.5 text-slate-500" />
               <span>Import</span>
@@ -215,7 +215,7 @@ export default function AdminServicePage() {
 
             <Link
               href="/admin/service/create"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/25 transition-all whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] shadow-xs shadow-indigo-600/20 transition-all whitespace-nowrap cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Layanan</span>
@@ -256,7 +256,7 @@ export default function AdminServicePage() {
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-indigo-600 mb-2" />
               <p className="text-xs">Memuat data layanan...</p>
             </div>
           ) : (
@@ -269,7 +269,7 @@ export default function AdminServicePage() {
                       checked={isAllPageSelected}
                       onChange={toggleSelectAllPage}
                       title="Pilih semua di halaman ini"
-                      className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500 cursor-pointer accent-red-600"
+                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
                     />
                   </th>
                   <th className="py-3.5 px-4">ID</th>
@@ -300,7 +300,7 @@ export default function AdminServicePage() {
                       <tr
                         key={s.id}
                         className={`transition-colors ${
-                          isSelected ? "bg-red-50/50" : "hover:bg-red-50/30"
+                          isSelected ? "bg-indigo-50/40" : "hover:bg-slate-50/70"
                         }`}
                       >
                         <td className="py-3.5 px-4 text-center">
@@ -308,7 +308,7 @@ export default function AdminServicePage() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(s.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500 cursor-pointer accent-red-600"
+                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
                           />
                         </td>
                         <td className="py-3.5 px-4 font-bold font-mono text-slate-900">
@@ -326,7 +326,7 @@ export default function AdminServicePage() {
                           {s.api_provider ? (
                             <div>
                               <span
-                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200"
+                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200"
                                 title={s.api_provider.uuid ? `Provider UUID: ${s.api_provider.uuid}` : undefined}
                               >
                                 {s.api_provider.name}
@@ -354,14 +354,14 @@ export default function AdminServicePage() {
                         <td className="py-3.5 px-5 font-mono text-slate-500">
                           ${Number(s.rate_api || 0).toFixed(4)}
                         </td>
-                        <td className="py-3.5 px-5 font-extrabold text-red-600 font-mono">
+                        <td className="py-3.5 px-5 font-extrabold text-slate-900 font-mono">
                           ${Number(s.rate_sale || 0).toFixed(4)}
                         </td>
                         <td className="py-3.5 px-5 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <Link
                               href={`/admin/service/${s.id}/edit`}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
                               title="Edit"
                             >
                               <Edit className="w-3.5 h-3.5" />

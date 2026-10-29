@@ -15,11 +15,12 @@ import {
   BarChart3,
   Settings,
   Zap,
-  LogOut,
   ChevronRight,
   Shield,
-  HelpCircle,
   Activity,
+  Coins,
+  Receipt,
+  Sparkles,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -78,6 +79,23 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
       ],
     },
     {
+      group: "PAYMENT GATEWAY",
+      items: [
+        {
+          name: "Setup Cryptomus",
+          href: "/admin/cryptomus/setup",
+          icon: Coins,
+          badge: "Kripto",
+        },
+        {
+          name: "Riwayat Deposit",
+          href: "/admin/cryptomus/history",
+          icon: Receipt,
+          badge: null,
+        },
+      ],
+    },
+    {
       group: "INFRASTRUKTUR & SERVER",
       items: [
         {
@@ -132,35 +150,36 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between">
+        <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between bg-white">
           <Link href="/admin" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 via-rose-600 to-red-500 p-[1px] shadow-md shadow-red-600/30">
-              <div className="w-full h-full bg-red-600 rounded-[11px] flex items-center justify-center text-white">
-                <Zap className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 p-[1px] shadow-md shadow-indigo-600/20">
+              <div className="w-full h-full bg-indigo-600 rounded-[11px] flex items-center justify-center text-white">
+                <Sparkles className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-lg tracking-tight text-slate-900">
-                  MASTER<span className="text-red-600">SMM</span>
+                  MASTER<span className="text-indigo-600">SMM</span>
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider block -mt-1">
-                Admin Panel
+              <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block -mt-1">
+                Admin Console
               </span>
             </div>
           </Link>
         </div>
 
         {/* Navigation Menu */}
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-thin scrollbar-thumb-slate-200">
+        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 bg-white">
           {menuGroups.map((group, groupIdx) => (
             <div key={groupIdx} className="space-y-1">
-              <h3 className="px-3 text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2">
+              <h3 className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">
                 {group.group}
               </h3>
               {group.items.map((item) => {
@@ -173,17 +192,19 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
                     onClick={() => {
                       if (window.innerWidth < 1024) onClose();
                     }}
-                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active
-                        ? "bg-red-600 text-white shadow-md shadow-red-600/25 font-semibold"
-                        : "text-slate-600 hover:text-red-600 hover:bg-red-50/70"
-                      }`}
+                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 ${
+                      active
+                        ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/25 font-semibold"
+                        : "text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/60"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon
-                        className={`w-4 h-4 transition-transform group-hover:scale-110 ${active
+                        className={`w-4 h-4 transition-transform group-hover:scale-110 ${
+                          active
                             ? "text-white"
-                            : "text-slate-400 group-hover:text-red-600"
-                          }`}
+                            : "text-slate-400 group-hover:text-indigo-600"
+                        }`}
                       />
                       <span>{item.name}</span>
                     </div>
@@ -191,10 +212,11 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="flex items-center gap-1.5">
                       {item.badge && (
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${active
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            active
                               ? "bg-white/20 text-white"
-                              : "bg-red-50 text-red-600 border border-red-200/60"
-                            }`}
+                              : "bg-indigo-50 text-indigo-600 border border-indigo-200/60"
+                          }`}
                         >
                           {item.badge}
                         </span>
@@ -211,10 +233,10 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-          <div className="p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div className="p-4 border-t border-slate-100 bg-white">
+          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center font-bold text-red-600 text-sm shadow-inner">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 border border-indigo-200/80 flex items-center justify-center font-bold text-indigo-700 text-xs shadow-inner">
                 SA
               </div>
               <div className="overflow-hidden">
@@ -230,7 +252,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
             <LogoutButton
               title="Keluar dari Panel Admin"
-              className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center"
+              className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer flex items-center justify-center"
               iconClassName="w-4 h-4"
             />
           </div>

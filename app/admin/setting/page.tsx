@@ -145,14 +145,14 @@ export default function AdminSettingPage() {
 
       {isLoading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-400">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
+          <Loader2 className="w-6 h-6 animate-spin mx-auto text-indigo-600 mb-2" />
           <p className="text-xs">Memuat pengaturan...</p>
         </div>
       ) : (
         <form onSubmit={handleSave} className="space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Globe className="w-4 h-4 text-red-600" />
+              <Globe className="w-4 h-4 text-indigo-600" />
               <span>Identitas Website</span>
             </h3>
 
@@ -166,7 +166,7 @@ export default function AdminSettingPage() {
                   value={siteName}
                   onChange={(e) => setSiteName(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -179,7 +179,7 @@ export default function AdminSettingPage() {
                   value={apiApp}
                   onChange={(e) => setApiApp(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -192,7 +192,7 @@ export default function AdminSettingPage() {
                   value={logo}
                   onChange={(e) => setLogo(e.target.value)}
                   placeholder="/logo.png"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -205,7 +205,7 @@ export default function AdminSettingPage() {
                   value={favicon}
                   onChange={(e) => setFavicon(e.target.value)}
                   placeholder="/favicon.ico"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function AdminSettingPage() {
           {/* Contact & Social Media */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-red-600" />
+              <Share2 className="w-4 h-4 text-indigo-600" />
               <span>Kontak & Media Sosial</span>
             </h3>
 
@@ -229,7 +229,7 @@ export default function AdminSettingPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="support@domain.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -243,7 +243,7 @@ export default function AdminSettingPage() {
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                   placeholder="+628123456789"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -257,7 +257,7 @@ export default function AdminSettingPage() {
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
                   placeholder="https://instagram.com/username atau @username"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -271,7 +271,7 @@ export default function AdminSettingPage() {
                   value={facebook}
                   onChange={(e) => setFacebook(e.target.value)}
                   placeholder="https://facebook.com/username"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function AdminSettingPage() {
                   value={tiktok}
                   onChange={(e) => setTiktok(e.target.value)}
                   placeholder="https://tiktok.com/@username atau @username"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -299,7 +299,7 @@ export default function AdminSettingPage() {
                   value={telegram}
                   onChange={(e) => setTelegram(e.target.value)}
                   placeholder="https://t.me/username atau @username"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function AdminSettingPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-red-600" />
+                <ImageIcon className="w-4 h-4 text-indigo-600" />
                 <span>Konfigurasi ImageKit (CDN &amp; Storage)</span>
               </h3>
               <span className="text-[11px] font-medium text-slate-400">Media Upload CDN</span>
@@ -325,7 +325,7 @@ export default function AdminSettingPage() {
                   value={urlImageKit}
                   onChange={(e) => setUrlImageKit(e.target.value)}
                   placeholder="https://ik.imagekit.io/your_id"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -338,7 +338,7 @@ export default function AdminSettingPage() {
                   value={imagekitApi}
                   onChange={(e) => setImagekitApi(e.target.value)}
                   placeholder="public_..."
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -351,7 +351,7 @@ export default function AdminSettingPage() {
                   value={imagekitSecret}
                   onChange={(e) => setImagekitSecret(e.target.value)}
                   placeholder="private_..."
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -360,7 +360,7 @@ export default function AdminSettingPage() {
           {/* Security & Maintenance */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-red-600" />
+              <Shield className="w-4 h-4 text-indigo-600" />
               <span>Opsi Sistem</span>
             </h3>
 
@@ -373,7 +373,7 @@ export default function AdminSettingPage() {
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="w-4 h-4 rounded text-red-600 accent-red-600"
+                  className="w-4 h-4 rounded text-indigo-600 accent-indigo-600"
                 />
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function AdminSettingPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-xs shadow-indigo-600/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSaving ? (
                   <>

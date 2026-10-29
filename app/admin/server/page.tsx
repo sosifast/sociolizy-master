@@ -26,6 +26,7 @@ import {
   Table as TableIcon,
   ShieldCheck,
   Network,
+  Users,
 } from "lucide-react";
 import { useToast } from "@/app/admin/components/toast-context";
 import { useCachedFetch } from "@/lib/client-cache";
@@ -57,6 +58,7 @@ export default function AdminServerMonitoringPage() {
       avgLatency: number;
       totalThroughput: number;
       totalBandwidth: number;
+      totalAssignedUsers: number;
     };
     regions: Array<{
       code: string;
@@ -92,34 +94,6 @@ export default function AdminServerMonitoringPage() {
     }, 10000);
     return () => clearInterval(interval);
   }, [autoRefresh, fetchServers]);
-
-  // Set active routing handler
-  const handleSetActive = async (group: string, serverId: string) => {
-    try {
-      const res = await fetch("/api/admin/server", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "set_active", group, server: serverId }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(
-          "Routing Server Berubah",
-          `Server aktif dialihkan ke ${group} - ${serverId}`
-        );
-        fetchServers();
-        if (detailModal.isOpen && detailModal.server) {
-          setDetailModal((prev) => ({
-            ...prev,
-            server: prev.server ? { ...prev.server, isActive: prev.server.id === serverId } : null,
-          }));
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Gagal Mengubah Routing", "Terjadi kesalahan saat mengupdate server aktif.");
-    }
-  };
 
   // Ping single server
   const handleQuickPing = async (e: React.MouseEvent, serverId: string) => {
@@ -186,18 +160,20 @@ export default function AdminServerMonitoringPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            {data?.active && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span>Aktif: {data.active.server} ({data.active.regionName})</span>
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Klaster Multi-Active Paralel (Auto-Rolling)</span>
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <Network className="w-3.5 h-3.5" />
+              <span>Penyimpanan Transaksi Tersegmentasi Otomatis</span>
+            </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Server Monitoring
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Status node server dan koneksi cluster database.
+            Status node server dan koneksi cluster database MongoDB.
           </p>
         </div>
 
@@ -220,11 +196,41 @@ export default function AdminServerMonitoringPage() {
           <button
             onClick={() => fetchServers()}
             disabled={isRefreshing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-95 shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-sm shadow-indigo-600/25 transition-all cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
             <span>Perbarui Data</span>
           </button>
+        </div>
+      </div>
+
+      {/* Auto-Rolling Cluster Explanation Banner */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-slate-900 to-indigo-950/20 border border-slate-800 text-white shadow-sm">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5">
+            <Network className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-white flex items-center gap-2">
+              <span>Distribusi Transaksi Otomatis (Rolling Segmentation)</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-extrabold uppercase">
+                100% Multi-Active
+              </span>
+            </h4>
+            <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              Seluruh node database MongoDB di setiap wilayah berjalan aktif secara paralel. Ketika pengguna mendaftar dan memilih wilayah server, sistem otomatis mengalokasikan node dengan beban terendah, dan setiap transaksi disimpan secara otomatis ke server MongoDB terkait tanpa perlu pemilihan server aktif manual.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-xs font-medium flex-shrink-0">
+          <div className="px-3.5 py-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-center">
+            <span className="text-slate-400 block text-[10px]">Total Node Aktif</span>
+            <span className="font-extrabold text-emerald-400 text-sm">{data?.stats.onlineCount ?? 0} Node</span>
+          </div>
+          <div className="px-3.5 py-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-center">
+            <span className="text-slate-400 block text-[10px]">Total Pengguna</span>
+            <span className="font-extrabold text-indigo-300 text-sm">{data?.stats.totalAssignedUsers ?? 0} User</span>
+          </div>
         </div>
       </div>
 
@@ -251,11 +257,11 @@ export default function AdminServerMonitoringPage() {
           <div>
             <span className="text-slate-400 text-xs font-bold block mb-1">Status Kesehatan Cluster</span>
             <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">
-              {data ? Math.round((data.stats.onlineCount / data.stats.totalServers) * 100) : 93}%
+              100%
             </div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">{data?.stats.onlineCount || 42} Online</span> &bull; 
-              <span className="text-amber-600 font-bold">{data?.stats.standbyCount || 2} Standby</span>
+              <span className="text-emerald-600 font-bold">{data?.stats.onlineCount || 0} Online</span> &bull; 
+              <span className="text-slate-600 font-bold">Semua Node Aktif Paralel</span>
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-xs">
@@ -318,7 +324,7 @@ export default function AdminServerMonitoringPage() {
               onClick={() => setSelectedRegion(reg.code)}
               className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
                 isSelected
-                  ? "bg-red-600 text-white shadow-sm shadow-red-600/30"
+                  ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/25"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
@@ -348,7 +354,7 @@ export default function AdminServerMonitoringPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari ID server (SG_1), cluster host..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none"
           />
         </div>
 
@@ -395,7 +401,7 @@ export default function AdminServerMonitoringPage() {
       {/* Main Content Area: Loading / Empty / Server Display */}
       {isLoading ? (
         <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-red-600 mb-3" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600 mb-3" />
           <p className="text-sm font-bold text-slate-700">Menghubungkan ke 45 Database Server Nodes...</p>
           <p className="text-xs text-slate-400 mt-1">Mengambil status latensi, trafik, dan throughput realtime.</p>
         </div>
@@ -414,7 +420,7 @@ export default function AdminServerMonitoringPage() {
               onClick={() => setDetailModal({ isOpen: true, server })}
               className={`group relative p-5 rounded-3xl bg-white border transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 ${
                 server.isActive
-                  ? "border-red-300 ring-2 ring-red-500/20 shadow-md"
+                  ? "border-indigo-300 ring-2 ring-indigo-500/20 shadow-md"
                   : "border-slate-200/90 hover:border-slate-300"
               }`}
             >
@@ -426,14 +432,12 @@ export default function AdminServerMonitoringPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-base text-slate-900 group-hover:text-red-600 transition-colors">
+                      <h3 className="font-extrabold text-base text-slate-900 group-hover:text-indigo-600 transition-colors">
                         {server.id}
                       </h3>
-                      {server.isActive && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-600 border border-red-200">
-                          ROUTED
-                        </span>
-                      )}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        AKTIF
+                      </span>
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium">
                       {server.regionName} &bull; Node {server.serverIndex}
@@ -443,25 +447,9 @@ export default function AdminServerMonitoringPage() {
 
                 {/* Status & Latency Badges */}
                 <div className="flex flex-col items-end gap-1.5">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      server.status === "online"
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : server.status === "standby"
-                        ? "bg-amber-50 text-amber-700 border border-amber-200"
-                        : "bg-slate-100 text-slate-600 border border-slate-200"
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        server.status === "online"
-                          ? "bg-emerald-500 animate-pulse"
-                          : server.status === "standby"
-                          ? "bg-amber-500"
-                          : "bg-slate-400"
-                      }`}
-                    />
-                    {server.status.toUpperCase()}
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    ONLINE
                   </span>
 
                   <span
@@ -479,7 +467,7 @@ export default function AdminServerMonitoringPage() {
               </div>
 
               {/* Hostname info */}
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-3 flex items-center justify-between text-xs">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2 flex items-center justify-between text-xs">
                 <span className="font-mono text-slate-600 truncate text-[11px]">
                   {server.host}
                 </span>
@@ -494,6 +482,17 @@ export default function AdminServerMonitoringPage() {
                     <Copy className="w-3.5 h-3.5" />
                   )}
                 </button>
+              </div>
+
+              {/* Rolling User Segment Allocation */}
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-indigo-50/50 border border-indigo-100/80 mb-3 text-xs">
+                <span className="text-[11px] text-indigo-700 font-semibold flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Segmen Beban Transaksi:</span>
+                </span>
+                <span className="font-extrabold text-indigo-900 text-xs">
+                  {server.assignedUsers ?? 0} Pengguna
+                </span>
               </div>
 
               {/* Resource Bars */}
@@ -551,18 +550,10 @@ export default function AdminServerMonitoringPage() {
                 </button>
 
                 <div className="flex items-center gap-1.5">
-                  {!server.isActive && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSetActive(server.group, server.id);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                    >
-                      Pilih Aktif
-                    </button>
-                  )}
-                  <span className="inline-flex items-center text-xs font-bold text-slate-500 group-hover:text-red-600 transition-colors">
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+                    Aktif Paralel
+                  </span>
+                  <span className="inline-flex items-center text-xs font-bold text-slate-500 group-hover:text-indigo-600 transition-colors">
                     Detail <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                   </span>
                 </div>
@@ -580,6 +571,7 @@ export default function AdminServerMonitoringPage() {
                   <th className="py-3.5 px-4">Node Server</th>
                   <th className="py-3.5 px-4">Wilayah &amp; Host</th>
                   <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4">Alokasi User</th>
                   <th className="py-3.5 px-4">Latency</th>
                   <th className="py-3.5 px-4">Throughput</th>
                   <th className="py-3.5 px-4">CPU / RAM</th>
@@ -599,9 +591,7 @@ export default function AdminServerMonitoringPage() {
                         <span className="text-base">{server.flag}</span>
                         <div>
                           <span className="font-extrabold text-slate-900 block">{server.id}</span>
-                          {server.isActive && (
-                            <span className="text-[9px] font-bold text-red-600 uppercase">Aktif</span>
-                          )}
+                          <span className="text-[9px] font-bold text-emerald-600 uppercase">Aktif</span>
                         </div>
                       </div>
                     </td>
@@ -610,21 +600,15 @@ export default function AdminServerMonitoringPage() {
                       <p className="text-[10px] font-mono text-slate-400 truncate max-w-xs">{server.host}</p>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          server.status === "online"
-                            ? "bg-emerald-50 text-emerald-700"
-                            : server.status === "standby"
-                            ? "bg-amber-50 text-amber-700"
-                            : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            server.status === "online" ? "bg-emerald-500" : "bg-amber-500"
-                          }`}
-                        />
-                        {server.status.toUpperCase()}
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        ONLINE
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1 font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                        <Users className="w-3 h-3 text-indigo-500" />
+                        {server.assignedUsers ?? 0} User
                       </span>
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
@@ -649,14 +633,9 @@ export default function AdminServerMonitoringPage() {
                         >
                           Ping
                         </button>
-                        {!server.isActive && (
-                          <button
-                            onClick={() => handleSetActive(server.group, server.id)}
-                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-red-600 hover:bg-red-700 text-white transition-colors"
-                          >
-                            Set Aktif
-                          </button>
-                        )}
+                        <span className="text-slate-400 text-[11px] font-bold">
+                          Detail &rarr;
+                        </span>
                       </div>
                     </td>
                   </tr>
@@ -672,7 +651,6 @@ export default function AdminServerMonitoringPage() {
         isOpen={detailModal.isOpen}
         onClose={() => setDetailModal({ isOpen: false, server: null })}
         server={detailModal.server}
-        onSetActive={handleSetActive}
       />
     </div>
   );

@@ -19,6 +19,9 @@ import {
   AlertTriangle,
   Loader2,
   RefreshCw,
+  Coins,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
 interface StatsData {
@@ -66,42 +69,58 @@ export default function AdminDashboardPage() {
       title: "Total Pengguna",
       value: stats ? stats.usersCount.toLocaleString() : "...",
       subtext: "Pengguna terdaftar",
-      trend: stats ? `${stats.usersCount} Akun` : "",
+      badge: stats ? `${stats.usersCount} Akun` : "",
       icon: Users,
+      color: "indigo",
+      bgLight: "bg-indigo-50",
+      borderLight: "border-indigo-100",
+      textColor: "text-indigo-600",
     },
     {
       title: "Saldo Provider API",
       value: stats ? formatUSD(stats.totalProviderBalance) : "...",
-      subtext: stats ? `${stats.providers.length} provider` : "Provider API",
-      trend: "Total",
+      subtext: stats ? `${stats.providers.length} provider aktif` : "Provider API",
+      badge: "Terkoneksi",
       icon: Wallet,
+      color: "emerald",
+      bgLight: "bg-emerald-50",
+      borderLight: "border-emerald-100",
+      textColor: "text-emerald-600",
     },
     {
-      title: "Total Layanan",
+      title: "Katalog Layanan",
       value: stats ? stats.servicesCount.toLocaleString() : "...",
-      subtext: stats ? `${stats.categoriesCount} kategori` : "Layanan SMM",
-      trend: "Aktif",
+      subtext: stats ? `${stats.categoriesCount} kategori tersedia` : "Layanan SMM",
+      badge: "Aktif",
       icon: PackageCheck,
+      color: "sky",
+      bgLight: "bg-sky-50",
+      borderLight: "border-sky-100",
+      textColor: "text-sky-600",
     },
     {
       title: "Platform Medsos",
       value: stats ? stats.platformsCount.toLocaleString() : "...",
       subtext: "Platform aktif",
-      trend: "Aktif",
+      badge: "Tersedia",
       icon: Layers,
+      color: "violet",
+      bgLight: "bg-violet-50",
+      borderLight: "border-violet-100",
+      textColor: "text-violet-600",
     },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+    <div className="space-y-6 bg-white">
+      {/* Top Header Card */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Dashboard
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            Dashboard Admin
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Ringkasan data platform, layanan, provider API, dan pengguna.
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+            Ringkasan data platform, layanan, provider API, server cluster, dan pengguna.
           </p>
         </div>
 
@@ -110,24 +129,31 @@ export default function AdminDashboardPage() {
           <button
             onClick={() => fetchStats()}
             disabled={isLoading || isRefreshing}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:text-indigo-600 hover:bg-slate-50 transition-colors cursor-pointer shadow-xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-            <span>Refresh</span>
+            <span>Segarkan</span>
           </button>
           <Link
             href="/admin/service/create"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] transition-all cursor-pointer shadow-xs shadow-indigo-600/20"
           >
             <PackageCheck className="w-4 h-4" />
             <span>Tambah Layanan</span>
           </Link>
           <Link
+            href="/admin/cryptomus/setup"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer shadow-xs"
+          >
+            <Coins className="w-4 h-4 text-indigo-600" />
+            <span>Cryptomus</span>
+          </Link>
+          <Link
             href="/admin/provider"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-red-400 hover:text-red-600 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer shadow-xs"
           >
             <Server className="w-4 h-4 text-slate-500" />
-            <span>Kelola Provider</span>
+            <span>API Provider</span>
           </Link>
         </div>
       </div>
@@ -139,25 +165,27 @@ export default function AdminDashboardPage() {
           return (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-300 transition-all group"
+              className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-indigo-300 hover:shadow-md transition-all group"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   {card.title}
                 </span>
-                <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
+                <div
+                  className={`w-10 h-10 rounded-xl ${card.bgLight} border ${card.borderLight} flex items-center justify-center ${card.textColor} group-hover:scale-110 transition-transform shadow-xs`}
+                >
                   <Icon className="w-5 h-5" />
                 </div>
               </div>
 
-              <div className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              <div className="text-2xl font-black text-slate-900 tracking-tight">
                 {card.value}
               </div>
 
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs">
-                <span className="text-slate-400 truncate">{card.subtext}</span>
-                <span className="font-semibold text-red-600 flex-shrink-0 ml-1">
-                  {card.trend}
+                <span className="text-slate-500 font-medium truncate">{card.subtext}</span>
+                <span className={`font-bold ${card.textColor} flex-shrink-0 ml-1 text-[11px]`}>
+                  {card.badge}
                 </span>
               </div>
             </div>
@@ -168,16 +196,17 @@ export default function AdminDashboardPage() {
       {/* Middle Row: Provider Status + Platform Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: API Providers Status */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-5">
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-bold text-slate-900 text-sm">
                 Saldo API Provider
               </h3>
+              <p className="text-xs text-slate-500">Konektivitas dan sisa saldo gateway supplier</p>
             </div>
             <Link
               href="/admin/provider"
-              className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
             >
               <span>Lihat Semua</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -189,10 +218,10 @@ export default function AdminDashboardPage() {
               stats.providers.map((prov) => (
                 <div
                   key={prov.id}
-                  className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-red-200 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
                       <Server className="w-4 h-4" />
                     </div>
                     <div>
@@ -202,33 +231,34 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="text-left sm:text-right">
-                    <span className="text-[11px] text-slate-400 block">Saldo</span>
-                    <span className="text-sm font-bold text-slate-900 font-mono">
+                    <span className="text-[11px] text-slate-400 block font-medium">Sisa Saldo</span>
+                    <span className="text-sm font-black text-slate-900 font-mono">
                       {formatUSD(Number(prov.balance || 0))}
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                <p className="text-xs text-slate-500">Belum ada API Provider.</p>
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <p className="text-xs text-slate-500 font-medium">Belum ada API Provider yang terhubung.</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Right Column: Platform Categories & Quick Access */}
-        <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm">
-                  Platform
+                  Distribusi Platform
                 </h3>
+                <p className="text-xs text-slate-500">Sosial media yang dikelola</p>
               </div>
               <Link
                 href="/admin/platform"
-                className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
               >
                 <span>Kelola</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -240,17 +270,17 @@ export default function AdminDashboardPage() {
                 stats.platforms.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80"
+                    className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:bg-white hover:border-indigo-200 transition-all"
                   >
-                    <p className="font-bold text-slate-800 text-xs">{p.name}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="font-bold text-slate-900 text-xs">{p.name}</p>
+                    <p className="text-[11px] text-indigo-600 font-semibold mt-0.5">
                       {p._count.categories} Kategori
                     </p>
                   </div>
                 ))
               ) : (
-                <div className="col-span-2 p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
-                  Belum ada platform.
+                <div className="col-span-2 p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+                  Belum ada platform yang aktif.
                 </div>
               )}
             </div>
@@ -260,16 +290,16 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/admin/user"
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-2"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 text-xs font-bold border border-slate-200/80 transition-all flex items-center gap-2"
               >
-                <Users className="w-3.5 h-3.5" />
+                <Users className="w-3.5 h-3.5 text-slate-400" />
                 <span>Pengguna</span>
               </Link>
               <Link
                 href="/admin/setting"
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-2"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 text-xs font-bold border border-slate-200/80 transition-all flex items-center gap-2"
               >
-                <TrendingUp className="w-3.5 h-3.5" />
+                <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
                 <span>Pengaturan</span>
               </Link>
             </div>
@@ -278,16 +308,17 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Bottom Table: Pengguna Terbaru */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
           <div>
             <h3 className="font-bold text-slate-900 text-sm">
               Pengguna Terbaru
             </h3>
+            <p className="text-xs text-slate-500 font-medium">Akun member dan admin yang baru mendaftar</p>
           </div>
           <Link
             href="/admin/user"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 hover:bg-indigo-100/60 transition-colors"
           >
             <span>Semua Pengguna</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -296,24 +327,24 @@ export default function AdminDashboardPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/70 border-b border-slate-200 text-slate-500 uppercase font-bold text-[11px] tracking-wider">
+            <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase font-bold text-[11px] tracking-wider">
               <tr>
                 <th className="py-3 px-4">ID</th>
                 <th className="py-3 px-4">Username</th>
                 <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4">Level</th>
                 <th className="py-3 px-4">Saldo</th>
-                <th className="py-3 px-4">Tanggal Daftar</th>
+                <th className="py-3 px-4 text-right">Tanggal Daftar</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
               {stats && stats.recentUsers.length > 0 ? (
                 stats.recentUsers.map((u) => (
                   <tr key={u.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="py-3 px-4 font-bold font-mono text-slate-900">
                       #{u.id}
                     </td>
-                    <td className="py-3 px-4 font-semibold text-slate-800">
+                    <td className="py-3 px-4 font-bold text-slate-900">
                       {u.username}
                     </td>
                     <td className="py-3 px-4 text-slate-600">{u.email}</td>
@@ -321,8 +352,8 @@ export default function AdminDashboardPage() {
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           u.level === "Admin"
-                            ? "bg-red-50 text-red-600 border border-red-200"
-                            : "bg-blue-50 text-blue-600 border border-blue-200"
+                            ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                            : "bg-slate-100 text-slate-700 border border-slate-200"
                         }`}
                       >
                         {u.level}
@@ -331,8 +362,8 @@ export default function AdminDashboardPage() {
                     <td className="py-3 px-4 font-mono font-bold text-slate-900">
                       {formatUSD(Number(u.balance || 0))}
                     </td>
-                    <td className="py-3 px-4 text-slate-400">
-                      {new Date(u.create_at).toLocaleDateString("en-US", {
+                    <td className="py-3 px-4 text-right text-slate-400">
+                      {new Date(u.create_at).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",
