@@ -1,52 +1,85 @@
 import React from "react";
-import Link from "next/link";
-import { ArrowLeft, PackageCheck } from "lucide-react";
+import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Topbar, Navbar, Footer } from "@/app/layouts";
+import { prisma } from "@/lib/prisma";
+import ServiceListView, { PublicServiceItem } from "./service-list-view";
 
-export default function PublicServicePage() {
+export const metadata: Metadata = {
+  title: "SMM Services List & Pricing - Sociolizy",
+  description:
+    "Complete 24/7 automated SMM services catalog: Instagram, TikTok, YouTube, Facebook, Telegram with lowest rates per 1,000 and refill guarantees.",
+};
+
+export const instant = false;
+
+async function getServices(): Promise<PublicServiceItem[]> {
+  try {
+    const rows = await prisma.service.findMany({
+      select: {
+        id: true,
+        uuid: true,
+        service_id: true,
+        service_name: true,
+        slug: true,
+        min: true,
+        max: true,
+        desc: true,
+        rate_sale: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            icon: true,
+            platform: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                icon: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { id: "asc" },
+    });
+
+    return rows.map((s) => ({
+      ...s,
+      rate_sale: Number(s.rate_sale || 0),
+    }));
+  } catch (error) {
+    console.error("Error fetching services for public page:", error);
+    return [];
+  }
+}
+
+export default async function ServicesPage() {
+  await connection();
+  const services = await getServices();
+
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col">
-      <header className="border-b border-slate-800 bg-[#0c1222]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div>
-            <h1 className="font-bold text-base leading-tight text-white flex items-center gap-2">
-              <PackageCheck className="w-4 h-4 text-indigo-400" />
-              Katalog Layanan
-            </h1>
-            <span className="text-xs text-slate-400">Daftar layanan SMM tersedia</span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+      {/* Ambient background glows */}
+      <div className="fixed inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
+      <div className="fixed -top-40 -left-40 w-[550px] h-[550px] bg-gradient-to-tr from-indigo-600/15 via-violet-600/10 to-transparent blur-[140px] rounded-full pointer-events-none animate-glow" />
+      <div className="fixed -bottom-40 -right-40 w-[550px] h-[550px] bg-gradient-to-bl from-cyan-500/10 via-blue-600/10 to-transparent blur-[140px] rounded-full pointer-events-none animate-glow" />
 
-        <Link
-          href="/member/order"
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
-        >
-          Pesan Sekarang
-        </Link>
-      </header>
+      {/* Top Security & Updates Bar */}
+      <Topbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto p-6 md:p-8">
-        <div className="p-8 rounded-3xl bg-[#0c1222] border border-slate-800 text-center space-y-4">
-          <PackageCheck className="w-12 h-12 text-indigo-400 mx-auto" />
-          <h2 className="text-lg font-bold text-white">Katalog Layanan SMM Instan</h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
-            Dapatkan akses langsung ke ribuan layanan media sosial dengan harga kompetitif dan pemrosesan otomatis 24 jam.
-          </p>
-          <div className="pt-2">
-            <Link
-              href="/member/order"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
-            >
-              Lihat Layanan di Member Area
-            </Link>
-          </div>
-        </div>
+      {/* Main Navbar */}
+      <Navbar currentBadge="Services" />
+
+      {/* Main Content Area */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <ServiceListView initialServices={services} />
       </main>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }

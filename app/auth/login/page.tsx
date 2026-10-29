@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   User,
   Lock,
@@ -16,8 +15,6 @@ import {
 } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,8 +24,21 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // If navigating back or restored from browser back-forward cache, reset loading state
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        setIsLoading(false);
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+
     setErrorMessage(null);
     setSuccessMessage(null);
 
@@ -56,13 +66,24 @@ export default function LoginPage() {
 
       setSuccessMessage("Login successful! Redirecting to your dashboard...");
 
-      // Redirect based on user role returned from API
+      // Determine redirect URL (respect safe internal redirect URL if present)
+      let destination = result.data?.redirectUrl || "/member";
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const redirectParam = params.get("redirect");
+        if (redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")) {
+          if (result.data?.level === "Admin" || !redirectParam.startsWith("/admin")) {
+            destination = redirectParam;
+          }
+        }
+      }
+
+      // Hard redirect to cleanly establish session cookie and avoid stale client router cache
       setTimeout(() => {
-        router.push(result.data?.redirectUrl || "/member");
-        router.refresh();
-      }, 800);
+        window.location.href = destination;
+      }, 400);
     } catch (err) {
-      console.error(err);
+      console.error("Login submit error:", err);
       setErrorMessage("Network connection error. Please try again.");
       setIsLoading(false);
     }

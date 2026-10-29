@@ -20,6 +20,7 @@ import {
   Database,
   ArrowUpRight,
   Gauge,
+  Users,
 } from "lucide-react";
 import { useToast } from "@/app/admin/components/toast-context";
 
@@ -34,6 +35,8 @@ export interface ServerData {
   host: string;
   isConfigured: boolean;
   isActive: boolean;
+  assignedUsers?: number;
+  clusterMode?: string;
   status: "online" | "standby" | "maintenance";
   latencyMs: number;
   qps: number;
@@ -61,14 +64,12 @@ interface ServerDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   server: ServerData | null;
-  onSetActive: (group: string, serverId: string) => void;
 }
 
 export default function ServerDetailModal({
   isOpen,
   onClose,
   server,
-  onSetActive,
 }: ServerDetailModalProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);

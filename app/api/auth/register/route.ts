@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDiscoveredRegions, getActiveClusterConfig } from "@/lib/server-db";
+import { allocateRollingServerNode } from "@/lib/mongodb";
 
 /**
  * GET: Mengambil daftar server region yang aktif dan terdeteksi di .env
@@ -109,7 +110,11 @@ export async function POST(request: Request) {
     // Generate API Key unik untuk user
     const apiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
 
-    // Buat user baru dengan pilihan server area
+    // Alokasikan server node MongoDB secara rolling otomatis berdasarkan wilayah yang dipilih
+    // untuk membagi beban transaksi (I/O, cache, storage) secara merata per pengguna
+    const { assignedNode } = await allocateRollingServerNode(selectedArea);
+
+    // Buat user baru dengan server node rolling otomatis
     const newUser = await prisma.user.create({
       data: {
         username: username.trim(),
@@ -118,7 +123,7 @@ export async function POST(request: Request) {
         balance: 0,
         level: "Member",
         api_key: apiKey,
-        server_area: selectedArea,
+        server_area: assignedNode,
       },
       select: {
         id: true,

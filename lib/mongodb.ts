@@ -92,6 +92,97 @@ export function getServersForRegion(serverArea?: string): ServerNodeConfig[] {
 }
 
 /**
+ * Automatically allocates a rolling, load-balanced MongoDB server node for a user in a chosen region.
+ * Distributes user assignments evenly across all configured server nodes in that region so that
+ * transaction storage and database query workloads are segmented on a per-user basis.
+ */
+export async function allocateRollingServerNode(requestedRegion: string = "SG"): Promise<{
+  assignedNode: string;
+  regionGroup: string;
+  serverNode: ServerNodeConfig | null;
+}> {
+  const normGroup = normalizeRegionGroup(requestedRegion);
+  const regionServers = getServersForRegion(normGroup);
+
+  // 1. If no servers found for this region, fallback to any configured server or SG_1
+  if (regionServers.length === 0) {
+    const allConfigured = getDiscoveredServers().filter((s) => s.isConfigured);
+    const fallbackNode = allConfigured[0]?.id || "SG_1";
+    return {
+      assignedNode: fallbackNode,
+      regionGroup: normGroup,
+      serverNode: allConfigured[0] || null,
+    };
+  }
+
+  // 2. If the user already provided an exact node (e.g. "SG_2"), verify and return it
+  const exact = regionServers.find((s) => s.id === requestedRegion.toUpperCase().trim());
+  if (exact) {
+    return {
+      assignedNode: exact.id,
+      regionGroup: exact.group,
+      serverNode: exact,
+    };
+  }
+
+  // 3. If only 1 server node configured in this region, assign it directly
+  if (regionServers.length === 1) {
+    return {
+      assignedNode: regionServers[0].id,
+      regionGroup: regionServers[0].group,
+      serverNode: regionServers[0],
+    };
+  }
+
+  // 4. If multiple servers exist in this region (e.g. SG_1, SG_2, SG_3...),
+  // calculate current user allocation per node from PostgreSQL to pick the least-loaded node (rolling assignment)
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const counts = await prisma.user.groupBy({
+      by: ["server_area"],
+      where: {
+        server_area: { in: regionServers.map((s) => s.id) },
+      },
+      _count: { id: true },
+    });
+
+    const countMap = new Map<string, number>();
+    counts.forEach((c) => {
+      if (c.server_area) {
+        countMap.set(c.server_area, c._count.id);
+      }
+    });
+
+    // Pick the node with minimum users
+    let minCount = Infinity;
+    let chosen = regionServers[0];
+
+    for (const node of regionServers) {
+      const current = countMap.get(node.id) || 0;
+      if (current < minCount) {
+        minCount = current;
+        chosen = node;
+      }
+    }
+
+    return {
+      assignedNode: chosen.id,
+      regionGroup: chosen.group,
+      serverNode: chosen,
+    };
+  } catch (err) {
+    // Fallback if DB query fails: pseudo-random rolling assignment
+    const idx = Math.floor(Math.random() * regionServers.length);
+    const chosen = regionServers[idx];
+    return {
+      assignedNode: chosen.id,
+      regionGroup: chosen.group,
+      serverNode: chosen,
+    };
+  }
+}
+
+/**
  * Automatically and dynamically resolves the target MongoDB server node and URI.
  * - Supports arbitrary number of servers per region (e.g. 10, 20, 30+ servers)
  * - Automatically load balances across servers in the same region using consistent user hashing

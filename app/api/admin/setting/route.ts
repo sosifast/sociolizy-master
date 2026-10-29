@@ -44,7 +44,21 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { site_name, favicon, logo, api_app } = body;
+    const {
+      site_name,
+      favicon,
+      logo,
+      api_app,
+      email,
+      whatsapp,
+      instagram,
+      facebook,
+      tiktok,
+      telegram,
+      url_image_kit,
+      imagekit_api,
+      imagekit_secret,
+    } = body;
 
     let setting = await prisma.setting.findFirst({
       orderBy: { id: "asc" },
@@ -58,6 +72,15 @@ export async function POST(request: Request) {
           ...(favicon !== undefined && { favicon }),
           ...(logo !== undefined && { logo }),
           ...(api_app && { api_app: api_app.trim() }),
+          ...(email !== undefined && { email: email ? email.trim() : null }),
+          ...(whatsapp !== undefined && { whatsapp: whatsapp ? whatsapp.trim() : null }),
+          ...(instagram !== undefined && { instagram: instagram ? instagram.trim() : null }),
+          ...(facebook !== undefined && { facebook: facebook ? facebook.trim() : null }),
+          ...(tiktok !== undefined && { tiktok: tiktok ? tiktok.trim() : null }),
+          ...(telegram !== undefined && { telegram: telegram ? telegram.trim() : null }),
+          ...(url_image_kit !== undefined && { url_image_kit: url_image_kit ? url_image_kit.trim() : null }),
+          ...(imagekit_api !== undefined && { imagekit_api: imagekit_api ? imagekit_api.trim() : null }),
+          ...(imagekit_secret !== undefined && { imagekit_secret: imagekit_secret ? imagekit_secret.trim() : null }),
         },
       });
     } else {
@@ -67,6 +90,15 @@ export async function POST(request: Request) {
           favicon: favicon || "/favicon.ico",
           logo: logo || "/logo.png",
           api_app: api_app ? api_app.trim() : "smm_app_key_master_live_2026",
+          email: email ? email.trim() : null,
+          whatsapp: whatsapp ? whatsapp.trim() : null,
+          instagram: instagram ? instagram.trim() : null,
+          facebook: facebook ? facebook.trim() : null,
+          tiktok: tiktok ? tiktok.trim() : null,
+          telegram: telegram ? telegram.trim() : null,
+          url_image_kit: url_image_kit ? url_image_kit.trim() : null,
+          imagekit_api: imagekit_api ? imagekit_api.trim() : null,
+          imagekit_secret: imagekit_secret ? imagekit_secret.trim() : null,
         },
       });
     }

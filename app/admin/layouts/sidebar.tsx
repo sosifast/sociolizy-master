@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoutButton from "@/app/components/logout-button";
 import {
   LayoutDashboard,
   Layers,
@@ -131,9 +132,8 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+          }`}
       >
         {/* Brand Logo Header */}
         <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between">
@@ -173,19 +173,17 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
                     onClick={() => {
                       if (window.innerWidth < 1024) onClose();
                     }}
-                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                      active
+                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active
                         ? "bg-red-600 text-white shadow-md shadow-red-600/25 font-semibold"
                         : "text-slate-600 hover:text-red-600 hover:bg-red-50/70"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon
-                        className={`w-4 h-4 transition-transform group-hover:scale-110 ${
-                          active
+                        className={`w-4 h-4 transition-transform group-hover:scale-110 ${active
                             ? "text-white"
                             : "text-slate-400 group-hover:text-red-600"
-                        }`}
+                          }`}
                       />
                       <span>{item.name}</span>
                     </div>
@@ -193,11 +191,10 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="flex items-center gap-1.5">
                       {item.badge && (
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            active
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${active
                               ? "bg-white/20 text-white"
                               : "bg-red-50 text-red-600 border border-red-200/60"
-                          }`}
+                            }`}
                         >
                           {item.badge}
                         </span>
@@ -231,13 +228,11 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
               </div>
             </div>
 
-            <Link
-              href="/api/auth/logout"
+            <LogoutButton
               title="Keluar dari Panel Admin"
-              className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </Link>
+              className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center"
+              iconClassName="w-4 h-4"
+            />
           </div>
         </div>
       </aside>

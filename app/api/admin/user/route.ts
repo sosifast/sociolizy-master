@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDiscoveredRegions } from "@/lib/server-db";
+import { allocateRollingServerNode } from "@/lib/mongodb";
 import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
@@ -87,6 +88,9 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const apiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
 
+    const requestedArea = (body.server_area || body.server_region || "SG").toUpperCase().trim();
+    const { assignedNode } = await allocateRollingServerNode(requestedArea);
+
     const newUser = await prisma.user.create({
       data: {
         username: cleanUsername,
@@ -95,7 +99,7 @@ export async function POST(request: Request) {
         level: level === "Admin" ? "Admin" : "Member",
         balance: Number(balance || 0),
         api_key: apiKey,
-        server_area: (body.server_area || body.server_region || "SG").toUpperCase(),
+        server_area: assignedNode,
       },
       select: {
         id: true,

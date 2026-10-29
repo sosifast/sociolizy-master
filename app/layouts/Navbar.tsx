@@ -1,9 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Zap, Menu, X } from "lucide-react";
+import { Zap, Menu, X, LayoutDashboard } from "lucide-react";
 import Menubar, { NavItem } from "./Menubar";
+import { useCachedFetch } from "@/lib/client-cache";
+
+interface UserSessionInfo {
+  id: number;
+  username: string;
+  level: "Admin" | "Member" | string;
+  email?: string;
+}
+
+interface SessionApiResponse {
+  success?: boolean;
+  authenticated: boolean;
+  user: UserSessionInfo | null;
+}
 
 interface NavbarProps {
   navItems?: NavItem[];
@@ -15,6 +29,21 @@ export default function Navbar({
   currentBadge = "#1 SMM",
 }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { data: sessionData, isLoading } = useCachedFetch<SessionApiResponse>(
+    "/api/auth/session",
+    {
+      ttlMs: 30_000,
+    }
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted && !isLoading && Boolean(sessionData?.authenticated && sessionData?.user);
+  const dashboardHref = sessionData?.user?.level === "Admin" ? "/admin" : "/member";
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#070b14]/85 border-b border-white/[0.06] transition-all">
@@ -45,18 +74,32 @@ export default function Navbar({
 
         {/* Action Buttons */}
         <div className="hidden sm:flex items-center gap-3">
-          <Link
-            href="/auth/login"
-            className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/80 transition-all"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/auth/register"
-            className="relative px-5 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all"
-          >
-            Get Started
-          </Link>
+          {!mounted || isLoading ? (
+            <div className="h-9 w-28 rounded-xl bg-slate-800/40 animate-pulse" />
+          ) : isLoggedIn ? (
+            <Link
+              href={dashboardHref}
+              className="relative inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/80 transition-all"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/register"
+                className="relative px-5 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Toggle Button */}
@@ -78,20 +121,35 @@ export default function Navbar({
             onItemClick={() => setMobileMenuOpen(false)}
           />
           <div className="pt-4 border-t border-slate-800 flex flex-col gap-3">
-            <Link
-              href="/auth/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-sm font-medium text-slate-300 rounded-xl border border-slate-800 bg-slate-900/60"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/auth/register"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600"
-            >
-              Get Started
-            </Link>
+            {!mounted || isLoading ? (
+              <div className="h-10 w-full rounded-xl bg-slate-800/40 animate-pulse" />
+            ) : isLoggedIn ? (
+              <Link
+                href={dashboardHref}
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 shadow-lg shadow-indigo-600/30 active:scale-[0.98] transition-all"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-sm font-medium text-slate-300 rounded-xl border border-slate-800 bg-slate-900/60"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

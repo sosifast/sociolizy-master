@@ -10,12 +10,8 @@ export interface NavItem {
 }
 
 export const defaultNavItems: NavItem[] = [
-  { label: "Why Choose Us", href: "/#why-choose-us" },
-  { label: "Services", href: "/#services" },
-  { label: "Global Platform", href: "/#global-platform" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Privacy Policy", href: "/page/privacy" },
-  { label: "Terms & Policy", href: "/page/policy" },
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
 ];
 
 interface MenubarProps {
@@ -35,7 +31,7 @@ export default function Menubar({
 
   const isItemActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    if (href.startsWith("/#")) return pathname === "/";
+    if (href === "/services") return pathname === "/services" || pathname.startsWith("/page/service");
     return pathname === href;
   };
 

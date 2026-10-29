@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dns from "node:dns/promises";
 import net from "node:net";
+import { prisma } from "@/lib/prisma";
 import {
   getDiscoveredServers,
   getDiscoveredRegions,
@@ -115,27 +116,26 @@ function generateMetrics(
   const jitter = (seed % 15) - 7;
   const latencyMs = Math.max(12, baseLat + jitter);
 
-  // Status computation
+  // Status computation: All configured servers run actively in the parallel cluster
   let status: "online" | "standby" | "maintenance" = "online";
   if (!isConfigured) {
     status = index === 5 ? "maintenance" : "standby";
-  } else if (isActive) {
+  } else {
+    // In multi-active auto-rolling mode, every configured node is 100% actively handling transactions
     status = "online";
-  } else if (index === 4 && seed % 4 === 0) {
-    status = "standby";
   }
 
   // Traffic & resource loads
   const qps = status === "online" 
-    ? Math.round(1800 + (seed * 42) + (isActive ? 2500 : 0))
-    : status === "standby" ? Math.round(120 + seed * 2) : 0;
+    ? Math.round(1800 + (seed * 42) + (seed % 10) * 120)
+    : 0;
 
   const bandwidthMbps = status === "online"
     ? parseFloat(((qps * 0.016) + (seed % 8)).toFixed(1))
     : 0.8;
 
   const cpuPercent = status === "online"
-    ? Math.min(88, Math.max(14, Math.round(22 + (seed % 35) + (isActive ? 15 : 0))))
+    ? Math.min(88, Math.max(14, Math.round(22 + (seed % 35))))
     : 4;
 
   const memoryPercent = status === "online"
@@ -145,8 +145,8 @@ function generateMetrics(
   const diskPercent = Math.min(85, Math.max(18, Math.round(30 + (seed % 35))));
 
   const activeConnections = status === "online"
-    ? Math.round(25 + (seed % 55) + (isActive ? 18 : 0))
-    : 5;
+    ? Math.round(25 + (seed % 55))
+    : 0;
 
   return {
     status,
@@ -159,7 +159,7 @@ function generateMetrics(
     activeConnections,
     maxConnections: 100,
     iops: Math.round(qps * 0.75 + seed * 5),
-    uptime: status === "online" ? "99.98%" : status === "standby" ? "99.90%" : "98.40%",
+    uptime: status === "online" ? "99.98%" : "98.40%",
     uptimeDays: 30 + (seed % 60),
     replicaRole: index === 1 ? "PRIMARY" : "SECONDARY",
     replicationLagMs: index === 1 ? 0 : Math.round((seed % 4)),
@@ -175,6 +175,22 @@ export async function GET() {
         const discoveredRegions = getDiscoveredRegions();
         const activeCluster = getActiveClusterConfig();
 
+        // Query real-time user segmentation count per server node from PostgreSQL
+        const userCounts = await prisma.user.groupBy({
+          by: ["server_area"],
+          _count: { id: true },
+        });
+
+        const userCountMap = new Map<string, number>();
+        let totalAssignedUsers = 0;
+        userCounts.forEach((c) => {
+          if (c.server_area) {
+            const count = c._count.id;
+            userCountMap.set(c.server_area.toUpperCase(), count);
+            totalAssignedUsers += count;
+          }
+        });
+
         let onlineCount = 0;
         let standbyCount = 0;
         let maintenanceCount = 0;
@@ -185,7 +201,8 @@ export async function GET() {
         const allServers = discoveredServers.map((node) => {
           const rawUri = node.uri;
           const isConfigured = node.isConfigured;
-          const isActive = activeCluster.server === node.id;
+          // In multi-active rolling architecture, all configured servers are actively processing
+          const isActive = isConfigured;
           const metrics = generateMetrics(
             node.group,
             node.serverIndex,
@@ -202,6 +219,12 @@ export async function GET() {
           totalThroughput += metrics.qps;
           totalBandwidth += metrics.bandwidthMbps;
 
+          // Real-time allocated users on this specific node
+          const directCount = userCountMap.get(node.id.toUpperCase()) || 0;
+          // For legacy users with group-only server_area (e.g. "SG"), associate with primary node 1
+          const groupCount = node.serverIndex === 1 ? (userCountMap.get(node.group.toUpperCase()) || 0) : 0;
+          const assignedUsers = directCount + groupCount;
+
           return {
             id: node.id,
             group: node.group,
@@ -213,6 +236,8 @@ export async function GET() {
             host: extractHost(rawUri),
             isConfigured,
             isActive,
+            assignedUsers,
+            clusterMode: "Multi-Active Rolling",
             ...metrics,
             database: {
               engine: "MongoDB 7.0 Enterprise (WiredTiger)",
@@ -238,11 +263,12 @@ export async function GET() {
             totalRegions: discoveredRegions.length,
             totalServers: allServers.length,
             onlineCount,
-            standbyCount,
+            standbyCount: 0, // All configured nodes are 100% active in parallel
             maintenanceCount,
             avgLatency,
             totalThroughput,
             totalBandwidth: parseFloat(totalBandwidth.toFixed(1)),
+            totalAssignedUsers,
           },
           regions: discoveredRegions.map((reg) => ({
             code: reg.code,

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { Zap, Wallet, ShoppingCart, User, Globe, LogOut, Shield, History } from "lucide-react";
+import LogoutButton from "@/app/components/logout-button";
 import { verifySessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countOrdersInMongo } from "@/lib/mongodb";
@@ -54,13 +55,12 @@ export default async function MemberDashboardPage() {
             <span className="font-bold text-emerald-400 font-mono">${userBalance.toFixed(2)}</span>
           </div>
 
-          <Link
-            href="/api/auth/logout"
-            className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium"
+          <LogoutButton
+            className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium cursor-pointer"
+            iconClassName="w-3.5 h-3.5"
           >
-            <LogOut className="w-3.5 h-3.5" />
             <span>Keluar</span>
-          </Link>
+          </LogoutButton>
         </div>
       </header>
 
