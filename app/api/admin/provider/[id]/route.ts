@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateCacheTag } from "@/lib/server-cache";
+
+function getWhereClause(identifier: string) {
+  const isNumeric = !isNaN(parseInt(identifier)) && /^\d+$/.test(identifier);
+  return isNumeric ? { id: parseInt(identifier, 10) } : { uuid: identifier };
+}
 
 export async function GET(
   request: Request,
@@ -7,14 +13,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const providerId = parseInt(id);
-
-    if (isNaN(providerId)) {
-      return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Identifier tidak valid" }, { status: 400 });
     }
 
+    const where = getWhereClause(id);
     const provider = await prisma.apiProvider.findUnique({
-      where: { id: providerId },
+      where,
     });
 
     if (!provider) {
@@ -34,17 +39,16 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const providerId = parseInt(id);
-
-    if (isNaN(providerId)) {
-      return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Identifier tidak valid" }, { status: 400 });
     }
 
+    const where = getWhereClause(id);
     const body = await request.json();
     const { name, slug, url, api_key, balance } = body;
 
     const updated = await prisma.apiProvider.update({
-      where: { id: providerId },
+      where,
       data: {
         ...(name && { name: name.trim() }),
         ...(slug && { slug: slug.trim().toLowerCase().replace(/\s+/g, "-") }),
@@ -53,6 +57,8 @@ export async function PUT(
         ...(balance !== undefined && { balance: Number(balance) }),
       },
     });
+
+    invalidateCacheTag("providers", "stats", "services");
 
     return NextResponse.json({
       success: true,
@@ -71,15 +77,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const providerId = parseInt(id);
-
-    if (isNaN(providerId)) {
-      return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Identifier tidak valid" }, { status: 400 });
     }
 
+    const where = getWhereClause(id);
     await prisma.apiProvider.delete({
-      where: { id: providerId },
+      where,
     });
+
+    invalidateCacheTag("providers", "services", "stats");
 
     return NextResponse.json({
       success: true,

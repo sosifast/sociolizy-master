@@ -99,12 +99,9 @@ export default function CreateUserPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Tambah Pengguna Baru
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Tambah Pengguna
           </h1>
-          <p className="text-xs text-slate-500">
-            Daftarkan akun member atau admin baru langsung ke database PostgreSQL.
-          </p>
         </div>
       </div>
 
@@ -180,7 +177,7 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Saldo Awal (IDR)
+                Saldo Awal ($)
               </label>
               <input
                 type="number"

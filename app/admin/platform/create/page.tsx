@@ -65,12 +65,9 @@ export default function CreatePlatformPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Tambah Platform Baru
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Tambah Platform
           </h1>
-          <p className="text-xs text-slate-500">
-            Daftarkan platform media sosial baru langsung ke tabel PostgreSQL.
-          </p>
         </div>
       </div>
 
@@ -113,7 +110,6 @@ export default function CreatePlatformPage() {
               placeholder="instagram"
               className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
             />
-            <p className="text-[11px] text-slate-400 mt-1">Harus unik di database tabel platform.</p>
           </div>
 
           <div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   PackageCheck,
@@ -18,14 +18,22 @@ import {
 import TablePagination from "@/app/admin/components/table-pagination";
 import ConfirmModal from "@/app/admin/components/confirm-modal";
 import { useToast } from "@/app/admin/components/toast-context";
+import { useCachedFetch } from "@/lib/client-cache";
 
 export default function AdminServicePage() {
   const { toast } = useToast();
-  const [services, setServices] = useState<any[]>([]);
+  const {
+    data: servicesData,
+    isLoading,
+    isRefreshing,
+    refresh: fetchServices,
+    mutate,
+  } = useCachedFetch<any[]>("/api/admin/service", { ttlMs: 60_000 });
+
+  const services = useMemo(() => servicesData || [], [servicesData]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Delete Confirmation Modal State
   const [deleteModal, setDeleteModal] = useState<{
@@ -40,25 +48,15 @@ export default function AdminServicePage() {
     isDeleting: false,
   });
 
-  const fetchServices = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/service");
-      const json = await res.json();
-      if (json.success) {
-        setServices(json.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Gagal Memuat Data", "Tidak dapat mengambil data layanan dari database.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  // Multi-delete Selection State
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkDeleteModal, setBulkDeleteModal] = useState<{
+    isOpen: boolean;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    isDeleting: false,
+  });
 
   const openDeleteModal = (id: number, name: string) => {
     setDeleteModal({
@@ -78,7 +76,12 @@ export default function AdminServicePage() {
       const json = await res.json();
       if (json.success) {
         toast.success("Berhasil Dihapus", json.message || `Layanan "${deleteModal.name}" berhasil dihapus.`);
-        setServices((prev) => prev.filter((s) => s.id !== deleteModal.id));
+        mutate((prev) => (prev ? prev.filter((s: any) => s.id !== deleteModal.id) : []));
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          if (deleteModal.id) next.delete(deleteModal.id);
+          return next;
+        });
         setDeleteModal({ isOpen: false, id: null, name: "", isDeleting: false });
       } else {
         toast.error("Gagal Menghapus", json.message || "Gagal menghapus layanan.");
@@ -91,10 +94,23 @@ export default function AdminServicePage() {
     }
   };
 
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const filtered = services.filter(
     (s) =>
       s.service_name.toLowerCase().includes(search.toLowerCase()) ||
       (s.category?.name && s.category.name.toLowerCase().includes(search.toLowerCase())) ||
+      (s.api_provider?.name && s.api_provider.name.toLowerCase().includes(search.toLowerCase())) ||
+      (s.api_provider?.uuid && s.api_provider.uuid.toLowerCase().includes(search.toLowerCase())) ||
+      (s.service_id && String(s.service_id).toLowerCase().includes(search.toLowerCase())) ||
+      (s.uuid && s.uuid.toLowerCase().includes(search.toLowerCase())) ||
       s.slug.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -103,6 +119,51 @@ export default function AdminServicePage() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const isAllPageSelected = useMemo(() => {
+    if (paginated.length === 0) return false;
+    return paginated.every((s) => selectedIds.has(s.id));
+  }, [paginated, selectedIds]);
+
+  const toggleSelectAllPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (isAllPageSelected) {
+        paginated.forEach((s) => next.delete(s.id));
+      } else {
+        paginated.forEach((s) => next.add(s.id));
+      }
+      return next;
+    });
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setBulkDeleteModal((prev) => ({ ...prev, isDeleting: true }));
+
+    try {
+      const idsArray = Array.from(selectedIds);
+      const res = await fetch("/api/admin/service", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: idsArray }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success("Berhasil Dihapus", json.message || `${idsArray.length} layanan berhasil dihapus.`);
+        mutate((prev) => (prev ? prev.filter((s: any) => !selectedIds.has(s.id)) : []));
+        setSelectedIds(new Set());
+        setBulkDeleteModal({ isOpen: false, isDeleting: false });
+      } else {
+        toast.error("Gagal Menghapus", json.message || "Gagal menghapus layanan.");
+        setBulkDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Kesalahan Jaringan", "Terjadi kesalahan saat menghapus layanan terpilih.");
+      setBulkDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -136,12 +197,12 @@ export default function AdminServicePage() {
             </div>
 
             <button
-              onClick={fetchServices}
-              disabled={isLoading}
+              onClick={() => fetchServices()}
+              disabled={isLoading || isRefreshing}
               className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
             </button>
 
             <Link
@@ -162,79 +223,161 @@ export default function AdminServicePage() {
           </div>
         </div>
 
+        {/* Bulk Action Bar */}
+        {selectedIds.size > 0 && (
+          <div className="mx-5 my-3 p-3 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+              <span className="text-xs font-bold text-red-900">
+                {selectedIds.size} layanan dipilih
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition-colors cursor-pointer"
+              >
+                Batal Pilih
+              </button>
+              <button
+                type="button"
+                onClick={() => setBulkDeleteModal({ isOpen: true, isDeleting: false })}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm shadow-red-600/25 active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Hapus Terpilih ({selectedIds.size})</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="py-16 text-center text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
-              <p className="text-xs">Memuat layanan dari database...</p>
+              <p className="text-xs">Memuat data layanan...</p>
             </div>
           ) : (
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/70 border-b border-slate-200/70 text-slate-500 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3.5 px-5">ID</th>
+                  <th className="py-3.5 px-4 w-10 text-center">
+                    <input
+                      type="checkbox"
+                      checked={isAllPageSelected}
+                      onChange={toggleSelectAllPage}
+                      title="Pilih semua di halaman ini"
+                      className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500 cursor-pointer accent-red-600"
+                    />
+                  </th>
+                  <th className="py-3.5 px-4">ID</th>
                   <th className="py-3.5 px-5">Nama Layanan</th>
                   <th className="py-3.5 px-5">Kategori & Platform</th>
+                  <th className="py-3.5 px-5">Provider</th>
                   <th className="py-3.5 px-5">Min / Max</th>
-                  <th className="py-3.5 px-5">Harga Modal (rate_api)</th>
-                  <th className="py-3.5 px-5">Harga Jual (rate_sale)</th>
+                  <th className="py-3.5 px-5">Harga Modal ($)</th>
+                  <th className="py-3.5 px-5">Harga Jual ($)</th>
                   <th className="py-3.5 px-5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
                       <PackageCheck className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                      <p className="font-semibold text-slate-600">Belum ada layanan di database</p>
+                      <p className="font-semibold text-slate-600">Belum ada layanan</p>
                       <p className="text-xs text-slate-400 mt-0.5">
                         Tambahkan layanan manual atau gunakan fitur <strong>Import Otomatis</strong> untuk menyinkronkan ribuan layanan provider.
                       </p>
                     </td>
                   </tr>
                 ) : (
-                  paginated.map((s) => (
-                    <tr key={s.id} className="hover:bg-red-50/30 transition-colors">
-                      <td className="py-3.5 px-5 font-bold font-mono text-slate-900">
-                        #{s.id}
-                      </td>
-                      <td className="py-3.5 px-5 font-bold text-slate-900 max-w-xs truncate">
-                        {s.service_name}
-                      </td>
-                      <td className="py-3.5 px-5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                          {s.category?.name || `Kategori #${s.id_category}`}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-5 font-mono text-slate-600">
-                        {s.min} / {s.max}
-                      </td>
-                      <td className="py-3.5 px-5 font-mono text-slate-500">
-                        Rp {Number(s.rate_api || 0).toLocaleString("id-ID")}
-                      </td>
-                      <td className="py-3.5 px-5 font-extrabold text-red-600 font-mono">
-                        Rp {Number(s.rate_sale || 0).toLocaleString("id-ID")}
-                      </td>
-                      <td className="py-3.5 px-5 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Link
-                            href={`/admin/service/${s.id}/edit`}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                            title="Edit"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </Link>
-                          <button
-                            onClick={() => openDeleteModal(s.id, s.service_name)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="Hapus"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  paginated.map((s) => {
+                    const isSelected = selectedIds.has(s.id);
+                    return (
+                      <tr
+                        key={s.id}
+                        className={`transition-colors ${
+                          isSelected ? "bg-red-50/50" : "hover:bg-red-50/30"
+                        }`}
+                      >
+                        <td className="py-3.5 px-4 text-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelect(s.id)}
+                            className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500 cursor-pointer accent-red-600"
+                          />
+                        </td>
+                        <td className="py-3.5 px-4 font-bold font-mono text-slate-900">
+                          #{s.id}
+                        </td>
+                        <td className="py-3.5 px-5 font-bold text-slate-900 max-w-xs truncate">
+                          {s.service_name}
+                        </td>
+                        <td className="py-3.5 px-5">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            {s.category?.name || `Kategori #${s.id_category}`}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-5">
+                          {s.api_provider ? (
+                            <div>
+                              <span
+                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200"
+                                title={s.api_provider.uuid ? `Provider UUID: ${s.api_provider.uuid}` : undefined}
+                              >
+                                {s.api_provider.name}
+                              </span>
+                              <div className="text-[10px] font-mono text-slate-400 mt-0.5">
+                                ID: {s.service_id}
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                Manual
+                              </span>
+                              {s.service_id && (
+                                <div className="text-[10px] font-mono text-slate-400 mt-0.5">
+                                  ID: {s.service_id}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-5 font-mono text-slate-600">
+                          {s.min} / {s.max}
+                        </td>
+                        <td className="py-3.5 px-5 font-mono text-slate-500">
+                          ${Number(s.rate_api || 0).toFixed(4)}
+                        </td>
+                        <td className="py-3.5 px-5 font-extrabold text-red-600 font-mono">
+                          ${Number(s.rate_sale || 0).toFixed(4)}
+                        </td>
+                        <td className="py-3.5 px-5 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Link
+                              href={`/admin/service/${s.id}/edit`}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </Link>
+                            <button
+                              onClick={() => openDeleteModal(s.id, s.service_name)}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -269,6 +412,25 @@ export default function AdminServicePage() {
         cancelText="Batal"
         type="danger"
         isLoading={deleteModal.isDeleting}
+      />
+
+      {/* Bulk Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={bulkDeleteModal.isOpen}
+        onClose={() => setBulkDeleteModal({ isOpen: false, isDeleting: false })}
+        onConfirm={handleConfirmBulkDelete}
+        title={`Hapus ${selectedIds.size} Layanan Terpilih?`}
+        message={
+          <>
+            Apakah Anda yakin ingin menghapus{" "}
+            <span className="font-bold text-slate-800">{selectedIds.size} layanan</span> terpilih?
+            Layanan-layanan ini akan dihapus secara permanen dan tidak dapat dipulihkan.
+          </>
+        }
+        confirmText={`Ya, Hapus (${selectedIds.size}) Layanan`}
+        cancelText="Batal"
+        type="danger"
+        isLoading={bulkDeleteModal.isDeleting}
       />
     </div>
   );

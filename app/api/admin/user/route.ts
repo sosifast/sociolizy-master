@@ -3,36 +3,48 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDiscoveredRegions } from "@/lib/server-db";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        uuid: true,
-        username: true,
-        email: true,
-        level: true,
-        balance: true,
-        api_key: true,
-        server_area: true,
-        create_at: true,
-        update_at: true,
+    const payload = await getCachedData(
+      "admin:users",
+      async () => {
+        const users = await prisma.user.findMany({
+          select: {
+            id: true,
+            uuid: true,
+            username: true,
+            email: true,
+            level: true,
+            balance: true,
+            api_key: true,
+            server_area: true,
+            create_at: true,
+            update_at: true,
+          },
+          orderBy: { id: "desc" },
+        });
+
+        const regions = getDiscoveredRegions().map((r) => ({
+          code: r.code,
+          name: r.name,
+          flag: r.flag,
+        }));
+
+        return { users, regions };
       },
-      orderBy: { id: "desc" },
-    });
+      { ttlSeconds: 45, tags: ["users"] }
+    );
 
-    const regions = getDiscoveredRegions().map((r) => ({
-      code: r.code,
-      name: r.name,
-      flag: r.flag,
-    }));
-
-    return NextResponse.json({
-      success: true,
-      data: users,
-      regions,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: payload.users,
+        regions: payload.regions,
+      },
+      { headers: getCacheHeaders(20, 45) }
+    );
   } catch (error) {
     console.error("GET /api/admin/user error:", error);
     const message = error instanceof Error ? error.message : "Gagal mengambil data pengguna";
@@ -98,6 +110,8 @@ export async function POST(request: Request) {
         update_at: true,
       },
     });
+
+    invalidateCacheTag("users", "stats");
 
     return NextResponse.json({
       success: true,

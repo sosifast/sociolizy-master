@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateCacheTag } from "@/lib/server-cache";
 
 export async function POST(
   request: Request,
@@ -44,13 +45,15 @@ export async function POST(
       // Empty body is okay for query action
     }
 
-    // Jika request menyertakan opsi 'save' beserta 'balance_idr', langsung update database
-    if (requestBody && requestBody.save && requestBody.balance_idr !== undefined) {
-      const newBalance = Number(requestBody.balance_idr);
+    // Jika request menyertakan opsi 'save' beserta 'balance' atau 'balance_idr', langsung update database
+    if (requestBody && requestBody.save && (requestBody.balance !== undefined || requestBody.balance_idr !== undefined)) {
+      const newBalance = Number(requestBody.balance ?? requestBody.balance_idr);
       const updated = await prisma.apiProvider.update({
         where: { id: providerId },
         data: { balance: newBalance },
       });
+
+      invalidateCacheTag("providers", "stats");
 
       return NextResponse.json({
         success: true,

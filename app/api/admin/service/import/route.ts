@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateCacheTag } from "@/lib/server-cache";
 
 function slugify(text: string): string {
   return (
@@ -16,7 +17,21 @@ function slugify(text: string): string {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { services, update_existing = false } = body;
+    const { provider_id, services, update_existing = false } = body;
+
+    let resolvedProviderId: number | null = null;
+    if (provider_id) {
+      const isNum = !isNaN(parseInt(String(provider_id))) && /^\d+$/.test(String(provider_id));
+      if (isNum) {
+        resolvedProviderId = parseInt(String(provider_id), 10);
+      } else {
+        const prov = await prisma.apiProvider.findUnique({
+          where: { uuid: String(provider_id) },
+          select: { id: true },
+        });
+        if (prov) resolvedProviderId = prov.id;
+      }
+    }
 
     if (!Array.isArray(services) || services.length === 0) {
       return NextResponse.json(
@@ -99,6 +114,7 @@ export async function POST(request: Request) {
               data: {
                 service_name: sName,
                 id_category: catId,
+                id_api_provider: resolvedProviderId !== null ? resolvedProviderId : undefined,
                 rate_api: rateApi,
                 rate_sale: rateSale,
                 min,
@@ -132,6 +148,7 @@ export async function POST(request: Request) {
               service_name: sName,
               slug: candidateSlug,
               id_category: catId,
+              id_api_provider: resolvedProviderId,
               min,
               max,
               desc,
@@ -149,6 +166,8 @@ export async function POST(request: Request) {
     const summaryMsg = `Proses impor selesai: ${createdCount} layanan baru ditambahkan${
       updatedCount > 0 ? `, ${updatedCount} diperbarui` : ""
     }${skippedCount > 0 ? `, ${skippedCount} dilewati (sudah ada)` : ""}.`;
+
+    invalidateCacheTag("services", "categories", "platforms", "stats");
 
     return NextResponse.json({
       success: true,

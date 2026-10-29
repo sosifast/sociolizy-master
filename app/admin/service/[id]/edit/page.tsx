@@ -13,7 +13,9 @@ export default function EditServicePage() {
   const id = params?.id as string;
 
   const [categories, setCategories] = useState<any[]>([]);
+  const [providers, setProviders] = useState<any[]>([]);
   const [idCategory, setIdCategory] = useState("");
+  const [idApiProvider, setIdApiProvider] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [slug, setSlug] = useState("");
   const [serviceId, setServiceId] = useState("");
@@ -30,21 +32,28 @@ export default function EditServicePage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [srvRes, catRes] = await Promise.all([
+        const [srvRes, catRes, provRes] = await Promise.all([
           fetch(`/api/admin/service/${id}`),
           fetch(`/api/admin/category`),
+          fetch(`/api/admin/provider`),
         ]);
 
         const srvJson = await srvRes.json();
         const catJson = await catRes.json();
+        const provJson = await provRes.json();
 
         if (catJson.success && catJson.data) {
           setCategories(catJson.data);
         }
 
+        if (provJson.success && provJson.data) {
+          setProviders(provJson.data);
+        }
+
         if (srvJson.success && srvJson.data) {
           const s = srvJson.data;
           setIdCategory(String(s.id_category || ""));
+          setIdApiProvider(String(s.id_api_provider || ""));
           setServiceName(s.service_name || "");
           setSlug(s.slug || "");
           setServiceId(s.service_id || "");
@@ -77,6 +86,7 @@ export default function EditServicePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_category: Number(idCategory),
+          id_api_provider: idApiProvider ? Number(idApiProvider) : null,
           service_name: serviceName,
           slug,
           service_id: serviceId,
@@ -121,12 +131,9 @@ export default function EditServicePage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Edit Layanan #{id}
           </h1>
-          <p className="text-xs text-slate-500">
-            Perbarui data harga modal, harga jual, atau kuota order di database PostgreSQL.
-          </p>
         </div>
       </div>
 
@@ -145,22 +152,42 @@ export default function EditServicePage() {
       ) : (
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Kategori Layanan
-              </label>
-              <select
-                value={idCategory}
-                onChange={(e) => setIdCategory(e.target.value)}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.platform?.name ? `[${c.platform.name}] ` : ""}{c.name}
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Kategori Layanan <span className="text-red-600">*</span>
+                </label>
+                <select
+                  value={idCategory}
+                  onChange={(e) => setIdCategory(e.target.value)}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.platform?.name ? `[${c.platform.name}] ` : ""}{c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  API Provider (Sumber Layanan)
+                </label>
+                <select
+                  value={idApiProvider}
+                  onChange={(e) => setIdApiProvider(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                >
+                  <option value="">Manual (Tanpa API Provider)</option>
+                  {providers.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.slug}){p.uuid ? ` [${p.uuid.slice(0, 8)}...]` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>
@@ -233,10 +260,11 @@ export default function EditServicePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Harga Modal Provider (rate_api)
+                  Harga Modal Provider (rate_api) ($)
                 </label>
                 <input
                   type="number"
+                  step="0.0001"
                   value={rateApi}
                   onChange={(e) => setRateApi(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
@@ -245,10 +273,11 @@ export default function EditServicePage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Harga Jual Member (rate_sale)
+                  Harga Jual Member (rate_sale) ($)
                 </label>
                 <input
                   type="number"
+                  step="0.0001"
                   value={rateSale}
                   onChange={(e) => setRateSale(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"

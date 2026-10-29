@@ -74,12 +74,9 @@ export default function CreateProviderPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Tambah API Provider Baru
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Tambah API Provider
           </h1>
-          <p className="text-xs text-slate-500">
-            Daftarkan server penyedia layanan SMM langsung ke tabel PostgreSQL <code className="font-mono text-red-600">api_provider</code>.
-          </p>
         </div>
       </div>
 
@@ -159,7 +156,7 @@ export default function CreateProviderPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Saldo Deposit Awal (IDR)
+              Saldo Deposit Awal ($)
             </label>
             <input
               type="number"

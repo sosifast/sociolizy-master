@@ -86,12 +86,9 @@ export default function EditPlatformPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Edit Platform #{id}
           </h1>
-          <p className="text-xs text-slate-500">
-            Perbarui data platform media sosial di database.
-          </p>
         </div>
       </div>
 

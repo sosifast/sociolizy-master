@@ -98,12 +98,9 @@ export default function CreateCategoryPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Tambah Kategori Baru
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Tambah Kategori
           </h1>
-          <p className="text-xs text-slate-500">
-            Daftarkan kategori layanan baru langsung ke tabel PostgreSQL <code className="font-mono text-red-600">category</code>.
-          </p>
         </div>
       </div>
 

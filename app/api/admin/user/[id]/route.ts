@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { invalidateCacheTag } from "@/lib/server-cache";
 import { getDiscoveredRegions } from "@/lib/server-db";
 
 export async function GET(
@@ -94,6 +95,8 @@ export async function PUT(
       },
     });
 
+    invalidateCacheTag("users", "stats");
+
     return NextResponse.json({
       success: true,
       message: "Data pengguna berhasil diperbarui",
@@ -120,6 +123,8 @@ export async function DELETE(
     await prisma.user.delete({
       where: { id: userId },
     });
+
+    invalidateCacheTag("users", "stats");
 
     return NextResponse.json({
       success: true,

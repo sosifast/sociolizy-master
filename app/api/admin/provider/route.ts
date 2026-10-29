@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
   try {
-    const providers = await prisma.apiProvider.findMany({
-      orderBy: { id: "desc" },
-    });
+    const providers = await getCachedData(
+      "admin:providers",
+      async () => {
+        return prisma.apiProvider.findMany({
+          orderBy: { id: "desc" },
+        });
+      },
+      { ttlSeconds: 60, tags: ["providers"] }
+    );
 
-    return NextResponse.json({
-      success: true,
-      data: providers,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: providers,
+      },
+      { headers: getCacheHeaders(30, 60) }
+    );
   } catch (error) {
     console.error("GET /api/admin/provider error:", error);
     const message = error instanceof Error ? error.message : "Gagal mengambil data provider";
@@ -54,6 +64,8 @@ export async function POST(request: Request) {
         balance: Number(balance || 0),
       },
     });
+
+    invalidateCacheTag("providers", "stats");
 
     return NextResponse.json({
       success: true,

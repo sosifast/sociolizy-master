@@ -100,7 +100,7 @@ export default function AdminHeader({ onToggleSidebar }: HeaderProps) {
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-red-50/50 transition-colors">
                   <p className="font-semibold text-slate-800">Saldo Provider Menipis</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">SMM King API tersisa Rp 250.000. Segera top-up.</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">SMM King API tersisa $15.00. Segera lakukan isi ulang saldo.</p>
                   <span className="text-[10px] text-slate-400 mt-1 block">1 jam yang lalu</span>
                 </div>
               </div>

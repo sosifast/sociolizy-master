@@ -185,7 +185,7 @@ export default function EditUserPage() {
         </Link>
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
               Edit Pengguna #{id}
             </h1>
             {uuid && (
@@ -204,9 +204,6 @@ export default function EditUserPage() {
               </button>
             )}
           </div>
-          <p className="text-xs text-slate-500">
-            Perbarui data profil, saldo deposit, wilayah server, atau level hak akses pengguna.
-          </p>
         </div>
       </div>
 
@@ -334,14 +331,11 @@ export default function EditUserPage() {
                     ))}
                   </select>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Server cluster/database alokasi akun pengguna ini.
-                </p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Saldo Deposit (IDR)
+                  Saldo Deposit ($)
                 </label>
                 <input
                   type="number"

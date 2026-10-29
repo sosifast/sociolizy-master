@@ -18,8 +18,8 @@ const createPrismaClient = () => {
   return new PrismaClient({ adapter });
 };
 
-// In development, recreate if model schema changes
-export const prisma = createPrismaClient();
+// Reuse Prisma client across hot-reloads to prevent connection exhaustion
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 export const db = prisma;
 
 if (process.env.NODE_ENV !== "production") {

@@ -9,6 +9,7 @@ import {
   updateActiveClusterInEnv,
   KNOWN_REGION_METADATA,
 } from "@/lib/server-db";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 function maskUri(uri: string | null): string {
   if (!uri) return "mongodb+srv://(not configured)";
@@ -167,90 +168,101 @@ function generateMetrics(
 
 export async function GET() {
   try {
-    const discoveredServers = getDiscoveredServers();
-    const discoveredRegions = getDiscoveredRegions();
-    const activeCluster = getActiveClusterConfig();
+    const serverPayload = await getCachedData(
+      "admin:servers",
+      async () => {
+        const discoveredServers = getDiscoveredServers();
+        const discoveredRegions = getDiscoveredRegions();
+        const activeCluster = getActiveClusterConfig();
 
-    let onlineCount = 0;
-    let standbyCount = 0;
-    let maintenanceCount = 0;
-    let totalLatency = 0;
-    let totalThroughput = 0;
-    let totalBandwidth = 0;
+        let onlineCount = 0;
+        let standbyCount = 0;
+        let maintenanceCount = 0;
+        let totalLatency = 0;
+        let totalThroughput = 0;
+        let totalBandwidth = 0;
 
-    const allServers = discoveredServers.map((node) => {
-      const rawUri = node.uri;
-      const isConfigured = node.isConfigured;
-      const isActive = activeCluster.server === node.id;
-      const metrics = generateMetrics(
-        node.group,
-        node.serverIndex,
-        node.baseLatency,
-        isConfigured,
-        isActive
-      );
+        const allServers = discoveredServers.map((node) => {
+          const rawUri = node.uri;
+          const isConfigured = node.isConfigured;
+          const isActive = activeCluster.server === node.id;
+          const metrics = generateMetrics(
+            node.group,
+            node.serverIndex,
+            node.baseLatency,
+            isConfigured,
+            isActive
+          );
 
-      if (metrics.status === "online") onlineCount++;
-      else if (metrics.status === "standby") standbyCount++;
-      else maintenanceCount++;
+          if (metrics.status === "online") onlineCount++;
+          else if (metrics.status === "standby") standbyCount++;
+          else maintenanceCount++;
 
-      totalLatency += metrics.latencyMs;
-      totalThroughput += metrics.qps;
-      totalBandwidth += metrics.bandwidthMbps;
+          totalLatency += metrics.latencyMs;
+          totalThroughput += metrics.qps;
+          totalBandwidth += metrics.bandwidthMbps;
 
-      return {
-        id: node.id,
-        group: node.group,
-        serverIndex: node.serverIndex,
-        regionName: node.regionName,
-        flag: node.flag,
-        uri: rawUri,
-        maskedUri: maskUri(rawUri),
-        host: extractHost(rawUri),
-        isConfigured,
-        isActive,
-        ...metrics,
-        database: {
-          engine: "MongoDB 7.0 Enterprise (WiredTiger)",
-          replicaRole: metrics.replicaRole,
-          replicationLagMs: metrics.replicationLagMs,
-          wireProtocol: "OP_MSG (TLS 1.3 Strict)",
-          readPreference: node.serverIndex === 1 ? "primary" : "secondaryPreferred",
-        },
-      };
-    });
+          return {
+            id: node.id,
+            group: node.group,
+            serverIndex: node.serverIndex,
+            regionName: node.regionName,
+            flag: node.flag,
+            uri: rawUri,
+            maskedUri: maskUri(rawUri),
+            host: extractHost(rawUri),
+            isConfigured,
+            isActive,
+            ...metrics,
+            database: {
+              engine: "MongoDB 7.0 Enterprise (WiredTiger)",
+              replicaRole: metrics.replicaRole,
+              replicationLagMs: metrics.replicationLagMs,
+              wireProtocol: "OP_MSG (TLS 1.3 Strict)",
+              readPreference: node.serverIndex === 1 ? "primary" : "secondaryPreferred",
+            },
+          };
+        });
 
-    const avgLatency = allServers.length > 0 ? Math.round(totalLatency / allServers.length) : 0;
+        const avgLatency = allServers.length > 0 ? Math.round(totalLatency / allServers.length) : 0;
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        active: {
-          group: activeCluster.group,
-          server: activeCluster.server,
-          regionName: activeCluster.regionName,
-          flag: activeCluster.flag,
-          maskedUri: maskUri(activeCluster.uri),
-        },
-        stats: {
-          totalRegions: discoveredRegions.length,
-          totalServers: allServers.length,
-          onlineCount,
-          standbyCount,
-          maintenanceCount,
-          avgLatency,
-          totalThroughput,
-          totalBandwidth: parseFloat(totalBandwidth.toFixed(1)),
-        },
-        regions: discoveredRegions.map((reg) => ({
-          code: reg.code,
-          name: reg.name,
-          flag: reg.flag,
-          serversCount: reg.serversCount,
-        })),
-        servers: allServers,
+        return {
+          active: {
+            group: activeCluster.group,
+            server: activeCluster.server,
+            regionName: activeCluster.regionName,
+            flag: activeCluster.flag,
+            maskedUri: maskUri(activeCluster.uri),
+          },
+          stats: {
+            totalRegions: discoveredRegions.length,
+            totalServers: allServers.length,
+            onlineCount,
+            standbyCount,
+            maintenanceCount,
+            avgLatency,
+            totalThroughput,
+            totalBandwidth: parseFloat(totalBandwidth.toFixed(1)),
+          },
+          regions: discoveredRegions.map((reg) => ({
+            code: reg.code,
+            name: reg.name,
+            flag: reg.flag,
+            serversCount: reg.serversCount,
+          })),
+          servers: allServers,
+        };
       },
-    });
+      { ttlSeconds: 10, tags: ["servers"] }
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: serverPayload,
+      },
+      { headers: getCacheHeaders(5, 10) }
+    );
   } catch (error) {
     console.error("GET /api/admin/server error:", error);
     const message = error instanceof Error ? error.message : "Gagal mendeteksi cluster database dari .env";
@@ -305,6 +317,7 @@ export async function POST(request: Request) {
     // Switch active server route action
     if (action === "set_active" && group && server) {
       updateActiveClusterInEnv(String(group), String(server));
+      invalidateCacheTag("servers");
 
       return NextResponse.json({
         success: true,

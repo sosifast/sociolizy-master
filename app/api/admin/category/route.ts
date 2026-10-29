@@ -1,22 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
-      include: {
-        platform: true,
-        _count: {
-          select: { services: true },
-        },
+    const categories = await getCachedData(
+      "admin:categories",
+      async () => {
+        return prisma.category.findMany({
+          include: {
+            platform: true,
+            _count: {
+              select: { services: true },
+            },
+          },
+          orderBy: { id: "desc" },
+        });
       },
-      orderBy: { id: "desc" },
-    });
+      { ttlSeconds: 60, tags: ["categories"] }
+    );
 
-    return NextResponse.json({
-      success: true,
-      data: categories,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: categories,
+      },
+      { headers: getCacheHeaders(30, 60) }
+    );
   } catch (error) {
     console.error("GET /api/admin/category error:", error);
     const message = error instanceof Error ? error.message : "Gagal mengambil data kategori";
@@ -82,6 +92,8 @@ export async function POST(request: Request) {
         platform: true,
       },
     });
+
+    invalidateCacheTag("categories", "stats");
 
     return NextResponse.json({
       success: true,

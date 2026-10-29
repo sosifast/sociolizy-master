@@ -28,14 +28,19 @@ import {
   Network,
 } from "lucide-react";
 import { useToast } from "@/app/admin/components/toast-context";
+import { useCachedFetch } from "@/lib/client-cache";
 import ServerDetailModal, { ServerData } from "./server-detail-modal";
 
 export default function AdminServerMonitoringPage() {
   const { toast } = useToast();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [data, setData] = useState<{
+  const {
+    data,
+    setData,
+    isLoading,
+    isRefreshing,
+    refresh: fetchServers,
+  } = useCachedFetch<{
     active: {
       group: string;
       server: string;
@@ -60,7 +65,7 @@ export default function AdminServerMonitoringPage() {
       serversCount: number;
     }>;
     servers: ServerData[];
-  } | null>(null);
+  }>("/api/admin/server", { ttlMs: 10_000 });
 
   // Filters & State
   const [selectedRegion, setSelectedRegion] = useState<string>("ALL");
@@ -79,38 +84,14 @@ export default function AdminServerMonitoringPage() {
     server: null,
   });
 
-  // Fetch servers data
-  const fetchServers = async (silent = false) => {
-    if (!silent) setIsRefreshing(true);
-    try {
-      const res = await fetch("/api/admin/server");
-      const json = await res.json();
-      if (json.success && json.data) {
-        setData(json.data);
-      } else {
-        toast.error("Gagal Memuat Data", json.message || "Gagal mengambil data cluster server.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Kesalahan Jaringan", "Tidak dapat terhubung ke server API monitoring.");
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchServers();
-  }, []);
-
   // Auto-refresh interval (every 10s if toggled)
   useEffect(() => {
     if (!autoRefresh) return;
     const interval = setInterval(() => {
-      fetchServers(true);
+      fetchServers();
     }, 10000);
     return () => clearInterval(interval);
-  }, [autoRefresh]);
+  }, [autoRefresh, fetchServers]);
 
   // Set active routing handler
   const handleSetActive = async (group: string, serverId: string) => {
@@ -126,7 +107,7 @@ export default function AdminServerMonitoringPage() {
           "Routing Server Berubah",
           `Server aktif dialihkan ke ${group} - ${serverId}`
         );
-        fetchServers(true);
+        fetchServers();
         if (detailModal.isOpen && detailModal.server) {
           setDetailModal((prev) => ({
             ...prev,
@@ -202,24 +183,21 @@ export default function AdminServerMonitoringPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-600 border border-red-200">
-              Cluster Database Infrastructure
-            </span>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             {data?.active && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span>ROUTING AKTIF: {data.active.server} ({data.active.regionName})</span>
+                <span>Aktif: {data.active.server} ({data.active.regionName})</span>
               </span>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Server &amp; Cluster Monitoring
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Server Monitoring
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Monitoring realtime <span className="font-bold text-slate-800">{data?.stats.totalServers ?? "..."} node database</span> di <span className="font-bold text-slate-800">{data?.stats.totalRegions ?? "..."} zona global</span> yang terdeteksi otomatis langsung dari file <code className="font-mono text-red-600 bg-red-50 px-1 py-0.5 rounded text-xs">.env</code>.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Status node server dan koneksi cluster database.
           </p>
         </div>
 

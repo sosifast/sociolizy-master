@@ -1,28 +1,39 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
   try {
-    let setting = await prisma.setting.findFirst({
-      orderBy: { id: "asc" },
-    });
+    const setting = await getCachedData(
+      "admin:setting",
+      async () => {
+        let rec = await prisma.setting.findFirst({
+          orderBy: { id: "asc" },
+        });
 
-    // Jika belum ada record setting, buat default
-    if (!setting) {
-      setting = await prisma.setting.create({
-        data: {
-          site_name: "Master SMM",
-          favicon: "/favicon.ico",
-          logo: "/logo.png",
-          api_app: "smm_app_key_master_live_2026",
-        },
-      });
-    }
+        // Jika belum ada record setting, buat default
+        if (!rec) {
+          rec = await prisma.setting.create({
+            data: {
+              site_name: "Master SMM",
+              favicon: "/favicon.ico",
+              logo: "/logo.png",
+              api_app: "smm_app_key_master_live_2026",
+            },
+          });
+        }
+        return rec;
+      },
+      { ttlSeconds: 120, tags: ["settings"] }
+    );
 
-    return NextResponse.json({
-      success: true,
-      data: setting,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: setting,
+      },
+      { headers: getCacheHeaders(60, 120) }
+    );
   } catch (error) {
     console.error("GET /api/admin/setting error:", error);
     const message = error instanceof Error ? error.message : "Gagal mengambil pengaturan";
@@ -60,9 +71,11 @@ export async function POST(request: Request) {
       });
     }
 
+    invalidateCacheTag("settings");
+
     return NextResponse.json({
       success: true,
-      message: "Pengaturan berhasil disimpan ke database",
+      message: "Pengaturan berhasil disimpan",
       data: setting,
     });
   } catch (error) {

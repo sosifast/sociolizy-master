@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateCacheTag } from "@/lib/server-cache";
 
 export async function GET(
   request: Request,
@@ -58,6 +59,8 @@ export async function PUT(
       },
     });
 
+    invalidateCacheTag("categories", "stats");
+
     return NextResponse.json({
       success: true,
       message: "Kategori berhasil diperbarui",
@@ -84,6 +87,8 @@ export async function DELETE(
     await prisma.category.delete({
       where: { id: categoryId },
     });
+
+    invalidateCacheTag("categories", "services", "stats");
 
     return NextResponse.json({
       success: true,

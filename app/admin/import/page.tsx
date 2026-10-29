@@ -18,6 +18,7 @@ import {
 
 import TablePagination from "@/app/admin/components/table-pagination";
 import { useToast } from "@/app/admin/components/toast-context";
+import { clientCache } from "@/lib/client-cache";
 
 interface ApiProvider {
   id: number;
@@ -387,6 +388,11 @@ export default function AdminImportPage() {
       selectedIds.forEach((id) => nextExisting.add(id));
       setExistingServiceIds(nextExisting);
       setSelectedIds(new Set());
+
+      // Invalidate client cache so services page has fresh list
+      clientCache.invalidate("/api/admin/service");
+      clientCache.invalidate("/api/admin/stats");
+      clientCache.invalidate("/api/admin/category");
 
       toast.success(
         "Selesai",

@@ -13,6 +13,7 @@ export default function EditProviderPage() {
   const id = params?.id as string;
 
   const [name, setName] = useState("");
+  const [uuid, setUuid] = useState("");
   const [slug, setSlug] = useState("");
   const [url, setUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
@@ -29,6 +30,7 @@ export default function EditProviderPage() {
         const json = await res.json();
         if (json.success && json.data) {
           setName(json.data.name || "");
+          setUuid(json.data.uuid || "");
           setSlug(json.data.slug || "");
           setUrl(json.data.url || "");
           setApiKey(json.data.api_key || "");
@@ -102,12 +104,9 @@ export default function EditProviderPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Edit Provider #{id}
           </h1>
-          <p className="text-xs text-slate-500">
-            Perbarui data konfigurasi provider di database PostgreSQL.
-          </p>
         </div>
       </div>
 
@@ -125,6 +124,17 @@ export default function EditProviderPage() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+          {uuid && (
+            <div className="mb-5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">UUID Provider</span>
+                <span className="text-xs font-mono font-bold text-slate-800 select-all">{uuid}</span>
+              </div>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                Unique
+              </span>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -166,9 +176,6 @@ export default function EditProviderPage() {
                 placeholder="https://provider.com/api/v2"
                 className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
-                URL endpoint API penyedia untuk melakukan request order, balance check, dan status layanan.
-              </p>
             </div>
 
             <div>
@@ -186,7 +193,7 @@ export default function EditProviderPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Saldo Deposit (IDR)
+                Saldo Deposit ($)
               </label>
               <input
                 type="number"

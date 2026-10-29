@@ -10,7 +10,9 @@ export default function CreateServicePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [categories, setCategories] = useState<any[]>([]);
+  const [providers, setProviders] = useState<any[]>([]);
   const [idCategory, setIdCategory] = useState("");
+  const [idApiProvider, setIdApiProvider] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [slug, setSlug] = useState("");
   const [serviceId, setServiceId] = useState("");
@@ -20,28 +22,37 @@ export default function CreateServicePage() {
   const [rateApi, setRateApi] = useState("0");
   const [rateSale, setRateSale] = useState("0");
 
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadCategories() {
+    async function loadInitial() {
       try {
-        const res = await fetch("/api/admin/category");
-        const json = await res.json();
-        if (json.success && json.data) {
-          setCategories(json.data);
-          if (json.data.length > 0) {
-            setIdCategory(String(json.data[0].id));
+        const [catRes, provRes] = await Promise.all([
+          fetch("/api/admin/category"),
+          fetch("/api/admin/provider"),
+        ]);
+        const catJson = await catRes.json();
+        const provJson = await provRes.json();
+
+        if (catJson.success && catJson.data) {
+          setCategories(catJson.data);
+          if (catJson.data.length > 0) {
+            setIdCategory(String(catJson.data[0].id));
           }
+        }
+
+        if (provJson.success && provJson.data) {
+          setProviders(provJson.data);
         }
       } catch (err) {
         console.error(err);
       } finally {
-        setIsLoadingCategories(false);
+        setIsLoadingInitial(false);
       }
     }
-    loadCategories();
+    loadInitial();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +75,7 @@ export default function CreateServicePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_category: Number(idCategory),
+          id_api_provider: idApiProvider ? Number(idApiProvider) : null,
           service_name: serviceName,
           slug,
           service_id: serviceId,
@@ -108,12 +120,9 @@ export default function CreateServicePage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Tambah Layanan SMM Manual
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Tambah Layanan
           </h1>
-          <p className="text-xs text-slate-500">
-            Daftarkan produk layanan baru langsung ke tabel PostgreSQL <code className="font-mono text-red-600">services</code>.
-          </p>
         </div>
       </div>
 
@@ -126,34 +135,54 @@ export default function CreateServicePage() {
 
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Pilih Kategori Layanan <span className="text-red-600">*</span>
-            </label>
-            {isLoadingCategories ? (
-              <div className="p-2 text-xs text-slate-400">Memuat kategori...</div>
-            ) : categories.length === 0 ? (
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
-                Belum ada kategori di database. Silakan{" "}
-                <Link href="/admin/category/create" className="font-bold underline text-red-600">
-                  Tambah Kategori
-                </Link>{" "}
-                terlebih dahulu.
-              </div>
-            ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Kategori Layanan <span className="text-red-600">*</span>
+              </label>
+              {isLoadingInitial ? (
+                <div className="p-2 text-xs text-slate-400">Memuat kategori...</div>
+              ) : categories.length === 0 ? (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                  Belum ada kategori di database. Silakan{" "}
+                  <Link href="/admin/category/create" className="font-bold underline text-red-600">
+                    Tambah Kategori
+                  </Link>{" "}
+                  terlebih dahulu.
+                </div>
+              ) : (
+                <select
+                  value={idCategory}
+                  onChange={(e) => setIdCategory(e.target.value)}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.platform?.name ? `[${c.platform.name}] ` : ""}{c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                API Provider (Sumber Layanan)
+              </label>
               <select
-                value={idCategory}
-                onChange={(e) => setIdCategory(e.target.value)}
-                required
+                value={idApiProvider}
+                onChange={(e) => setIdApiProvider(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
               >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.platform?.name ? `[${c.platform.name}] ` : ""}{c.name}
+                <option value="">Manual (Tanpa API Provider)</option>
+                {providers.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.slug}){p.uuid ? ` [${p.uuid.slice(0, 8)}...]` : ""}
                   </option>
                 ))}
               </select>
-            )}
+            </div>
           </div>
 
           <div>
@@ -233,26 +262,28 @@ export default function CreateServicePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Harga Modal Provider (rate_api)
+                Harga Modal Provider (rate_api) ($)
               </label>
               <input
                 type="number"
+                step="0.0001"
                 value={rateApi}
                 onChange={(e) => setRateApi(e.target.value)}
-                placeholder="30000"
+                placeholder="0.0450"
                 className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Harga Jual ke Member (rate_sale)
+                Harga Jual ke Member (rate_sale) ($)
               </label>
               <input
                 type="number"
+                step="0.0001"
                 value={rateSale}
                 onChange={(e) => setRateSale(e.target.value)}
-                placeholder="45000"
+                placeholder="0.0540"
                 className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
               />
             </div>

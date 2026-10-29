@@ -105,12 +105,9 @@ export default function EditCategoryPage() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Edit Kategori #{id}
           </h1>
-          <p className="text-xs text-slate-500">
-            Perbarui data kategori layanan di database PostgreSQL.
-          </p>
         </div>
       </div>
 

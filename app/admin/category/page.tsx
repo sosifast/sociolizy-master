@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   FolderTree,
@@ -17,14 +17,22 @@ import {
 import TablePagination from "@/app/admin/components/table-pagination";
 import ConfirmModal from "@/app/admin/components/confirm-modal";
 import { useToast } from "@/app/admin/components/toast-context";
+import { useCachedFetch } from "@/lib/client-cache";
 
 export default function AdminCategoryPage() {
   const { toast } = useToast();
-  const [categories, setCategories] = useState<any[]>([]);
+  const {
+    data: categoriesData,
+    isLoading,
+    isRefreshing,
+    refresh: fetchCategories,
+    mutate,
+  } = useCachedFetch<any[]>("/api/admin/category", { ttlMs: 60_000 });
+
+  const categories = useMemo(() => categoriesData || [], [categoriesData]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Delete Confirmation Modal State
   const [deleteModal, setDeleteModal] = useState<{
@@ -38,26 +46,6 @@ export default function AdminCategoryPage() {
     name: "",
     isDeleting: false,
   });
-
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/category");
-      const json = await res.json();
-      if (json.success) {
-        setCategories(json.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Gagal Memuat Data", "Tidak dapat mengambil data kategori dari database.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   const openDeleteModal = (id: number, name: string) => {
     setDeleteModal({
@@ -77,7 +65,7 @@ export default function AdminCategoryPage() {
       const json = await res.json();
       if (json.success) {
         toast.success("Berhasil Dihapus", json.message || `Kategori "${deleteModal.name}" berhasil dihapus.`);
-        setCategories((prev) => prev.filter((c) => c.id !== deleteModal.id));
+        mutate((prev) => (prev ? prev.filter((c: any) => c.id !== deleteModal.id) : []));
         setDeleteModal({ isOpen: false, id: null, name: "", isDeleting: false });
       } else {
         toast.error("Gagal Menghapus", json.message || "Gagal menghapus kategori.");
@@ -135,12 +123,12 @@ export default function AdminCategoryPage() {
             </div>
 
             <button
-              onClick={fetchCategories}
-              disabled={isLoading}
+              onClick={() => fetchCategories()}
+              disabled={isLoading || isRefreshing}
               className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
             </button>
 
             <Link
@@ -157,7 +145,7 @@ export default function AdminCategoryPage() {
           {isLoading ? (
             <div className="py-16 text-center text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
-              <p className="text-xs">Memuat kategori dari database...</p>
+              <p className="text-xs">Memuat data kategori...</p>
             </div>
           ) : (
             <table className="w-full text-left text-xs">
@@ -176,7 +164,7 @@ export default function AdminCategoryPage() {
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-slate-400">
                       <FolderTree className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                      <p className="font-semibold text-slate-600">Belum ada kategori di database</p>
+                      <p className="font-semibold text-slate-600">Belum ada kategori</p>
                       <p className="text-xs text-slate-400 mt-0.5">
                         Pastikan Anda telah membuat Platform terlebih dahulu sebelum membuat Kategori.
                       </p>

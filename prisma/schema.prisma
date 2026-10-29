@@ -29,14 +29,17 @@ model User {
 }
 
 model ApiProvider {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   name      String
-  slug      String   @unique
+  slug      String    @unique
   url       String
   api_key   String
-  balance   Decimal  @default(0) @db.Decimal(15, 2)
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  balance   Decimal   @default(0) @db.Decimal(15, 2)
+  create_at DateTime  @default(now())
+  update_at DateTime  @updatedAt
+
+  services  Service[]
 
   @@map("api_provider")
 }
@@ -73,21 +76,23 @@ model Category {
 }
 
 model Service {
-  id           Int      @id @default(autoincrement())
-  uuid         String   @unique @default(uuid())
-  id_category  Int
-  service_name String
-  slug         String   @unique
-  service_id   String
-  min          Int      @default(0)
-  max          Int      @default(0)
-  desc         String?  @db.Text
-  rate_api     Decimal  @default(0) @db.Decimal(15, 4)
-  rate_sale    Decimal  @default(0) @db.Decimal(15, 4) @map("rate_sale")
-  create_at    DateTime @default(now())
-  update_at    DateTime @updatedAt
+  id              Int          @id @default(autoincrement())
+  uuid            String       @unique @default(uuid())
+  id_category     Int
+  id_api_provider Int?
+  service_name    String
+  slug            String       @unique
+  service_id      String
+  min             Int          @default(0)
+  max             Int          @default(0)
+  desc            String?      @db.Text
+  rate_api        Decimal      @default(0) @db.Decimal(15, 4)
+  rate_sale       Decimal      @default(0) @db.Decimal(15, 4) @map("rate_sale")
+  create_at       DateTime     @default(now())
+  update_at       DateTime     @updatedAt
 
-  category     Category @relation(fields: [id_category], references: [id], onDelete: Cascade)
+  category        Category     @relation(fields: [id_category], references: [id], onDelete: Cascade)
+  api_provider    ApiProvider? @relation(fields: [id_api_provider], references: [id], onDelete: SetNull)
 
   @@map("services")
 }

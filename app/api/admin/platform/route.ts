@@ -1,21 +1,31 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCachedData, invalidateCacheTag, getCacheHeaders } from "@/lib/server-cache";
 
 export async function GET() {
   try {
-    const platforms = await prisma.platform.findMany({
-      include: {
-        _count: {
-          select: { categories: true },
-        },
+    const platforms = await getCachedData(
+      "admin:platforms",
+      async () => {
+        return prisma.platform.findMany({
+          include: {
+            _count: {
+              select: { categories: true },
+            },
+          },
+          orderBy: { id: "desc" },
+        });
       },
-      orderBy: { id: "desc" },
-    });
+      { ttlSeconds: 60, tags: ["platforms"] }
+    );
 
-    return NextResponse.json({
-      success: true,
-      data: platforms,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: platforms,
+      },
+      { headers: getCacheHeaders(30, 60) }
+    );
   } catch (error) {
     console.error("GET /api/admin/platform error:", error);
     const message = error instanceof Error ? error.message : "Gagal mengambil data platform";
@@ -58,6 +68,8 @@ export async function POST(request: Request) {
         icon: icon || null,
       },
     });
+
+    invalidateCacheTag("platforms", "stats");
 
     return NextResponse.json({
       success: true,

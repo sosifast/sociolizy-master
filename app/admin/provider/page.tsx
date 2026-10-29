@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   Server,
@@ -18,15 +18,23 @@ import { Search } from "lucide-react";
 import TablePagination from "@/app/admin/components/table-pagination";
 import ConfirmModal from "@/app/admin/components/confirm-modal";
 import { useToast } from "@/app/admin/components/toast-context";
+import { useCachedFetch } from "@/lib/client-cache";
 import SyncBalanceModal from "./sync-balance-modal";
 
 export default function AdminProviderPage() {
   const { toast } = useToast();
-  const [providers, setProviders] = useState<any[]>([]);
+  const {
+    data: providersData,
+    isLoading,
+    isRefreshing,
+    refresh: fetchProviders,
+    mutate,
+  } = useCachedFetch<any[]>("/api/admin/provider", { ttlMs: 60_000 });
+
+  const providers = useMemo(() => providersData || [], [providersData]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Sync Balance Modal State
   const [syncModal, setSyncModal] = useState<{
@@ -50,26 +58,6 @@ export default function AdminProviderPage() {
     isDeleting: false,
   });
 
-  const fetchProviders = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/provider");
-      const json = await res.json();
-      if (json.success) {
-        setProviders(json.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Gagal Memuat Data", "Tidak dapat mengambil data provider dari database.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProviders();
-  }, []);
-
   const openDeleteModal = (id: number, name: string) => {
     setDeleteModal({
       isOpen: true,
@@ -88,7 +76,7 @@ export default function AdminProviderPage() {
       const json = await res.json();
       if (json.success) {
         toast.success("Berhasil Dihapus", json.message || `Provider "${deleteModal.name}" berhasil dihapus.`);
-        setProviders((prev) => prev.filter((p) => p.id !== deleteModal.id));
+        mutate((prev) => (prev ? prev.filter((p: any) => p.id !== deleteModal.id) : []));
         setDeleteModal({ isOpen: false, id: null, name: "", isDeleting: false });
       } else {
         toast.error("Gagal Menghapus", json.message || "Gagal menghapus data provider.");
@@ -102,15 +90,16 @@ export default function AdminProviderPage() {
   };
 
   const handleSyncSuccess = (providerId: number, newBalance: number) => {
-    setProviders((prev) =>
-      prev.map((p) => (p.id === providerId ? { ...p, balance: newBalance } : p))
+    mutate((prev) =>
+      prev ? prev.map((p: any) => (p.id === providerId ? { ...p, balance: newBalance } : p)) : []
     );
   };
 
   const filtered = providers.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.slug.toLowerCase().includes(search.toLowerCase())
+      p.slug.toLowerCase().includes(search.toLowerCase()) ||
+      (p.uuid && p.uuid.toLowerCase().includes(search.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
@@ -151,12 +140,12 @@ export default function AdminProviderPage() {
             </div>
 
             <button
-              onClick={fetchProviders}
-              disabled={isLoading}
+              onClick={() => fetchProviders()}
+              disabled={isLoading || isRefreshing}
               className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
             </button>
 
             <Link
@@ -184,7 +173,7 @@ export default function AdminProviderPage() {
                   <th className="py-3.5 px-5">Slug</th>
                   <th className="py-3.5 px-5">URL Endpoint</th>
                   <th className="py-3.5 px-5">API Key</th>
-                  <th className="py-3.5 px-5">Saldo Provider</th>
+                  <th className="py-3.5 px-5">Saldo ($)</th>
                   <th className="py-3.5 px-5">Status</th>
                   <th className="py-3.5 px-5 text-right">Aksi</th>
                 </tr>
@@ -206,8 +195,13 @@ export default function AdminProviderPage() {
                       <td className="py-3.5 px-5 font-bold font-mono text-slate-900">
                         #{p.id}
                       </td>
-                      <td className="py-3.5 px-5 font-bold text-slate-900">
-                        {p.name}
+                      <td className="py-3.5 px-5">
+                        <div className="font-bold text-slate-900">{p.name}</div>
+                        {p.uuid && (
+                          <div className="text-[10px] font-mono text-slate-400 select-all" title="UUID Provider">
+                            {p.uuid}
+                          </div>
+                        )}
                       </td>
                       <td className="py-3.5 px-5 font-mono text-slate-500">
                         {p.slug}
@@ -221,7 +215,7 @@ export default function AdminProviderPage() {
                       <td className="py-3.5 px-5">
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-slate-900 font-mono">
-                            Rp {Number(p.balance || 0).toLocaleString("id-ID")}
+                            ${Number(p.balance || 0).toFixed(2)}
                           </span>
                           <button
                             type="button"

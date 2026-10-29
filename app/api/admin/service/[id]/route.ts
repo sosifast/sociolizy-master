@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateCacheTag } from "@/lib/server-cache";
+
+function getServiceWhere(identifier: string) {
+  const isNumeric = !isNaN(parseInt(identifier)) && /^\d+$/.test(identifier);
+  return isNumeric ? { id: parseInt(identifier, 10) } : { uuid: identifier };
+}
 
 export async function GET(
   request: Request,
@@ -7,18 +13,25 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const serviceId = parseInt(id);
-
-    if (isNaN(serviceId)) {
+    if (!id) {
       return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
     }
 
+    const where = getServiceWhere(id);
     const service = await prisma.service.findUnique({
-      where: { id: serviceId },
+      where,
       include: {
         category: {
           include: {
             platform: true,
+          },
+        },
+        api_provider: {
+          select: {
+            id: true,
+            uuid: true,
+            name: true,
+            slug: true,
           },
         },
       },
@@ -41,15 +54,15 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const serviceId = parseInt(id);
-
-    if (isNaN(serviceId)) {
+    if (!id) {
       return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
     }
 
+    const where = getServiceWhere(id);
     const body = await request.json();
     const {
       id_category,
+      id_api_provider,
       service_name,
       slug,
       service_id,
@@ -61,9 +74,12 @@ export async function PUT(
     } = body;
 
     const updated = await prisma.service.update({
-      where: { id: serviceId },
+      where,
       data: {
         ...(id_category && { id_category: Number(id_category) }),
+        ...(id_api_provider !== undefined && {
+          id_api_provider: id_api_provider ? Number(id_api_provider) : null,
+        }),
         ...(service_name && { service_name: service_name.trim() }),
         ...(slug && { slug: slug.trim().toLowerCase().replace(/\s+/g, "-") }),
         ...(service_id !== undefined && { service_id: String(service_id).trim() }),
@@ -73,7 +89,24 @@ export async function PUT(
         ...(rate_api !== undefined && { rate_api: Number(rate_api) }),
         ...(rate_sale !== undefined && { rate_sale: Number(rate_sale) }),
       },
+      include: {
+        category: {
+          include: {
+            platform: true,
+          },
+        },
+        api_provider: {
+          select: {
+            id: true,
+            uuid: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
     });
+
+    invalidateCacheTag("services", "stats", "categories");
 
     return NextResponse.json({
       success: true,
@@ -92,15 +125,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const serviceId = parseInt(id);
-
-    if (isNaN(serviceId)) {
+    if (!id) {
       return NextResponse.json({ success: false, message: "ID tidak valid" }, { status: 400 });
     }
 
+    const where = getServiceWhere(id);
     await prisma.service.delete({
-      where: { id: serviceId },
+      where,
     });
+
+    invalidateCacheTag("services", "stats", "categories");
 
     return NextResponse.json({
       success: true,

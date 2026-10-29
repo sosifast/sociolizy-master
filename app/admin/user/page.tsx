@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -28,6 +28,7 @@ import {
 import TablePagination from "@/app/admin/components/table-pagination";
 import ConfirmModal from "@/app/admin/components/confirm-modal";
 import { useToast } from "@/app/admin/components/toast-context";
+import { useCachedFetch } from "@/lib/client-cache";
 
 interface UserItem {
   id: number;
@@ -50,14 +51,34 @@ interface RegionItem {
 
 export default function AdminUserPage() {
   const { toast } = useToast();
-  const [users, setUsers] = useState<UserItem[]>([]);
   const [regions, setRegions] = useState<RegionItem[]>([]);
+  const {
+    data: usersData,
+    isLoading,
+    isRefreshing,
+    refresh: fetchUsers,
+    mutate,
+  } = useCachedFetch<UserItem[]>("/api/admin/user", {
+    ttlMs: 45_000,
+    onSuccess: (data: any) => {
+      if (data && data.regions) {
+        setRegions(data.regions);
+      }
+    },
+  });
+
+  const users: UserItem[] = useMemo(() => {
+    if (!usersData) return [];
+    if (Array.isArray(usersData)) return usersData;
+    if ((usersData as any).data && Array.isArray((usersData as any).data)) return (usersData as any).data;
+    return [];
+  }, [usersData]);
+
   const [filterLevel, setFilterLevel] = useState("Semua");
   const [filterRegion, setFilterRegion] = useState("Semua");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Quick Copy Feedback State
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -77,29 +98,6 @@ export default function AdminUserPage() {
     username: "",
     isDeleting: false,
   });
-
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/user");
-      const json = await res.json();
-      if (json.success) {
-        setUsers(json.data || []);
-        if (json.regions && json.regions.length > 0) {
-          setRegions(json.regions);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Gagal Memuat Data", "Tidak dapat mengambil data pengguna dari database.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const copyToClipboard = (text: string, label: string) => {
     if (!text) return;
@@ -127,7 +125,7 @@ export default function AdminUserPage() {
       const json = await res.json();
       if (json.success) {
         toast.success("Berhasil Dihapus", json.message || `Pengguna "${deleteModal.username}" berhasil dihapus.`);
-        setUsers((prev) => prev.filter((u) => u.id !== deleteModal.id));
+        mutate((prev: any) => (prev ? prev.filter((u: any) => u.id !== deleteModal.id) : []));
         setDeleteModal({ isOpen: false, id: null, username: "", isDeleting: false });
       } else {
         toast.error("Gagal Menghapus", json.message || "Gagal menghapus pengguna.");
@@ -175,7 +173,7 @@ export default function AdminUserPage() {
     <div className="space-y-5">
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span className="font-semibold">Total Pengguna</span>
             <div className="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
@@ -185,12 +183,11 @@ export default function AdminUserPage() {
           <div className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             {users.length}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Akun terdaftar di database</div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-            <span className="font-semibold">Member Aktif</span>
+            <span className="font-semibold">Member</span>
             <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <UserCheck className="w-4 h-4" />
             </div>
@@ -198,10 +195,9 @@ export default function AdminUserPage() {
           <div className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             {totalMembers}
           </div>
-          <div className="text-[11px] text-blue-600 font-medium mt-1">Level Member biasa</div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span className="font-semibold">Administrator</span>
             <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
@@ -211,20 +207,18 @@ export default function AdminUserPage() {
           <div className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             {totalAdmins}
           </div>
-          <div className="text-[11px] text-purple-600 font-medium mt-1">Akses penuh panel admin</div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-            <span className="font-semibold">Total Saldo Pengguna</span>
+            <span className="font-semibold">Total Saldo ($)</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono tracking-tight">
-            Rp {totalBalance.toLocaleString("id-ID")}
+            ${totalBalance.toFixed(2)}
           </div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-1">Akumulasi seluruh saldo</div>
         </div>
       </div>
 
@@ -304,12 +298,12 @@ export default function AdminUserPage() {
             </div>
 
             <button
-              onClick={fetchUsers}
-              disabled={isLoading}
+              onClick={() => fetchUsers()}
+              disabled={isLoading || isRefreshing}
               className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
             </button>
 
             <Link
@@ -422,7 +416,7 @@ export default function AdminUserPage() {
 
                         {/* Saldo */}
                         <td className="py-3.5 px-4 font-bold font-mono text-slate-900">
-                          Rp {Number(u.balance || 0).toLocaleString("id-ID")}
+                          ${Number(u.balance || 0).toFixed(2)}
                         </td>
 
                         {/* API Key */}
