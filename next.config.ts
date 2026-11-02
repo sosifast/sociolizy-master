@@ -36,10 +36,29 @@ const nextConfig: NextConfig = {
         source: "/contact",
         destination: "/page/contact-us",
       },
+      {
+        source: "/documentasi",
+        destination: "/page/doc",
+      },
+      {
+        source: "/dokumentasi",
+        destination: "/page/doc",
+      },
+      {
+        source: "/documentation",
+        destination: "/page/doc",
+      },
+      {
+        source: "/docs",
+        destination: "/page/doc",
+      },
     ];
   },
   experimental: {
     agentFeedback: true,
+    serverActions: {
+      allowedOrigins: ["*.ngrok-free.app", "*.ngrok.app", "localhost:3000"],
+    },
   },
   cacheComponents: true,
   partialPrefetching: true,

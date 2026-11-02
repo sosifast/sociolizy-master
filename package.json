@@ -19,6 +19,8 @@
     "pg": "^8.23.1",
     "posthog-js": "^1.442.0",
     "posthog-node": "^5.60.0",
+    "pusher": "^5.3.4",
+    "pusher-js": "^8.6.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

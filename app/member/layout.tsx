@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import MemberTopbar, { MemberUserData } from "./layouts/topbar";
 import MemberHeader from "./layouts/header";
 import MemberFooter from "./layouts/footer";
+import MemberRealtimeProvider from "./components/member-realtime-provider";
+import GoogleTag from "@/app/components/google-tag";
 
 export const instant = false;
 
@@ -46,18 +48,23 @@ export default async function MemberLayout({
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
-      {/* Topbar: Server cluster & realtime balance */}
-      <MemberTopbar user={userData} />
+    <MemberRealtimeProvider userUuid={session.uuid} initialBalance={userData.balance}>
+      <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+        {/* Google tag (gtag.js) */}
+        <GoogleTag />
 
-      {/* Main Header: Brand & Navigation Menu */}
-      <MemberHeader user={userData} />
+        {/* Topbar: Server cluster & realtime balance */}
+        <MemberTopbar user={userData} />
 
-      {/* Page Content Body */}
-      <main className="flex-1 w-full flex flex-col">{children}</main>
+        {/* Main Header: Brand & Navigation Menu */}
+        <MemberHeader user={userData} />
 
-      {/* Footer: Multi-column links & Security badge */}
-      <MemberFooter />
-    </div>
+        {/* Page Content Body */}
+        <main className="flex-1 w-full flex flex-col">{children}</main>
+
+        {/* Footer: Multi-column links & Security badge */}
+        <MemberFooter />
+      </div>
+    </MemberRealtimeProvider>
   );
 }

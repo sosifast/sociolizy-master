@@ -27,6 +27,11 @@ function PostHogRouteTracker() {
   const maxScrollPercentRef = useRef<number>(0);
   const reachedMilestonesRef = useRef<Set<number>>(new Set());
 
+  // Completely bypass tracking inside admin routes
+  if (pathname && pathname.startsWith("/admin")) {
+    return null;
+  }
+
   // 1. Route Change Tracking: $pageview & $pageleave
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -169,8 +174,19 @@ function PostHogRouteTracker() {
  * Mounts client-side tracking, Core Web Vitals, Error Tracking, and Log capture.
  */
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAdmin = pathname ? pathname.startsWith("/admin") : false;
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isAdmin) {
+      if (typeof window !== "undefined" && isAdmin) {
+        try {
+          const { posthog } = require("@/lib/posthog-client");
+          posthog?.stopSessionRecording?.();
+        } catch {}
+      }
+      return;
+    }
 
     // 1. Initialize PostHog client
     initPostHogClient();
@@ -362,13 +378,15 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       });
     };
-  }, []);
+  }, [isAdmin]);
 
   return (
     <>
-      <Suspense fallback={null}>
-        <PostHogRouteTracker />
-      </Suspense>
+      {!isAdmin && (
+        <Suspense fallback={null}>
+          <PostHogRouteTracker />
+        </Suspense>
+      )}
       {children}
     </>
   );

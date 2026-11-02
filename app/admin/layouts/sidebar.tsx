@@ -22,6 +22,7 @@ import {
   Receipt,
   Sparkles,
   Database,
+  MessageSquare,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -52,6 +53,12 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Laporan & Transaksi",
           href: "/admin/report",
           icon: BarChart3,
+          badge: null,
+        },
+        {
+          name: "Tiket Bantuan",
+          href: "/admin/ticket",
+          icon: MessageSquare,
           badge: null,
         },
       ],

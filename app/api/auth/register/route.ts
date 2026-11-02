@@ -137,6 +137,21 @@ export async function POST(request: Request) {
       },
     });
 
+    // Trigger realtime Pusher notification for admin
+    try {
+      const { pusherServer } = await import("@/lib/pusher");
+      await pusherServer.trigger("admin-notifications", "user-registered", {
+        id: newUser.id,
+        uuid: newUser.uuid,
+        username: newUser.username,
+        email: newUser.email,
+        server_area: newUser.server_area,
+        created_at: newUser.create_at,
+      });
+    } catch (pErr) {
+      console.warn("Pusher user-registered trigger warning:", pErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Akun berhasil dibuat! Silakan masuk.",

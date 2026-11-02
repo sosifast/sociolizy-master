@@ -5,6 +5,7 @@ import AdminSidebar from "../layouts/sidebar";
 import AdminHeader from "../layouts/header";
 import AdminFooter from "../layouts/footer";
 import { ToastProvider } from "./toast-context";
+import AdminRealtimeNotifier from "./admin-realtime-notifier";
 import { UserSession } from "@/lib/auth";
 
 export default function AdminClientLayout({
@@ -18,6 +19,7 @@ export default function AdminClientLayout({
 
   return (
     <ToastProvider>
+      <AdminRealtimeNotifier />
       <div className="min-h-screen bg-white text-slate-900 antialiased font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
         {/* Sidebar Component */}
         <React.Suspense

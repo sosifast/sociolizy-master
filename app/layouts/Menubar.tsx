@@ -12,6 +12,7 @@ export interface NavItem {
 export const defaultNavItems: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
+  { label: "API Docs", href: "/documentasi" },
 ];
 
 interface MenubarProps {
@@ -32,6 +33,7 @@ export default function Menubar({
   const isItemActive = (href: string) => {
     if (href === "/") return pathname === "/";
     if (href === "/services") return pathname === "/services" || pathname.startsWith("/page/service");
+    if (href === "/documentasi") return pathname === "/documentasi" || pathname.startsWith("/page/doc");
     return pathname === href;
   };
 

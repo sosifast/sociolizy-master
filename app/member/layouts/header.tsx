@@ -17,8 +17,10 @@ import {
   Menu,
   X,
   CreditCard,
+  MessageSquare,
 } from "lucide-react";
 import { MemberUserData } from "./topbar";
+import MemberNotificationsDropdown from "../components/member-notifications-dropdown";
 
 interface MemberHeaderProps {
   user: MemberUserData;
@@ -71,6 +73,12 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
       name: "Deposit",
       href: "/member/payment",
       icon: Wallet,
+      exact: false,
+    },
+    {
+      name: "Tickets",
+      href: "/member/ticket",
+      icon: MessageSquare,
       exact: false,
     },
   ];
@@ -213,11 +221,14 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
               <Wallet className="w-4 h-4 text-emerald-400 shrink-0" />
               <div className="text-left">
                 <span className="text-[10px] text-slate-400 block leading-none">Balance</span>
-                <span className="font-mono font-bold text-emerald-400 leading-tight">
+                <span data-member-balance className="font-mono font-bold text-emerald-400 leading-tight">
                   ${Number(user.balance || 0).toFixed(2)}
                 </span>
               </div>
             </Link>
+
+            {/* Realtime Notification Bell Dropdown */}
+            <MemberNotificationsDropdown />
 
             {/* Profile Dropdown */}
             <div className="relative" ref={profileRef}>
@@ -324,7 +335,7 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
             </div>
             <div className="text-right">
               <span className="text-[10px] text-slate-400 block">Balance</span>
-              <span className="font-mono font-bold text-emerald-400 text-xs">
+              <span data-member-balance className="font-mono font-bold text-emerald-400 text-xs">
                 ${Number(user.balance || 0).toFixed(2)}
               </span>
             </div>

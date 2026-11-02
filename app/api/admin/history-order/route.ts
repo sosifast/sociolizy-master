@@ -332,6 +332,36 @@ export async function POST(request: Request) {
 
       await updateOrderInAllServers(inv, updateData, serverNode.id);
 
+      // Realtime Pusher broadcast for member & admin
+      try {
+        const { pusherServer } = await import("@/lib/pusher");
+        const orderStatusPayload = {
+          invoice: inv,
+          status: normalizedStatus,
+          remains,
+          start: startCount,
+          refunded: refundCalc.shouldRefund,
+          refund_amount: refundCalc.refundAmount,
+        };
+
+        if (order.uuid_user) {
+          await pusherServer.trigger(`member-${order.uuid_user}`, "order-status-updated", orderStatusPayload);
+          if (refundApplied) {
+            await pusherServer.trigger(`member-${order.uuid_user}`, "balance-updated", {
+              refund_amount: refundCalc.refundAmount,
+            });
+          }
+        }
+
+        await pusherServer.trigger("admin-orders", "order-status-updated", orderStatusPayload);
+        await pusherServer.trigger("admin-notifications", "order-status-updated", {
+          ...orderStatusPayload,
+          user: userUsername,
+        });
+      } catch (pErr) {
+        console.warn("[Pusher] Failed to broadcast order sync status:", pErr);
+      }
+
       syncResults.push({
         invoice: inv,
         success: true,
@@ -468,6 +498,33 @@ export async function PATCH(request: Request) {
         { success: false, message: "Gagal memperbarui pesanan di server database MongoDB." },
         { status: 500 }
       );
+    }
+
+    // Realtime Pusher broadcast for member & admin
+    try {
+      const { pusherServer } = await import("@/lib/pusher");
+      const orderStatusPayload = {
+        invoice,
+        status: normStatus,
+        remains: newRemains,
+        start: newStart,
+        refunded: refundCalc.shouldRefund,
+        refund_amount: refundCalc.refundAmount,
+      };
+
+      if (order.uuid_user) {
+        await pusherServer.trigger(`member-${order.uuid_user}`, "order-status-updated", orderStatusPayload);
+        if (refundCalc.shouldRefund && refundCalc.refundAmount > 0) {
+          await pusherServer.trigger(`member-${order.uuid_user}`, "balance-updated", {
+            refund_amount: refundCalc.refundAmount,
+          });
+        }
+      }
+
+      await pusherServer.trigger("admin-orders", "order-status-updated", orderStatusPayload);
+      await pusherServer.trigger("admin-notifications", "order-status-updated", orderStatusPayload);
+    } catch (pErr) {
+      console.warn("[Pusher] Failed to broadcast manual order status update:", pErr);
     }
 
     return NextResponse.json({

@@ -60,12 +60,12 @@ export default function MemberTopbar({ user }: MemberTopbarProps) {
           <span className="hidden sm:inline text-slate-700">•</span>
 
           <Link
-            href="/page/contact-us"
+            href="/member/ticket"
             className="inline-flex items-center gap-1 text-slate-400 hover:text-indigo-300 transition-colors"
-            title="Customer Support"
+            title="Support Tickets"
           >
             <HelpCircle className="w-3 h-3" />
-            <span>Support</span>
+            <span>Support Tickets</span>
           </Link>
         </div>
       </div>

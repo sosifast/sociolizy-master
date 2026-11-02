@@ -13,6 +13,11 @@ export function initPostHogClient() {
     return posthog;
   }
 
+  // Never initialize or track inside admin pages
+  if (window.location.pathname.startsWith("/admin")) {
+    return posthog;
+  }
+
   const apiKey =
     process.env.NEXT_PUBLIC_POSTHOG_KEY || config.apiKey || "";
   const host =
@@ -101,7 +106,13 @@ export function capturePostHogPageView(
   pathname: string,
   properties?: Record<string, any>
 ) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    pathname.startsWith("/admin") ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   const section = getPageSection(pathname);
   const sessionId = getPostHogSessionId();
@@ -130,7 +141,13 @@ export function capturePostHogPageLeave(
   maxScrollPercentage: number,
   properties?: Record<string, any>
 ) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    pathname.startsWith("/admin") ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   try {
     posthog.capture("$pageleave", {
@@ -157,7 +174,13 @@ export function capturePostHogScrollDepth(
   scrollPx: number,
   totalHeightPx: number
 ) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    pathname.startsWith("/admin") ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   try {
     posthog.capture("scroll_depth", {
@@ -186,7 +209,13 @@ export interface WebVitalMetric {
  * Captures Web Vitals performance metric ($web_vitals).
  */
 export function capturePostHogWebVital(metric: WebVitalMetric) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    (metric.pathname && metric.pathname.startsWith("/admin")) ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   const currentPath =
     metric.pathname || (typeof window !== "undefined" ? window.location.pathname : "");
@@ -213,7 +242,12 @@ export function capturePostHogException(
   error: Error | unknown,
   properties?: Record<string, any>
 ) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   const currentPath = window.location.pathname;
   const sessionId = getPostHogSessionId();
@@ -250,7 +284,12 @@ export function capturePostHogLog(
   message: string,
   data?: any
 ) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    window.location.pathname.startsWith("/admin")
+  ) {
+    return;
+  }
 
   try {
     posthog.capture("client_log", {
@@ -277,7 +316,13 @@ export function identifyPostHogUser(user: {
   level?: string;
   server_area?: string;
 }) {
-  if (typeof window === "undefined") return;
+  if (
+    typeof window === "undefined" ||
+    window.location.pathname.startsWith("/admin") ||
+    user?.level === "Admin"
+  ) {
+    return;
+  }
 
   try {
     posthog.identify(`user_${user.id}`, {

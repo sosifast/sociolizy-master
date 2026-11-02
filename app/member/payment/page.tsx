@@ -26,15 +26,35 @@ export default function MemberPaymentPage() {
 
   const presetAmounts = [5, 10, 25, 50, 100, 250];
 
-  const handleDepositSubmit = (e: React.FormEvent) => {
+  const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isProcessing) return;
     setIsProcessing(true);
-    setInfoMessage(
-      "The Cryptomus payment gateway is ready to process your deposit. You will be redirected to the secure cryptocurrency payment invoice."
-    );
-    setTimeout(() => {
+    setInfoMessage(null);
+
+    try {
+      const res = await fetch("/api/member/payment/cryptomus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, currency: selectedCurrency }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Failed to create deposit invoice");
+      }
+
+      setInfoMessage(
+        `Invoice ${json.data.order_id} generated successfully! Redirecting to your deposit transactions...`
+      );
+
+      setTimeout(() => {
+        window.location.href = "/member/history/deposit";
+      }, 1000);
+    } catch (err: any) {
+      setInfoMessage(err.message || "Failed to create deposit invoice. Please try again.");
       setIsProcessing(false);
-    }, 1000);
+    }
   };
 
   return (

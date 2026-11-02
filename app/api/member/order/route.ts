@@ -251,6 +251,39 @@ export async function POST(request: Request) {
       userRegion
     );
 
+    // Trigger realtime Pusher notifications for Admin & Member
+    try {
+      const { pusherServer } = await import("@/lib/pusher");
+      const orderPayload = {
+        id: newMongoOrder.id,
+        invoice: newMongoOrder.invoice,
+        order_id: newMongoOrder.order_id,
+        username: user.username,
+        service_name: service.service_name,
+        target: newMongoOrder.target,
+        amount: newMongoOrder.amount,
+        price_sale: newMongoOrder.price_sale,
+        status: newMongoOrder.status,
+        server_area: userRegion,
+        create_at: newMongoOrder.create_at,
+      };
+
+      // Notify Admin
+      await pusherServer.trigger("admin-notifications", "order-created", orderPayload);
+      await pusherServer.trigger("admin-orders", "new-order", orderPayload);
+
+      // Notify Member
+      await pusherServer.trigger(`member-${user.uuid}`, "order-created", {
+        ...orderPayload,
+        balance: Number(updatedUser.balance),
+      });
+      await pusherServer.trigger(`member-${user.uuid}`, "balance-updated", {
+        balance: Number(updatedUser.balance),
+      });
+    } catch (pErr) {
+      console.warn("[Pusher] Failed to broadcast order event:", pErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: `Pesanan berhasil dibuat di klaster region ${userRegion}!`,

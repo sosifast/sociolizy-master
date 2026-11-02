@@ -70,6 +70,28 @@ export default function AdminCryptomusHistoryPage() {
 
   useEffect(() => {
     fetchTransactions();
+
+    const handleDepositUpdate = (e: any) => {
+      const data = e.detail;
+      if (!data?.order_id) return;
+      setTransactions((prev) =>
+        prev.map((t) =>
+          t.order_id === data.order_id ? { ...t, payment_status: data.status } : t
+        )
+      );
+    };
+
+    const handleNewDeposit = () => {
+      fetchTransactions();
+    };
+
+    window.addEventListener("master_smm:admin_deposit_updated", handleDepositUpdate);
+    window.addEventListener("master_smm:admin_deposit_created", handleNewDeposit);
+
+    return () => {
+      window.removeEventListener("master_smm:admin_deposit_updated", handleDepositUpdate);
+      window.removeEventListener("master_smm:admin_deposit_created", handleNewDeposit);
+    };
   }, [page, statusFilter]);
 
   const handleSearch = (e: React.FormEvent) => {

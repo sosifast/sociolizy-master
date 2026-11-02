@@ -48,6 +48,28 @@ export default function MemberOrderHistoryPage() {
 
   useEffect(() => {
     fetchOrders();
+
+    const handleStatusUpdate = (e: any) => {
+      const data = e.detail;
+      if (!data?.invoice) return;
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.invoice === data.invoice ? { ...o, status: data.status } : o
+        )
+      );
+    };
+
+    const handleNewOrder = () => {
+      fetchOrders();
+    };
+
+    window.addEventListener("master_smm:order_status_updated", handleStatusUpdate);
+    window.addEventListener("master_smm:order_created", handleNewOrder);
+
+    return () => {
+      window.removeEventListener("master_smm:order_status_updated", handleStatusUpdate);
+      window.removeEventListener("master_smm:order_created", handleNewOrder);
+    };
   }, []);
 
   const filteredOrders = orders.filter((ord) => {

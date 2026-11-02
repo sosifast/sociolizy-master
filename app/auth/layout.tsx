@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Zap } from "lucide-react";
+import GoogleTag from "@/app/components/google-tag";
 
 export default function AuthLayout({
   children,
@@ -9,6 +10,9 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative min-h-screen w-full bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+      {/* Google tag (gtag.js) */}
+      <GoogleTag />
+
       {/* Background ambient lighting & grid (overflow strictly clipped to prevent extra page scrollbar) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-grid-pattern opacity-40" />

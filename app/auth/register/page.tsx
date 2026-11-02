@@ -78,7 +78,9 @@ export default function RegisterPage() {
   useEffect(() => {
     let isMounted = true;
     setIsLoadingRegions(true);
-    fetch("/api/auth/register")
+    fetch("/api/auth/register", {
+      headers: { "ngrok-skip-browser-warning": "true" },
+    })
       .then((res) => res.json())
       .then((res) => {
         if (isMounted && res.success && res.data?.regions?.length > 0) {
@@ -135,7 +137,10 @@ export default function RegisterPage() {
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
         body: JSON.stringify({
           username,
           email,

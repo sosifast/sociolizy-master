@@ -168,6 +168,30 @@ export default function AdminHistoryOrderPage() {
 
   useEffect(() => {
     fetchOrders();
+
+    const handleOrderUpdate = (e: any) => {
+      const data = e.detail;
+      if (!data?.invoice) return;
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.invoice === data.invoice
+            ? { ...o, status: data.status, remains: data.remains !== undefined ? data.remains : o.remains }
+            : o
+        )
+      );
+    };
+
+    const handleNewOrder = () => {
+      fetchOrders(true);
+    };
+
+    window.addEventListener("master_smm:admin_order_updated", handleOrderUpdate);
+    window.addEventListener("master_smm:admin_order_created", handleNewOrder);
+
+    return () => {
+      window.removeEventListener("master_smm:admin_order_updated", handleOrderUpdate);
+      window.removeEventListener("master_smm:admin_order_created", handleNewOrder);
+    };
   }, [fetchOrders]);
 
   const handleCopy = (text: string, label: string) => {
