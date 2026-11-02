@@ -22,6 +22,7 @@ import {
   Coins,
   Sparkles,
   ShieldCheck,
+  Database,
 } from "lucide-react";
 
 interface StatsData {
@@ -140,6 +141,13 @@ export default function AdminDashboardPage() {
           >
             <PackageCheck className="w-4 h-4" />
             <span>Tambah Layanan</span>
+          </Link>
+          <Link
+            href="/admin/history-order"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer shadow-xs"
+          >
+            <Database className="w-4 h-4 text-indigo-600" />
+            <span>Riwayat Order</span>
           </Link>
           <Link
             href="/admin/cryptomus/setup"

@@ -21,6 +21,7 @@ import {
   Coins,
   Receipt,
   Sparkles,
+  Database,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -42,10 +43,16 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           badge: null,
         },
         {
+          name: "Riwayat Order",
+          href: "/admin/history-order",
+          icon: Database,
+          badge: null,
+        },
+        {
           name: "Laporan & Transaksi",
           href: "/admin/report",
           icon: BarChart3,
-          badge: "Baru",
+          badge: null,
         },
       ],
     },
@@ -74,7 +81,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Import Layanan",
           href: "/admin/import",
           icon: FileDown,
-          badge: "Otomatis",
+          badge: null,
         },
       ],
     },
@@ -85,7 +92,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Setup Cryptomus",
           href: "/admin/cryptomus/setup",
           icon: Coins,
-          badge: "Kripto",
+          badge: null,
         },
         {
           name: "Riwayat Deposit",
@@ -102,7 +109,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Monitoring Server",
           href: "/admin/server",
           icon: Activity,
-          badge: "Cluster",
+          badge: null,
         },
         {
           name: "API Provider",

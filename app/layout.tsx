@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PostHogProvider } from "@/app/components/posthog-provider";
 import { PostHogErrorBoundary } from "@/app/components/posthog-error-boundary";
+import gscConfig from "@/app/data/gsc.json";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,20 +16,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sociolizy - #1 Best & Cheapest SMM Panel | Automated Social Media Services",
+  title: "MasterSMM - The Best Social Media Panel in The Market!",
   description:
-    "Sociolizy is the world's most affordable automated SMM panel for creators, resellers, and agencies across Instagram, TikTok, YouTube, Facebook, and more.",
+    "Manage all social media networks from a single panel, quality and cheap. We provide services on Instagram, Twitter, Facebook, YouTube, TikTok, Spotify and more.",
   keywords: [
     "SMM panel",
     "cheapest smm panel",
     "best smm panel",
-    "sociolizy",
+    "mastersmm",
     "reseller smm panel",
     "instagram smm panel",
     "tiktok smm panel",
     "youtube smm panel",
     "facebook smm panel",
+    "spotify smm panel",
   ],
+  verification: {
+    google: gscConfig.googleSiteVerification || gscConfig.content,
+  },
 };
 
 export default function RootLayout({

@@ -215,7 +215,7 @@ export default function MemberOrderPage() {
       if (json.success) {
         setAlertInfo({
           type: "success",
-          message: `Pesanan berhasil dibuat! Invoice: ${json.data.invoice} (Order ID: ${json.data.order_id || "Diproses"})`,
+          message: `Order placed successfully! Invoice: ${json.data.invoice} (Order ID: ${json.data.order_id || "Processing"})`,
         });
         // Reset form input
         setTarget("");
@@ -228,13 +228,13 @@ export default function MemberOrderPage() {
       } else {
         setAlertInfo({
           type: "error",
-          message: json.message || "Gagal membuat pesanan. Silakan coba lagi.",
+          message: json.message || "Failed to place order. Please try again.",
         });
       }
     } catch (err: any) {
       setAlertInfo({
         type: "error",
-        message: err?.message || "Terjadi kesalahan jaringan.",
+        message: err?.message || "A network error occurred.",
       });
     } finally {
       setIsSubmitting(false);
@@ -242,45 +242,44 @@ export default function MemberOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col">
-      {/* Top Bar */}
-      <header className="border-b border-slate-800 bg-[#0c1222]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/member"
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
-            title="Kembali ke Dashboard"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div>
-            <h1 className="font-bold text-base leading-tight text-white flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-indigo-400" />
-              Pesanan Baru
-            </h1>
-            <span className="text-xs text-slate-400">Pemesanan Layanan SMM Instan</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
-            <Globe className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="text-slate-400">Node:</span>
-            <span className="font-bold text-white">{serverArea}</span>
-          </div>
-
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
-            <Wallet className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-slate-400">Saldo:</span>
-            <span className="font-bold text-emerald-400 font-mono">
-              ${userBalance.toFixed(2)}
+    <div className="max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-6">
+      {/* Page Title & Breadcrumb Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              SMM Order
             </span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+            <ShoppingCart className="w-6 h-6 text-indigo-400" />
+            <span>New Order</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Select a category and social media service to place an instant order.
+          </p>
         </div>
-      </header>
+
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <Link
+            href="/member/payment"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs font-bold text-emerald-400 hover:bg-emerald-900/30 transition-colors"
+          >
+            <Wallet className="w-4 h-4" />
+            <span>Deposit</span>
+          </Link>
+          <Link
+            href="/member/history/order"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#0c1222] border border-slate-800 text-xs font-bold text-slate-300 hover:text-white transition-colors"
+          >
+            <ExternalLink className="w-4 h-4 text-indigo-400" />
+            <span>History</span>
+          </Link>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-8 space-y-8">
+      <div className="space-y-8">
         {/* Notification Alert */}
         {alertInfo && (
           <div
@@ -310,24 +309,24 @@ export default function MemberOrderPage() {
           {/* Left: Order Form (7 Cols) */}
           <div className="lg:col-span-7 bg-[#0c1222] border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
-              <span>Formulir Pesanan</span>
+              <span>Order Form</span>
             </h2>
 
             {loadingCatalog ? (
               <div className="py-16 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-                <span className="text-sm">Memuat katalog layanan...</span>
+                <span className="text-sm">Loading service catalog...</span>
               </div>
             ) : categories.length === 0 ? (
               <div className="py-12 text-center text-slate-400">
-                Belum ada layanan yang aktif. Silakan hubungi admin.
+                No active services available. Please contact support.
               </div>
             ) : (
               <form onSubmit={handleOrderSubmit} className="space-y-5">
-                {/* 1. Kategori */}
+                {/* 1. Category */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Kategori Layanan
+                    Service Category
                   </label>
                   <select
                     value={selectedCategoryId}
@@ -337,16 +336,16 @@ export default function MemberOrderPage() {
                     {filteredCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.platform?.name ? `[${cat.platform.name}] ` : ""}
-                        {cat.name} ({cat.services.length} layanan)
+                        {cat.name} ({cat.services.length} services)
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* 2. Layanan */}
+                {/* 2. Service */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Layanan
+                    Service
                   </label>
                   <select
                     value={selectedServiceId}
@@ -366,7 +365,7 @@ export default function MemberOrderPage() {
                   <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 text-xs space-y-2">
                     <div className="grid grid-cols-3 gap-2 text-center border-b border-slate-800 pb-2">
                       <div>
-                        <span className="text-slate-400 block">Harga / 1K</span>
+                        <span className="text-slate-400 block">Price / 1K</span>
                         <span className="font-bold text-emerald-400 font-mono text-sm">
                           ${Number(currentService.rate_sale).toFixed(4)}
                         </span>
@@ -397,26 +396,26 @@ export default function MemberOrderPage() {
                 {/* 3. Target / Link */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Target / Link / Username
+                    Target Link / Username
                   </label>
                   <input
                     type="text"
                     required
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
-                    placeholder="https://instagram.com/p/... atau username"
+                    placeholder="https://instagram.com/p/... or username"
                     className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                   <span className="text-[11px] text-slate-500 mt-1 block">
-                    Pastikan akun atau postingan tidak dalam status privat.
+                    Make sure the target account or post is set to public (not private).
                   </span>
                 </div>
 
-                {/* 4. Jumlah (Quantity) */}
+                {/* 4. Quantity */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-semibold text-slate-300">
-                      Jumlah Pemesanan
+                      Quantity
                     </label>
                     {currentService && (
                       <span className="text-[11px] text-slate-400">
@@ -434,12 +433,12 @@ export default function MemberOrderPage() {
                     max={currentService?.max || undefined}
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="Masukkan kuantitas..."
+                    placeholder="Enter quantity..."
                     className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors font-mono"
                   />
                   {quantity && !isQtyValid && (
                     <span className="text-[11px] text-rose-400 mt-1 block">
-                      Jumlah harus antara {currentService?.min.toLocaleString()} dan{" "}
+                      Quantity must be between {currentService?.min.toLocaleString()} and{" "}
                       {currentService?.max.toLocaleString()}.
                     </span>
                   )}
@@ -454,12 +453,12 @@ export default function MemberOrderPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Memproses Pesanan...</span>
+                      <span>Processing Order...</span>
                     </>
                   ) : (
                     <>
                       <ShoppingCart className="w-4 h-4" />
-                      <span>Buat Pesanan Sekarang</span>
+                      <span>Place Order Now</span>
                     </>
                   )}
                 </button>
@@ -473,12 +472,12 @@ export default function MemberOrderPage() {
             <div className="bg-[#0c1222] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Info className="w-4 h-4 text-indigo-400" />
-                Ringkasan Pemesanan
+                Order Summary
               </h3>
 
               <div className="space-y-3 text-xs">
                 <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Layanan:</span>
+                  <span className="text-slate-400">Service:</span>
                   <span className="text-white font-medium text-right max-w-[200px] truncate">
                     {currentService?.service_name || "-"}
                   </span>
@@ -492,28 +491,28 @@ export default function MemberOrderPage() {
                 </div>
 
                 <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Jumlah:</span>
+                  <span className="text-slate-400">Quantity:</span>
                   <span className="text-white font-mono font-bold">
                     {parsedQty > 0 ? parsedQty.toLocaleString() : "0"}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Harga per 1K:</span>
+                  <span className="text-slate-400">Price per 1K:</span>
                   <span className="text-white font-mono font-medium">
                     ${rateSale.toFixed(4)}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-2 border-b border-slate-800/80 text-sm">
-                  <span className="text-slate-200 font-semibold">Total Biaya:</span>
+                  <span className="text-slate-200 font-semibold">Total Cost:</span>
                   <span className="text-emerald-400 font-mono font-extrabold">
                     ${totalPrice.toFixed(4)}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-1.5 text-xs">
-                  <span className="text-slate-400">Sisa Saldo:</span>
+                  <span className="text-slate-400">Remaining Balance:</span>
                   <span
                     className={`font-mono font-bold ${
                       isBalanceSufficient ? "text-slate-300" : "text-rose-400"
@@ -526,17 +525,17 @@ export default function MemberOrderPage() {
 
               {!isBalanceSufficient && (
                 <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
-                  Saldo Anda tidak mencukupi untuk melakukan pesanan ini.
+                  Insufficient balance to place this order.
                 </div>
               )}
             </div>
 
             {/* Quick Rules */}
             <div className="bg-[#0c1222] border border-slate-800 rounded-2xl p-5 text-xs space-y-2 text-slate-400">
-              <span className="font-bold text-slate-300 block mb-1">Ketentuan Pemesanan:</span>
-              <p>• Akun target wajib publik (tidak diprivat).</p>
-              <p>• Jangan memasukkan pesanan baru untuk target yang sama sebelum proses selesai.</p>
-              <p>• Pesanan langsung diteruskan secara otomatis ke server provider.</p>
+              <span className="font-bold text-slate-300 block mb-1">Order Guidelines:</span>
+              <p>• Target account or post must be public (not private).</p>
+              <p>• Do not place duplicate orders for the same target before completion.</p>
+              <p>• Orders are automatically dispatched to the server provider.</p>
             </div>
           </div>
         </div>
@@ -547,9 +546,9 @@ export default function MemberOrderPage() {
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Clock className="w-4 h-4 text-indigo-400" />
-                Riwayat Pesanan Terkini
+                Recent Orders
               </h3>
-              <span className="text-xs text-slate-400">Daftar transaksi pesanan Anda</span>
+              <span className="text-xs text-slate-400">List of your recent order transactions</span>
             </div>
             <button
               onClick={fetchOrderHistory}
@@ -564,11 +563,11 @@ export default function MemberOrderPage() {
           {loadingOrders ? (
             <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
               <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
-              <span className="text-xs">Memuat riwayat...</span>
+              <span className="text-xs">Loading history...</span>
             </div>
           ) : orders.length === 0 ? (
             <div className="py-12 text-center text-slate-500 text-xs">
-              Belum ada riwayat pesanan. Lakukan pesanan pertama Anda pada form di atas.
+              No orders placed yet. Place your first order using the form above.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -579,10 +578,10 @@ export default function MemberOrderPage() {
                     <th className="py-3 px-3">Node</th>
                     <th className="py-3 px-3">Order ID</th>
                     <th className="py-3 px-3">Target</th>
-                    <th className="py-3 px-3 text-right">Jumlah</th>
-                    <th className="py-3 px-3 text-right">Harga ($)</th>
+                    <th className="py-3 px-3 text-right">Quantity</th>
+                    <th className="py-3 px-3 text-right">Price ($)</th>
                     <th className="py-3 px-3 text-center">Status</th>
-                    <th className="py-3 px-3 text-right">Tanggal</th>
+                    <th className="py-3 px-3 text-right">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
@@ -624,7 +623,7 @@ export default function MemberOrderPage() {
                         </span>
                       </td>
                       <td className="py-3 px-3 text-right text-slate-400 whitespace-nowrap">
-                        {new Date(ord.create_at).toLocaleDateString("id-ID", {
+                        {new Date(ord.create_at).toLocaleDateString("en-US", {
                           day: "2-digit",
                           month: "short",
                           hour: "2-digit",
@@ -638,8 +637,7 @@ export default function MemberOrderPage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
-

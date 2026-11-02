@@ -26,6 +26,8 @@ export interface OrderSmmDocument {
   refill: boolean;
   status: string;
   server_area?: string | null;
+  refund_amount?: number;
+  refunded?: boolean;
   create_at: Date;
   update_at: Date;
 }
@@ -500,6 +502,278 @@ function mapOrderDocs(docs: any[], defaultArea: string): OrderSmmDocument[] {
     create_at: doc.create_at ? new Date(doc.create_at) : new Date(),
     update_at: doc.update_at ? new Date(doc.update_at) : new Date(),
   }));
+}
+
+/**
+ * Connect directly to a specific ServerNodeConfig node
+ */
+export async function getMongoClientByNode(node: ServerNodeConfig): Promise<MongoClient | null> {
+  if (!node.uri || !node.isConfigured) return null;
+  const clients = globalForMongo.mongoClients!;
+  if (clients.has(node.uri)) {
+    return clients.get(node.uri)!;
+  }
+  try {
+    const client = new MongoClient(node.uri, {
+      maxPoolSize: 15,
+      serverSelectionTimeoutMS: 5000,
+    });
+    await client.connect();
+    clients.set(node.uri, client);
+    return client;
+  } catch (error) {
+    console.error(`[MongoDB] Failed to connect to node ${node.id}:`, error);
+    return null;
+  }
+}
+
+export interface AdminOrderQueryOptions {
+  serverNode?: string; // "ALL" or "SG_1", "SG_2", etc.
+  status?: string; // "ALL" or "Pending", "Processing", etc.
+  search?: string;
+  userUuids?: string[];
+  page?: number;
+  limit?: number;
+}
+
+export interface AdminOrderQueryResult {
+  orders: OrderSmmDocument[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  serverCounts: Record<string, number>;
+  statusCounts: Record<string, number>;
+  totalOmset: number;
+  totalModal: number;
+  totalProfit: number;
+  activeServers: Array<{
+    id: string;
+    group: string;
+    regionName: string;
+    flag: string;
+    isOnline: boolean;
+    pingMs: number | null;
+    ordersCount: number;
+  }>;
+}
+
+/**
+ * Queries orders across ALL configured MongoDB cluster servers simultaneously.
+ * Aggregates statistics, status distributions, and server allocations.
+ */
+export async function getAllOrdersAcrossAllServers(
+  options: AdminOrderQueryOptions = {}
+): Promise<AdminOrderQueryResult> {
+  const {
+    serverNode = "ALL",
+    status = "ALL",
+    search = "",
+    userUuids = [],
+    page = 1,
+    limit = 20,
+  } = options;
+
+  const allServers = getDiscoveredServers().filter((s) => s.isConfigured);
+  const targetServers =
+    serverNode && serverNode !== "ALL"
+      ? allServers.filter((s) => s.id.toUpperCase() === serverNode.toUpperCase())
+      : allServers;
+
+  // Build MongoDB query filter
+  const mongoFilter: any = {};
+
+  if (status && status !== "ALL") {
+    mongoFilter.status = { $regex: new RegExp(`^${status}$`, "i") };
+  }
+
+  if (search.trim()) {
+    const term = search.trim();
+    const orConditions: any[] = [
+      { invoice: { $regex: term, $options: "i" } },
+      { order_id: { $regex: term, $options: "i" } },
+      { target: { $regex: term, $options: "i" } },
+      { service_id: { $regex: term, $options: "i" } },
+    ];
+    if (userUuids && userUuids.length > 0) {
+      orConditions.push({ uuid_user: { $in: userUuids } });
+    }
+    mongoFilter.$or = orConditions;
+  }
+
+  const serverCounts: Record<string, number> = {};
+  const statusCounts: Record<string, number> = {
+    Pending: 0,
+    Processing: 0,
+    "In progress": 0,
+    Completed: 0,
+    Partial: 0,
+    Canceled: 0,
+  };
+
+  let totalOmset = 0;
+  let totalModal = 0;
+
+  const serverHealthList: AdminOrderQueryResult["activeServers"] = [];
+  const fetchedOrders: OrderSmmDocument[] = [];
+  const seenInvoices = new Set<string>();
+
+  // Query each server in parallel
+  const promises = allServers.map(async (srv) => {
+    const startPing = Date.now();
+    let isOnline = false;
+    let pingMs: number | null = null;
+    let serverTotalOrders = 0;
+
+    try {
+      const client = await getMongoClientByNode(srv);
+      if (client) {
+        pingMs = Date.now() - startPing;
+        isOnline = true;
+        const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+
+        // Server total orders count (unfiltered)
+        serverTotalOrders = await col.countDocuments({});
+        serverCounts[srv.id] = serverTotalOrders;
+
+        // If this server is within targetServers, execute filtered search
+        const isTarget = targetServers.some((ts) => ts.id === srv.id);
+        if (isTarget) {
+          const docs = await col
+            .find(mongoFilter)
+            .sort({ create_at: -1, id: -1 })
+            .limit(500)
+            .toArray();
+
+          const mapped = mapOrderDocs(docs, srv.id);
+          for (const item of mapped) {
+            if (!seenInvoices.has(item.invoice)) {
+              seenInvoices.add(item.invoice);
+              fetchedOrders.push(item);
+
+              // Accumulate totals
+              totalOmset += Number(item.price_sale || 0);
+              totalModal += Number(item.price_api || 0);
+
+              // Status count
+              const sKey = item.status || "Pending";
+              statusCounts[sKey] = (statusCounts[sKey] || 0) + 1;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn(`[MongoDB] Error reading from node ${srv.id}:`, err);
+    }
+
+    serverHealthList.push({
+      id: srv.id,
+      group: srv.group,
+      regionName: srv.regionName,
+      flag: srv.flag,
+      isOnline,
+      pingMs,
+      ordersCount: serverTotalOrders,
+    });
+  });
+
+  await Promise.allSettled(promises);
+
+  // Sort orders descending by create_at
+  fetchedOrders.sort(
+    (a, b) => new Date(b.create_at).getTime() - new Date(a.create_at).getTime()
+  );
+
+  const totalMatched = fetchedOrders.length;
+  const skip = (Math.max(1, page) - 1) * limit;
+  const paginatedOrders = fetchedOrders.slice(skip, skip + limit);
+  const totalPages = Math.ceil(totalMatched / limit) || 1;
+
+  return {
+    orders: paginatedOrders,
+    total: totalMatched,
+    page,
+    limit,
+    totalPages,
+    serverCounts,
+    statusCounts,
+    totalOmset: Number(totalOmset.toFixed(4)),
+    totalModal: Number(totalModal.toFixed(4)),
+    totalProfit: Number((totalOmset - totalModal).toFixed(4)),
+    activeServers: serverHealthList.sort((a, b) => a.id.localeCompare(b.id)),
+  };
+}
+
+/**
+ * Retrieves a single order document by invoice across all configured MongoDB cluster servers.
+ */
+export async function getOrderByInvoiceAcrossServers(
+  invoice: string,
+  serverArea?: string
+): Promise<{ order: OrderSmmDocument; serverNode: ServerNodeConfig } | null> {
+  const allServers = getDiscoveredServers().filter((s) => s.isConfigured);
+  const targetServers =
+    serverArea && serverArea !== "ALL"
+      ? allServers.filter((s) => s.id.toUpperCase() === serverArea.toUpperCase())
+      : allServers;
+
+  for (const srv of targetServers) {
+    try {
+      const client = await getMongoClientByNode(srv);
+      if (!client) continue;
+      const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+      const order = await col.findOne({ invoice });
+      if (order) {
+        return { order, serverNode: srv };
+      }
+    } catch (err) {
+      console.warn(`[MongoDB] Find order error on node ${srv.id}:`, err);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Updates an order document across the cluster by invoice
+ */
+export async function updateOrderInAllServers(
+  invoice: string,
+  updates: Partial<OrderSmmDocument>,
+  serverArea?: string
+): Promise<boolean> {
+  const allServers = getDiscoveredServers().filter((s) => s.isConfigured);
+  const targetServers =
+    serverArea && serverArea !== "ALL"
+      ? allServers.filter((s) => s.id.toUpperCase() === serverArea.toUpperCase())
+      : allServers;
+
+  let updated = false;
+
+  for (const srv of targetServers) {
+    try {
+      const client = await getMongoClientByNode(srv);
+      if (!client) continue;
+      const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+
+      const updatePayload: any = {
+        ...updates,
+        update_at: new Date(),
+      };
+      delete updatePayload.id;
+      delete updatePayload.invoice;
+
+      const res = await col.updateOne({ invoice }, { $set: updatePayload });
+      if (res.matchedCount > 0) {
+        updated = true;
+        break;
+      }
+    } catch (err) {
+      console.warn(`[MongoDB] Update order error on node ${srv.id}:`, err);
+    }
+  }
+
+  return updated;
 }
 
 /**
