@@ -163,7 +163,10 @@ export async function PATCH(request: Request) {
       const hashedNewPassword = await bcrypt.hash(new_password, 10);
       await prisma.user.update({
         where: { uuid: session.uuid },
-        data: { password: hashedNewPassword },
+        data: {
+          password: hashedNewPassword,
+          mobile_session_version: { increment: 1 },
+        },
       });
 
       return NextResponse.json({
@@ -184,4 +187,3 @@ export async function PATCH(request: Request) {
     );
   }
 }
-

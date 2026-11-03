@@ -19,6 +19,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { posthog } from "@/lib/posthog-client";
+import AuthBrand from "@/app/auth/auth-brand";
 
 interface ServerRegionOption {
   code: string;
@@ -180,9 +181,9 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full max-w-md my-auto">
-      {/* Outer glow card */}
-      <div className="relative rounded-3xl p-[1px] bg-gradient-to-b from-indigo-500/40 via-slate-800/60 to-transparent shadow-2xl shadow-indigo-950/50">
-        <div className="relative rounded-[23px] bg-[#0c1222]/95 backdrop-blur-2xl p-6 sm:p-7 border border-white/[0.06]">
+      <div className="auth-card-frame">
+        <div className="auth-card relative rounded-3xl p-6 sm:p-7">
+          <AuthBrand />
           {/* Card Header */}
           <div className="mb-4 text-center">
             <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
@@ -384,7 +385,7 @@ export default function RegisterPage() {
                   className="w-full pl-10 pr-9 py-2 rounded-xl text-sm text-white bg-slate-900/70 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all cursor-pointer appearance-none"
                 >
                   {regions.map((reg) => (
-                    <option key={reg.code} value={reg.code} className="bg-slate-900 text-white py-1.5">
+                    <option key={reg.code} value={reg.code} className="bg-white text-slate-900 py-1.5">
                       {reg.name} ({reg.code})
                     </option>
                   ))}
@@ -403,14 +404,14 @@ export default function RegisterPage() {
                   required
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="mt-0.5 w-3.5 h-3.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 focus:ring-offset-0"
+                  className="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500/30 focus:ring-offset-0"
                 />
                 <span className="text-[11px] text-slate-400 leading-tight">
                   I agree to the{" "}
                   <Link
                     href="/page/policy"
                     target="_blank"
-                    className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2"
+                    className="text-emerald-700 hover:text-emerald-800 underline underline-offset-2"
                   >
                     Terms
                   </Link>{" "}
@@ -418,7 +419,7 @@ export default function RegisterPage() {
                   <Link
                     href="/page/privacy"
                     target="_blank"
-                    className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2"
+                    className="text-emerald-700 hover:text-emerald-800 underline underline-offset-2"
                   >
                     Privacy Policy
                   </Link>
@@ -432,7 +433,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99] transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                className="group relative w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-emerald-700 via-emerald-600 to-green-600 hover:from-emerald-600 hover:to-green-500 active:scale-[0.99] transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -455,7 +456,7 @@ export default function RegisterPage() {
               <div className="w-full border-t border-slate-800" />
             </div>
             <div className="relative flex justify-center text-[11px]">
-              <span className="px-2.5 bg-[#0c1222] text-slate-500 font-medium">
+              <span className="px-2.5 bg-white text-slate-500 font-medium">
                 Already have an account?
               </span>
             </div>
@@ -464,7 +465,7 @@ export default function RegisterPage() {
           {/* Login Link Button */}
           <Link
             href="/auth/login"
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/15 hover:border-indigo-500/30 transition-all text-center"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all text-center"
           >
             Sign In Instead
           </Link>

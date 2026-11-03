@@ -33,7 +33,6 @@ export interface MobileUserAuthResult extends MobileAuthResult {
  * The mobile app must supply this in the header:
  * - `x-api-app`: <api_app> OR
  * - `x-app-key`: <api_app> OR
- * - query parameter: `?api_app=<api_app>`
  */
 export async function validateMobileApp(request: Request): Promise<MobileAuthResult> {
   try {
@@ -47,26 +46,28 @@ export async function validateMobileApp(request: Request): Promise<MobileAuthRes
     });
 
     const configuredAppKey = setting?.api_app?.trim();
+    if (!configuredAppKey) {
+      return {
+        valid: false,
+        errorResponse: NextResponse.json(
+          { success: false, message: "Mobile API app key is not configured" },
+          { status: 503 }
+        ),
+      };
+    }
 
-    // If api_app is configured in setting table, enforce strict matching
-    if (configuredAppKey) {
-      const incomingAppKey =
-        request.headers.get("x-api-app") ||
-        request.headers.get("x-app-key") ||
-        new URL(request.url).searchParams.get("api_app");
-
-      if (!incomingAppKey || incomingAppKey.trim() !== configuredAppKey) {
-        return {
-          valid: false,
-          errorResponse: NextResponse.json(
-            {
-              success: false,
-              message: "Unauthorized: Invalid or missing Mobile App Key (x-api-app header)",
-            },
-            { status: 401 }
-          ),
-        };
-      }
+    const incomingAppKey = request.headers.get("x-api-app") || request.headers.get("x-app-key");
+    if (!incomingAppKey || incomingAppKey.trim() !== configuredAppKey) {
+      return {
+        valid: false,
+        errorResponse: NextResponse.json(
+          {
+            success: false,
+            message: "Unauthorized: Invalid or missing Mobile App Key (x-api-app header)",
+          },
+          { status: 401 }
+        ),
+      };
     }
 
     return {
@@ -162,6 +163,7 @@ export async function authenticateMobileUser(request: Request): Promise<MobileUs
       server_area: true,
       api_key: true,
       create_at: true,
+      mobile_session_version: true,
     },
   });
 
@@ -175,14 +177,34 @@ export async function authenticateMobileUser(request: Request): Promise<MobileUs
     };
   }
 
+  if (session.mobile_session_version !== user.mobile_session_version) {
+    return {
+      valid: false,
+      errorResponse: NextResponse.json(
+        {
+          success: false,
+          message: "Sesi tidak valid atau telah berakhir. Silakan login kembali.",
+        },
+        { status: 401 }
+      ),
+    };
+  }
+
   return {
     valid: true,
     session,
     user: {
-      ...user,
+      id: user.id,
+      uuid: user.uuid,
+      username: user.username,
+      email: user.email,
+      name: user.name,
       balance: Number(user.balance),
+      level: user.level,
+      server_area: user.server_area,
+      api_key: user.api_key,
+      create_at: user.create_at,
     },
     setting: appCheck.setting,
   };
 }
-

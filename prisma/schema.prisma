@@ -24,6 +24,7 @@ model User {
   api_key      String?  @unique
   callback_url       String?
   server_area        String    @default("SG")
+  mobile_session_version Int   @default(0)
   reset_token        String?
   reset_token_expiry DateTime?
   create_at          DateTime  @default(now())

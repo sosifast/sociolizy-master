@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { identifyPostHogUser } from "@/lib/posthog-client";
+import AuthBrand from "@/app/auth/auth-brand";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
@@ -99,9 +100,9 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md">
-      {/* Outer glow card */}
-      <div className="relative rounded-3xl p-[1px] bg-gradient-to-b from-indigo-500/40 via-slate-800/60 to-transparent shadow-2xl shadow-indigo-950/50">
-        <div className="relative rounded-[23px] bg-[#0c1222]/90 backdrop-blur-2xl p-7 sm:p-9 border border-white/[0.06]">
+      <div className="auth-card-frame">
+        <div className="auth-card relative rounded-3xl p-7 sm:p-9">
+          <AuthBrand />
           {/* Card Header */}
           <div className="mb-7 text-center">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -206,7 +207,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500/30 focus:ring-offset-0"
                 />
                 <span className="text-xs text-slate-400">Remember me on this device</span>
               </label>
@@ -217,7 +218,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99] transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                className="group relative w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-emerald-700 via-emerald-600 to-green-600 hover:from-emerald-600 hover:to-green-500 active:scale-[0.99] transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -240,7 +241,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-800" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-[#0c1222] text-slate-500 font-medium">
+              <span className="px-3 bg-white text-slate-500 font-medium">
                 Don&apos;t have an account?
               </span>
             </div>
@@ -249,7 +250,7 @@ export default function LoginPage() {
           {/* Register Link Button */}
           <Link
             href="/auth/register"
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/15 hover:border-indigo-500/30 transition-all text-center"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all text-center"
           >
             Create an Account
           </Link>

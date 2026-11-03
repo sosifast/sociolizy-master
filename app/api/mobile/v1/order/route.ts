@@ -82,8 +82,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const orderQuantity = parseInt(String(amount), 10);
-    if (isNaN(orderQuantity) || orderQuantity <= 0) {
+    const orderQuantity = Number(amount);
+    if (!Number.isSafeInteger(orderQuantity) || orderQuantity <= 0) {
       return NextResponse.json(
         { success: false, message: "Jumlah pemesanan harus berupa angka bulat positif." },
         { status: 400 }
@@ -142,9 +142,38 @@ export async function POST(request: Request) {
     const priceSale = (orderQuantity / 1000) * rateSale;
     const priceApi = (orderQuantity / 1000) * rateApi;
 
-    // Check user balance
-    const currentBalance = user.balance;
-    if (currentBalance < priceSale) {
+    if (
+      !Number.isFinite(rateSale) ||
+      !Number.isFinite(rateApi) ||
+      rateSale < 0 ||
+      rateApi < 0 ||
+      !Number.isFinite(priceSale) ||
+      !Number.isFinite(priceApi)
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Harga layanan tidak valid." },
+        { status: 400 }
+      );
+    }
+
+    // Atomically reserve the order cost so overlapping requests cannot overspend.
+    const debit = await prisma.user.updateMany({
+      where: {
+        id: user.id,
+        balance: { gte: priceSale },
+      },
+      data: {
+        balance: { decrement: priceSale },
+      },
+    });
+
+    if (debit.count !== 1) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { balance: true },
+      });
+      const currentBalance = Number(currentUser?.balance ?? 0);
+
       return NextResponse.json(
         {
           success: false,
@@ -155,6 +184,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      select: { balance: true },
+    });
 
     const invoice = generateInvoice();
 
@@ -173,6 +207,11 @@ export async function POST(request: Request) {
       });
 
       if (!providerResult.success) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { balance: { increment: priceSale } },
+        });
+
         return NextResponse.json(
           {
             success: false,
@@ -187,17 +226,7 @@ export async function POST(request: Request) {
       orderStatus = "Processing";
     }
 
-    // 6. Deduct balance in PostgreSQL
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        balance: {
-          decrement: priceSale,
-        },
-      },
-    });
-
-    // 7. Save order directly into MongoDB in user's assigned cluster region
+    // Save order directly into MongoDB in user's assigned cluster region.
     const newMongoOrder = await createOrderInMongo(
       {
         uuid_user: user.uuid,
@@ -300,4 +329,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

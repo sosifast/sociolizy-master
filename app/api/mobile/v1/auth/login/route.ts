@@ -62,6 +62,7 @@ export async function POST(request: Request) {
       email: user.email,
       level: user.level as "Admin" | "Member",
       server_area: user.server_area || "SG",
+      mobile_session_version: user.mobile_session_version,
     });
 
     return NextResponse.json({
@@ -89,4 +90,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

@@ -46,11 +46,17 @@ Aplikasi mobile wajib menyertakan kunci aplikasi pada setiap request HTTP:
 
 Jika header ini tidak dikirimkan atau nilainya salah, server mengembalikan status `401 Unauthorized`.
 
+Kunci aplikasi hanya diterima melalui header, bukan query string. Jika kunci belum dikonfigurasi, API menolak request dengan `503 Service Unavailable`.
+
 ### 2. Keamanan Pengguna (`Bearer Token`)
 Untuk endpoint yang membutuhkan login pengguna (Dashboard, Akun, Order, History), sertakan token sesi yang didapatkan setelah login atau registrasi:
 * **Header**: `Authorization: Bearer <token>` (atau `x-user-token`)
 
 ---
+
+Token sesi bertanda tangan dan berlaku selama 7 hari. Token kedaluwarsa harus diperbarui dengan login kembali; endpoint logout dan perubahan/reset kata sandi mencabut seluruh sesi mobile aktif pada akun tersebut. Backend membutuhkan `SESSION_SECRET` acak minimal 32 byte (contoh pembangkitan: `openssl rand -base64 48`). Simpan hanya di environment server, jangan di aplikasi mobile. Mengganti secret membatalkan semua token yang sudah diterbitkan.
+
+Setelah menambahkan `mobile_session_version` pada model `User`, sinkronkan skema database dengan `npx prisma db push` sebelum menjalankan versi backend ini.
 
 ## 1. Modul Autentikasi (Auth)
 
@@ -239,6 +245,9 @@ Keluar dari akun aplikasi.
 * **URL**: `/api/mobile/v1/auth/logout`
 * **Header**:
   * `x-api-app: <api_app>`
+  * `Authorization: Bearer <token>`
+
+Logout membutuhkan token sesi yang masih berlaku; token mobile akun tersebut tidak dapat digunakan lagi setelah logout.
 
 #### Response Berhasil (200 OK)
 ```json

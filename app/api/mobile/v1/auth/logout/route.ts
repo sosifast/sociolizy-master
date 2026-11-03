@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { validateMobileApp } from "@/lib/mobile-auth";
+import { authenticateMobileUser } from "@/lib/mobile-auth";
+import { prisma } from "@/lib/prisma";
 
 /**
  * POST /api/mobile/v1/auth/logout
@@ -7,9 +8,34 @@ import { validateMobileApp } from "@/lib/mobile-auth";
  */
 export async function POST(request: Request) {
   try {
-    const appCheck = await validateMobileApp(request);
-    if (!appCheck.valid) {
-      return appCheck.errorResponse!;
+    const auth = await authenticateMobileUser(request);
+    if (!auth.valid) {
+      return auth.errorResponse!;
+    }
+
+    if (
+      !auth.user ||
+      typeof auth.session?.mobile_session_version !== "number"
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Sesi tidak valid atau telah berakhir." },
+        { status: 401 }
+      );
+    }
+
+    const revoked = await prisma.user.updateMany({
+      where: {
+        id: auth.user.id,
+        mobile_session_version: auth.session.mobile_session_version,
+      },
+      data: { mobile_session_version: { increment: 1 } },
+    });
+
+    if (revoked.count !== 1) {
+      return NextResponse.json(
+        { success: false, message: "Sesi tidak valid atau telah berakhir." },
+        { status: 401 }
+      );
     }
 
     const response = NextResponse.json({
@@ -29,4 +55,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

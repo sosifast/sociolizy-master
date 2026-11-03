@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Mail, ArrowLeft, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import AuthBrand from "@/app/auth/auth-brand";
 
 export default function ForgotPasswordPage() {
   const [identifier, setIdentifier] = useState("");
@@ -45,7 +46,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
+      <div className="auth-card p-6 sm:p-8 rounded-3xl">
+        <AuthBrand />
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3">
             <Mail className="w-6 h-6" />
@@ -143,4 +145,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

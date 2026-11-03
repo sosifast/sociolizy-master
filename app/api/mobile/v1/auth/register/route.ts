@@ -176,6 +176,7 @@ export async function POST(request: Request) {
       email: newUser.email,
       level: newUser.level as "Admin" | "Member",
       server_area: newUser.server_area,
+      mobile_session_version: newUser.mobile_session_version,
     });
 
     return NextResponse.json({

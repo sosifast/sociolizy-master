@@ -60,6 +60,7 @@ export async function POST(request: Request) {
         password: hashedPassword,
         reset_token: null,
         reset_token_expiry: null,
+        mobile_session_version: { increment: 1 },
       },
     });
 
@@ -75,4 +76,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

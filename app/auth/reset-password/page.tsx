@@ -4,6 +4,7 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import AuthBrand from "@/app/auth/auth-brand";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -76,7 +77,8 @@ function ResetPasswordForm() {
   if (!token || !email) {
     return (
       <div className="w-full max-w-md">
-        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl text-center space-y-4">
+        <div className="auth-card p-6 sm:p-8 rounded-3xl text-center space-y-4">
+          <AuthBrand />
           <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
@@ -100,7 +102,8 @@ function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
+      <div className="auth-card p-6 sm:p-8 rounded-3xl">
+        <AuthBrand />
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3">
             <Lock className="w-6 h-6" />
@@ -228,7 +231,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="w-full max-w-md p-8 rounded-3xl bg-slate-900/80 border border-slate-800 text-center text-slate-400 text-xs">
+        <div className="auth-card w-full max-w-md p-8 rounded-3xl text-center text-slate-400 text-xs">
+          <AuthBrand />
           <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-500" />
           <span>Loading reset page...</span>
         </div>
@@ -238,4 +242,3 @@ export default function ResetPasswordPage() {
     </Suspense>
   );
 }
-
