@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Zap } from "lucide-react";
 import GoogleTag from "@/app/components/google-tag";
 
@@ -25,21 +26,16 @@ export default function AuthLayout({
         {/* Brand Logo */}
         <Link
           href="/"
-          className="group inline-flex items-center gap-2.5 mb-4 transition-transform duration-200 hover:scale-[1.02]"
+          className="group inline-flex items-center gap-2 mb-4 p-2 px-3.5 rounded-2xl bg-white shadow-md shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-cyan-400 p-[1px] shadow-lg shadow-indigo-500/25">
-            <div className="w-full h-full bg-[#0a0f1d] rounded-[11px] flex items-center justify-center">
-              <Zap className="w-4 h-4 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-200 bg-clip-text text-transparent">
-              MASTER<span className="text-indigo-400">SMM</span>
-            </span>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
-              PRO
-            </span>
-          </div>
+          <Image
+            src="/logo/logo.png"
+            alt="sociolizy"
+            width={120}
+            height={44}
+            className="h-7 w-auto object-contain"
+            priority
+          />
         </Link>
 
         {/* Children (Form Card) */}

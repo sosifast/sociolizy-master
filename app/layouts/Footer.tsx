@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Zap, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
@@ -11,12 +12,13 @@ export default function Footer() {
           {/* Col 1: Brand Info */}
           <div className="md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-3 mb-4 group">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shadow-xs">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-extrabold text-xl tracking-tight text-slate-900">
-                sociolizy
-              </span>
+              <Image
+                src="/logo/logo.png"
+                alt="sociolizy"
+                width={160}
+                height={58}
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
             </Link>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm mb-4">
               #1 Best and Cheapest SMM Panel. An automated social media services platform built for resellers, creators, agencies, and brands across 20+ countries.

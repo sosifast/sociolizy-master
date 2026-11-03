@@ -16,8 +16,8 @@ export async function GET() {
           rec = await prisma.setting.create({
             data: {
               site_name: "Master SMM",
-              favicon: "/favicon.ico",
-              logo: "/logo.png",
+              favicon: "/logo/favicon.png",
+              logo: "/logo/logo.png",
               api_app: "smm_app_key_master_live_2026",
             },
           });
@@ -87,8 +87,8 @@ export async function POST(request: Request) {
       setting = await prisma.setting.create({
         data: {
           site_name: site_name ? site_name.trim() : "Master SMM",
-          favicon: favicon || "/favicon.ico",
-          logo: logo || "/logo.png",
+          favicon: favicon || "/logo/favicon.png",
+          logo: logo || "/logo/logo.png",
           api_app: api_app ? api_app.trim() : "smm_app_key_master_live_2026",
           email: email ? email.trim() : null,
           whatsapp: whatsapp ? whatsapp.trim() : null,

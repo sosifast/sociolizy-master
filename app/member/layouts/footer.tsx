@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Zap,
   Server,
@@ -17,12 +18,13 @@ export default function MemberFooter() {
           {/* Col 1: Brand & Tagline */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-xs">
-                <Zap className="w-4 h-4 fill-white" />
-              </div>
-              <span className="font-extrabold text-base tracking-tight text-slate-900">
-                sociolizy
-              </span>
+              <Image
+                src="/logo/logo.png"
+                alt="sociolizy"
+                width={120}
+                height={44}
+                className="h-8 w-auto object-contain"
+              />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
               Automated Social Media Marketing (SMM) platform powered by distributed multi-server infrastructure. Fast, stable, and trusted 24/7 service.

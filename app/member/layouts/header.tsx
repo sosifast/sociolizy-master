@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import LogoutButton from "@/app/components/logout-button";
 import {
@@ -113,17 +114,17 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
           {/* Left: Brand Logo */}
           <div className="flex items-center gap-6">
             <Link href="/member" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-xs">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight text-slate-900 block leading-tight">
-                  sociolizy
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
-                  Member
-                </span>
-              </div>
+              <Image
+                src="/logo/logo.png"
+                alt="sociolizy"
+                width={140}
+                height={52}
+                className="h-9 sm:h-10 w-auto object-contain"
+                priority
+              />
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
+                Member
+              </span>
             </Link>
 
             {/* Desktop Navigation Links */}

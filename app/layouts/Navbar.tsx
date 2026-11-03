@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Zap, Menu, X, LayoutDashboard } from "lucide-react";
 import Menubar, { NavItem } from "./Menubar";
 import { useCachedFetch } from "@/lib/client-cache";
@@ -21,12 +22,10 @@ interface SessionApiResponse {
 
 interface NavbarProps {
   navItems?: NavItem[];
-  currentBadge?: string;
 }
 
 export default function Navbar({
   navItems,
-  currentBadge = "#1 SMM",
 }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -49,22 +48,15 @@ export default function Navbar({
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/95 border-b border-slate-200/80 transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 p-[1px] shadow-sm shadow-emerald-600/30">
-            <div className="w-full h-full bg-emerald-600 rounded-[11px] flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-2xl tracking-tight text-slate-900">
-              sociolizy
-            </span>
-            {currentBadge && (
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
-                {currentBadge}
-              </span>
-            )}
-          </div>
+        <Link href="/" className="group flex items-center py-1">
+          <Image
+            src="/logo/logo.png"
+            alt="sociolizy"
+            width={180}
+            height={66}
+            className="h-11 sm:h-12 md:h-14 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            priority
+          />
         </Link>
 
         {/* Desktop Menubar */}

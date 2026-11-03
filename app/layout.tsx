@@ -34,6 +34,13 @@ export const metadata: Metadata = {
   verification: {
     google: gscConfig.googleSiteVerification || gscConfig.content,
   },
+  icons: {
+    icon: [
+      { url: "/logo/favicon.png", type: "image/png" },
+    ],
+    shortcut: "/logo/favicon.png",
+    apple: "/logo/favicon.png",
+  },
 };
 
 export default function RootLayout({

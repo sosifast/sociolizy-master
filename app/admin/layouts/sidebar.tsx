@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import LogoutButton from "@/app/components/logout-button";
 import {
@@ -155,23 +156,19 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
-          <Link href="/admin" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 p-[1px] shadow-sm shadow-emerald-600/30">
-              <div className="w-full h-full bg-emerald-600 rounded-[11px] flex items-center justify-center text-white">
-                <Sparkles className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900">
-                  MASTER<span className="text-emerald-600">SMM</span>
-                </span>
-              </div>
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block -mt-1">
-                Admin Console
-              </span>
-            </div>
+        <div className="h-16 px-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+          <Link href="/admin" className="flex items-center gap-2.5 group">
+            <Image
+              src="/logo/logo.png"
+              alt="sociolizy"
+              width={125}
+              height={46}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200">
+              Admin
+            </span>
           </Link>
         </div>
 

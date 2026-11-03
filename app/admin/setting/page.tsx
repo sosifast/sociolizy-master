@@ -22,8 +22,8 @@ import { useCachedFetch, clientCache } from "@/lib/client-cache";
 export default function AdminSettingPage() {
   const { toast } = useToast();
   const [siteName, setSiteName] = useState("Master SMM");
-  const [logo, setLogo] = useState("/logo.png");
-  const [favicon, setFavicon] = useState("/favicon.ico");
+  const [logo, setLogo] = useState("/logo/logo.png");
+  const [favicon, setFavicon] = useState("/logo/favicon.png");
   const [apiApp, setApiApp] = useState("smm_app_key_master_live_2026");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
