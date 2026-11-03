@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import {
   Zap,
   ShieldCheck,
@@ -15,14 +16,50 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Topbar, Navbar, Footer } from "@/app/layouts";
+import { getSiteSetting } from "@/lib/setting";
 
 export const metadata: Metadata = {
-  title: "About Us - Sociolizy | Leading Social Media Growth Infrastructure",
+  title: {
+    absolute: "High-Performance SMM Infrastructure | Sociolizy",
+  },
   description:
-    "Learn more about Sociolizy: our mission, high-performance automated SMM infrastructure, direct provider network, and 24/7 enterprise service standards.",
+    "Learn about Sociolizy, the leading automated SMM platform providing high-speed order fulfillment, wholesale rates, and enterprise-grade API connectivity.",
+  alternates: {
+    canonical: "https://sociolizy.com/page/about-us",
+  },
+  openGraph: {
+    title: "About Us - High-Performance SMM Infrastructure | Sociolizy",
+    description:
+      "Learn about Sociolizy, the leading automated SMM platform providing high-speed order fulfillment, wholesale rates, and enterprise-grade API connectivity.",
+    url: "https://sociolizy.com/page/about-us",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us - High-Performance SMM Infrastructure | Sociolizy",
+    description:
+      "Learn about Sociolizy, the leading automated SMM platform providing high-speed order fulfillment, wholesale rates, and enterprise-grade API connectivity.",
+    images: ["/og-image.jpg"],
+  },
 };
 
-export default function AboutUsPage() {
+export const instant = false;
+
+export default async function AboutUsPage() {
+  await connection();
+  const setting = await getSiteSetting();
+  const siteName = setting.site_name;
+
   const stats = [
     { label: "Orders Delivered", value: "10M+", subtext: "Automated fulfillment" },
     { label: "Platform Uptime", value: "99.98%", subtext: "SLA enterprise grade" },
@@ -99,7 +136,7 @@ export default function AboutUsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold mb-6">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>About Sociolizy</span>
+            <span>About {siteName}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight max-w-4xl mx-auto leading-tight">
@@ -110,7 +147,7 @@ export default function AboutUsPage() {
           </h1>
 
           <p className="mt-6 text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Sociolizy is an enterprise-grade SMM automation platform engineered for digital agencies, resellers, content creators, and businesses seeking transparent pricing, reliable speeds, and direct API connectivity.
+            {siteName} is an enterprise-grade SMM automation platform engineered for digital agencies, resellers, content creators, and businesses seeking transparent pricing, reliable speeds, and direct API connectivity.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -175,7 +212,7 @@ export default function AboutUsPage() {
               </div>
               <h2 className="text-2xl font-bold text-slate-900 mb-3">Our Vision</h2>
               <p className="text-sm text-slate-600 leading-relaxed">
-                To be the world’s most trusted social media services backbone. Whether you are an aspiring creator launching your brand or a high-volume agency fulfilling millions of orders monthly, Sociolizy delivers the infrastructure you can rely on without fail.
+                To be the world’s most trusted social media services backbone. Whether you are an aspiring creator launching your brand or a high-volume agency fulfilling millions of orders monthly, {siteName} delivers the infrastructure you can rely on without fail.
               </p>
             </div>
           </div>

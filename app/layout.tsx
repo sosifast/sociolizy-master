@@ -4,6 +4,8 @@ import "./globals.css";
 import { PostHogProvider } from "@/app/components/posthog-provider";
 import { PostHogErrorBoundary } from "@/app/components/posthog-error-boundary";
 import gscConfig from "@/app/data/gsc.json";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,21 +18,53 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MasterSMM - The Best Social Media Panel in The Market!",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sociolizy.com"),
+  title: {
+    default: "Sociolizy - #1 Best & Cheapest SMM Panel for Resellers",
+    template: "%s | Sociolizy",
+  },
   description:
-    "Manage all social media networks from a single panel, quality and cheap. We provide services on Instagram, Twitter, Facebook, YouTube, TikTok, Spotify and more.",
+    "Sociolizy is the #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery and direct API access.",
   keywords: [
     "SMM panel",
     "cheapest smm panel",
     "best smm panel",
-    "mastersmm",
+    "sociolizy",
     "reseller smm panel",
     "instagram smm panel",
     "tiktok smm panel",
     "youtube smm panel",
     "facebook smm panel",
+    "telegram smm panel",
     "spotify smm panel",
   ],
+  alternates: {
+    canonical: "./",
+  },
+  openGraph: {
+    title: "Sociolizy - #1 Best & Cheapest SMM Panel for Resellers",
+    description:
+      "Grow your social media presence with Sociolizy. The cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant fulfillment.",
+    url: "https://sociolizy.com",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sociolizy - #1 Best & Cheapest SMM Panel for Resellers",
+    description:
+      "The cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook.",
+    images: ["/og-image.jpg"],
+  },
   verification: {
     google: gscConfig.googleSiteVerification || gscConfig.content,
   },
@@ -61,6 +95,8 @@ export default function RootLayout({
         <PostHogProvider>
           <PostHogErrorBoundary>
             {children}
+            <Analytics />
+            <SpeedInsights />
           </PostHogErrorBoundary>
         </PostHogProvider>
       </body>

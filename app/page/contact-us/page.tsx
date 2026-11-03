@@ -16,60 +16,57 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Topbar, Navbar, Footer } from "@/app/layouts";
-import { prisma } from "@/lib/prisma";
+import { getSiteSetting } from "@/lib/setting";
 import ContactForm from "./contact-form";
 
 export const metadata: Metadata = {
-  title: "Contact Us - Sociolizy | 24/7 Customer Support & Help Desk",
+  title: {
+    absolute: "24/7 SMM Support & Customer Help Desk | Sociolizy",
+  },
   description:
-    "Get in touch with the Sociolizy team. Reach our 24/7 help desk via WhatsApp, Telegram, Email, or social media for prompt assistance with orders and API.",
+    "Get in touch with the Sociolizy support team 24/7 via WhatsApp, Telegram, or ticket for fast assistance with orders, deposit issues, and API setup.",
+  alternates: {
+    canonical: "https://sociolizy.com/page/contact-us",
+  },
+  openGraph: {
+    title: "SMM Support & Customer Help Desk | Sociolizy",
+    description:
+      "Get in touch with the Sociolizy support team 24/7 via WhatsApp, Telegram, or ticket for fast assistance with orders, deposit issues, and API setup.",
+    url: "https://sociolizy.com/page/contact-us",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Us - 24/7 SMM Support & Customer Help Desk | Sociolizy",
+    description:
+      "Get in touch with the Sociolizy support team 24/7 via WhatsApp, Telegram, or ticket for fast assistance with orders, deposit issues, and API setup.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export const instant = false;
 
-interface SettingData {
-  id: number;
-  site_name: string;
-  email: string | null;
-  whatsapp: string | null;
-  instagram: string | null;
-  facebook: string | null;
-  tiktok: string | null;
-  telegram: string | null;
-}
-
-async function getSetting(): Promise<SettingData | null> {
-  try {
-    const setting = await prisma.setting.findFirst({
-      orderBy: { id: "asc" },
-      select: {
-        id: true,
-        site_name: true,
-        email: true,
-        whatsapp: true,
-        instagram: true,
-        facebook: true,
-        tiktok: true,
-        telegram: true,
-      },
-    });
-    return setting;
-  } catch (error) {
-    console.error("Error fetching settings for contact page:", error);
-    return null;
-  }
-}
-
 export default async function ContactUsPage() {
   await connection();
-  const setting = await getSetting();
+  const setting = await getSiteSetting();
 
-  const email = setting?.email || "support@sociolizy.com";
-  const whatsapp = setting?.whatsapp || "+628123456789";
-  const telegram = setting?.telegram || "sociolizy_support";
-  const instagram = setting?.instagram || "sociolizy.official";
-  const facebook = setting?.facebook || "sociolizy";
-  const tiktok = setting?.tiktok || "sociolizy";
+  const siteName = setting.site_name;
+  const email = setting.email || "support@sociolizy.com";
+  const whatsapp = setting.whatsapp || "+628123456789";
+  const telegram = setting.telegram || "sociolizy_support";
+  const instagram = setting.instagram || "sociolizy.official";
+  const facebook = setting.facebook || "sociolizy";
+  const tiktok = setting.tiktok || "sociolizy";
 
   const cleanWhatsappNumber = whatsapp.replace(/[^0-9]/g, "");
   const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}`;
@@ -163,10 +160,7 @@ export default async function ContactUsPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight max-w-3xl mx-auto">
-            We Are Here to Help{" "}
-            <span className="text-emerald-600">
-              Around the Clock
-            </span>
+            Contact <span className="text-emerald-600">{siteName}</span> Support
           </h1>
 
           <p className="mt-4 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import {
   ShieldCheck,
   FileText,
@@ -14,14 +15,51 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { Topbar, Navbar, Footer } from "@/app/layouts";
+import { getSiteSetting } from "@/lib/setting";
 
 export const metadata: Metadata = {
-  title: "Terms & Service Policy - Sociolizy (Smmfollowom)",
+  title: {
+    absolute: "Terms of Service, Refund Policy & Refill Rules | Sociolizy",
+  },
   description:
-    "Review Sociolizy's terms of service, order delivery guidelines, refund rules, refill guarantee, and API reseller policies.",
+    "Review Sociolizy terms of service, automated fulfillment rules, instant balance refund conditions, refill guarantees, and reseller partner guidelines.",
+  alternates: {
+    canonical: "https://sociolizy.com/page/policy",
+  },
+  openGraph: {
+    title: "Terms of Service, Refund Policy & Refill Rules | Sociolizy",
+    description:
+      "Review Sociolizy terms of service, automated fulfillment rules, instant balance refund conditions, refill guarantees, and reseller partner guidelines.",
+    url: "https://sociolizy.com/page/policy",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service, Refund Policy & Refill Rules | Sociolizy",
+    description:
+      "Review Sociolizy terms of service, automated fulfillment rules, instant balance refund conditions, refill guarantees, and reseller partner guidelines.",
+    images: ["/og-image.jpg"],
+  },
 };
 
-export default function PolicyPage() {
+export const instant = false;
+
+export default async function PolicyPage() {
+  await connection();
+  const setting = await getSiteSetting();
+  const siteName = setting.site_name;
+  const email = setting.email || "support@sociolizy.com";
+
   const sections = [
     { id: "general-terms", title: "1. General Overview & Agreement" },
     { id: "account-membership", title: "2. Account & Free Membership" },
@@ -55,7 +93,7 @@ export default function PolicyPage() {
             Service Policy &amp; Terms
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-3xl">
-            Please read these terms carefully before placing orders or utilizing services on <strong className="text-slate-900">Sociolizy (Smmfollowom)</strong>. By registering an account or making any purchase, you agree to comply with all policies outlined herein.
+            Please read these terms carefully before placing orders or utilizing services on <strong className="text-slate-900">{siteName}</strong>. By registering an account or making any purchase, you agree to comply with all policies outlined herein.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
@@ -101,11 +139,11 @@ export default function PolicyPage() {
               <div className="mt-6 pt-4 border-t border-slate-200">
                 <div className="text-[11px] text-slate-500 mb-2">Questions regarding our policy?</div>
                 <a
-                  href="mailto:info@smmfollowom.com"
+                  href={`mailto:${email}`}
                   className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>info@smmfollowom.com</span>
+                  <span>{email}</span>
                 </a>
               </div>
             </div>
@@ -119,7 +157,7 @@ export default function PolicyPage() {
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="text-amber-950 block mb-1">Authenticity &amp; Anti-Scam Warning:</strong>
-                Registration on Sociolizy is <strong>100% free</strong>. Do not contact or pay people who claim to sell you membership for Sociolizy! Any individual offering paid access to this platform is committing unauthorized fraud.
+                Registration on {siteName} is <strong>100% free</strong>. Do not contact or pay people who claim to sell you membership for {siteName}! Any individual offering paid access to this platform is committing unauthorized fraud.
               </div>
             </div>
 
@@ -135,11 +173,11 @@ export default function PolicyPage() {
                 Binding Legal Relationship
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                By accessing, browsing, or utilizing the services of <strong className="text-slate-900">Sociolizy (Smmfollowom)</strong>, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you must discontinue your use of our platform immediately.
+                By accessing, browsing, or utilizing the services of <strong className="text-slate-900">{siteName}</strong>, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you must discontinue your use of our platform immediately.
               </p>
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed space-y-2">
                 <p>
-                  <strong>Platform Independence Disclaimer:</strong> Sociolizy is an independent social media marketing service provider. We are not officially affiliated with, endorsed by, or partnered with Instagram, Meta, TikTok, ByteDance, YouTube, Google, X (Twitter), Telegram, Spotify, or any other social media corporation.
+                  <strong>Platform Independence Disclaimer:</strong> {siteName} is an independent social media marketing service provider. We are not officially affiliated with, endorsed by, or partnered with Instagram, Meta, TikTok, ByteDance, YouTube, Google, X (Twitter), Telegram, Spotify, or any other social media corporation.
                 </p>
                 <p>
                   All trademarks, logos, and brand names displayed on this platform remain the sole property of their respective trademark holders.
@@ -162,7 +200,7 @@ export default function PolicyPage() {
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs text-xs text-slate-600 space-y-2">
                   <p className="font-semibold text-slate-900">a) Free Membership Guarantee:</p>
                   <p className="text-slate-500">
-                    Sociolizy never requires subscription fees, membership fees, or upfront access payments. Account creation is free forever. Users only pay for the specific order services they deposit funds for.
+                    {siteName} never requires subscription fees, membership fees, or upfront access payments. Account creation is free forever. Users only pay for the specific order services they deposit funds for.
                   </p>
                 </div>
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs text-xs text-slate-600 space-y-2">
@@ -174,7 +212,7 @@ export default function PolicyPage() {
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs text-xs text-slate-600 space-y-2">
                   <p className="font-semibold text-slate-900">c) Account Confidentiality:</p>
                   <p className="text-slate-500">
-                    You are solely responsible for safeguarding your login credentials. Sociolizy is not liable for unauthorized access resulting from compromised passwords on the user&apos;s end.
+                    You are solely responsible for safeguarding your login credentials. {siteName} is not liable for unauthorized access resulting from compromised passwords on the user&apos;s end.
                   </p>
                 </div>
               </div>
@@ -192,7 +230,7 @@ export default function PolicyPage() {
                 Automated Engine &amp; Order Conditions
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy operates a fully automated server routing cluster. Once an order is confirmed, our engine transmits it to the corresponding server within seconds.
+                {siteName} operates a fully automated server routing cluster. Once an order is confirmed, our engine transmits it to the corresponding server within seconds.
               </p>
 
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5 text-xs text-slate-600">
@@ -217,7 +255,7 @@ export default function PolicyPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <span>
-                    <strong>Zero Password Requirement:</strong> We will never ask for your social media account password. If anyone claiming to represent Sociolizy asks for your password, report it immediately to our support.
+                    <strong>Zero Password Requirement:</strong> We will never ask for your social media account password. If anyone claiming to represent {siteName} asks for your password, report it immediately to our support.
                   </span>
                 </div>
               </div>
@@ -235,7 +273,7 @@ export default function PolicyPage() {
                 Strict Prohibitions
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                We maintain zero tolerance for illicit or harmful content. You may not use Sociolizy services for:
+                We maintain zero tolerance for illicit or harmful content. You may not use {siteName} services for:
               </p>
               <ul className="grid sm:grid-cols-2 gap-2.5 text-xs text-slate-600 pt-1">
                 {[
@@ -279,14 +317,14 @@ export default function PolicyPage() {
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs text-xs text-slate-600 space-y-1.5">
                   <h4 className="font-bold text-slate-900">Automatic System Refunds:</h4>
                   <p className="text-slate-500">
-                    If an order cannot be completed due to a server error or platform restriction, the system will automatically cancel or partial the order and refund the unfulfilled credits back to your Sociolizy balance instantly.
+                    If an order cannot be completed due to a server error or platform restriction, the system will automatically cancel or partial the order and refund the unfulfilled credits back to your {siteName} balance instantly.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs text-xs text-slate-600 space-y-1.5">
                   <h4 className="font-bold text-slate-900">Balance Usability:</h4>
                   <p className="text-slate-500">
-                    Deposited funds are designated for service orders on Sociolizy. Once deposited and credited, balance funds cannot be refunded to external bank accounts, credit cards, or crypto wallets unless explicitly authorized by billing management.
+                    Deposited funds are designated for service orders on {siteName}. Once deposited and credited, balance funds cannot be refunded to external bank accounts, credit cards, or crypto wallets unless explicitly authorized by billing management.
                   </p>
                 </div>
 
@@ -348,13 +386,13 @@ export default function PolicyPage() {
                 Secure Deposits &amp; Transparent Currency
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy supports multiple verified deposit gateways. All deposit transactions are secured with 256-bit SSL encryption.
+                {siteName} supports multiple verified deposit gateways. All deposit transactions are secured with 256-bit SSL encryption.
               </p>
               <ul className="space-y-2 text-xs text-slate-600 pt-1">
                 <li className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5">
                   <CreditCard className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <span>
-                    You certify that you are the lawful authorized cardholder or account owner for all payment methods utilized on Sociolizy.
+                    You certify that you are the lawful authorized cardholder or account owner for all payment methods utilized on {siteName}.
                   </span>
                 </li>
                 <li className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5">
@@ -378,11 +416,11 @@ export default function PolicyPage() {
                 Wholesale Connectivity &amp; Reseller Responsibilities
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy provides high-performance REST APIs allowing resellers to connect external panels and automate order placement.
+                {siteName} provides high-performance REST APIs allowing resellers to connect external panels and automate order placement.
               </p>
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed space-y-2">
                 <p>
-                  <strong>Reseller End-Client Responsibility:</strong> Resellers are exclusively responsible for customer support, pricing, and communication with their end users. Sociolizy maintains direct legal relationships solely with the registered account holder.
+                  <strong>Reseller End-Client Responsibility:</strong> Resellers are exclusively responsible for customer support, pricing, and communication with their end users. {siteName} maintains direct legal relationships solely with the registered account holder.
                 </p>
                 <p>
                   <strong>API Fair Usage:</strong> Automated API keys must not be used to launch denial-of-service attempts, spam endpoints with malformed requests, or abuse service catalogs. Rate limiting is enforced to ensure 99.9% uptime for all global users.
@@ -403,10 +441,10 @@ export default function PolicyPage() {
               </div>
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed space-y-3">
                 <p>
-                  Sociolizy services are provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis without warranties of any kind, either express or implied, including fitness for a particular marketing goal or commercial gain.
+                  {siteName} services are provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis without warranties of any kind, either express or implied, including fitness for a particular marketing goal or commercial gain.
                 </p>
                 <p>
-                  In no event shall Sociolizy, its operators, or technical infrastructure partners be liable for any direct, indirect, incidental, punitive, or consequential damages resulting from social media platform account restrictions, bans, suspension of monetization, or algorithmic demotions enacted by third-party social networks.
+                  In no event shall {siteName}, its operators, or technical infrastructure partners be liable for any direct, indirect, incidental, punitive, or consequential damages resulting from social media platform account restrictions, bans, suspension of monetization, or algorithmic demotions enacted by third-party social networks.
                 </p>
                 <p>
                   You choose to utilize promotional services at your own discretion and business evaluation.
@@ -426,14 +464,14 @@ export default function PolicyPage() {
                 Grounds for Action
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy reserves the right to suspend, terminate, or restrict any account without prior notice in the event of:
+                {siteName} reserves the right to suspend, terminate, or restrict any account without prior notice in the event of:
               </p>
               <ul className="space-y-1.5 text-xs text-slate-600 pl-5 list-disc">
                 <li>Attempting to defraud the platform or exploit software vulnerabilities</li>
                 <li>Initiating chargebacks, payment reversals, or dispute claims</li>
                 <li>Harassment, threats, or abusive language towards support personnel</li>
                 <li>Submitting fraudulent, scam, or prohibited content links</li>
-                <li>Reselling memberships or impersonating Sociolizy management</li>
+                <li>Reselling memberships or impersonating {siteName} management</li>
               </ul>
             </section>
 
@@ -460,10 +498,10 @@ export default function PolicyPage() {
                   <h3 className="font-bold text-sm text-slate-900 mb-1">General Inquiries &amp; Policy</h3>
                   <p className="text-xs text-slate-500 mb-3">Official administrative contact</p>
                   <a
-                    href="mailto:info@smmfollowom.com"
+                    href={`mailto:${email}`}
                     className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 break-all"
                   >
-                    info@smmfollowom.com
+                    {email}
                   </a>
                 </div>
 
@@ -473,12 +511,12 @@ export default function PolicyPage() {
                   </div>
                   <h3 className="font-bold text-sm text-slate-900 mb-1">Customer &amp; Order Support</h3>
                   <p className="text-xs text-slate-500 mb-3">Order queries, refills, and support tickets</p>
-                  <a
-                    href="mailto:infosmmfollowom@gmail.com"
+                  <Link
+                    href="/page/contact-us"
                     className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 break-all"
                   >
-                    infosmmfollowom@gmail.com
-                  </a>
+                    Contact Support Desk
+                  </Link>
                 </div>
               </div>
             </section>

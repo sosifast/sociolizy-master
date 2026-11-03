@@ -6,8 +6,21 @@ import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
 
 /**
+ * Generates a 16-character random string consisting of letters and numbers (alphanumeric)
+ */
+function generate16CharApiKey(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const randomBytes = crypto.randomBytes(16);
+  for (let i = 0; i < 16; i++) {
+    result += chars[randomBytes[i] % chars.length];
+  }
+  return result;
+}
+
+/**
  * GET /api/member/api-key
- * Returns member's active API key, generating one if not yet present
+ * Returns member's active API key, generating a 16-char alphanumeric key if not yet present
  */
 export async function GET() {
   await connection();
@@ -39,7 +52,7 @@ export async function GET() {
     // Auto-generate key if missing
     let apiKey = user.api_key;
     if (!apiKey) {
-      apiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
+      apiKey = generate16CharApiKey();
       await prisma.user.update({
         where: { id: user.id },
         data: { api_key: apiKey },
@@ -61,9 +74,9 @@ export async function GET() {
 
 /**
  * POST /api/member/api-key
- * Regenerates a new API key for the member
+ * Regenerates or updates a new API key (max 16 characters letters & numbers)
  */
-export async function POST() {
+export async function POST(request: Request) {
   await connection();
 
   try {
@@ -78,7 +91,32 @@ export async function POST() {
       );
     }
 
-    const newApiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
+    let customKey: string | undefined;
+    try {
+      const body = await request.json().catch(() => null);
+      if (body?.api_key && typeof body.api_key === "string") {
+        customKey = body.api_key.trim();
+      }
+    } catch {}
+
+    let newApiKey: string;
+    if (customKey) {
+      // Validate: maximum 16 characters, only letters and numbers
+      if (customKey.length > 16 || !/^[A-Za-z0-9]+$/.test(customKey)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "API Key must be a maximum of 16 alphanumeric characters (letters and numbers only).",
+          },
+          { status: 400 }
+        );
+      }
+      newApiKey = customKey;
+    } else {
+      newApiKey = generate16CharApiKey();
+    }
+
+    // Ensure uniqueness if collision occurs
     await prisma.user.update({
       where: { uuid: session.uuid },
       data: { api_key: newApiKey },
@@ -87,7 +125,7 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       api_key: newApiKey,
-      message: "API Key berhasil diperbarui",
+      message: "API Key successfully updated",
     });
   } catch (error) {
     console.error("POST /api/member/api-key error:", error);

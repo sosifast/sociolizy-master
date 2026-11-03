@@ -267,27 +267,11 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
 
                   <div className="space-y-0.5">
                     <Link
-                      href="/member/order"
+                      href="/member/account"
                       className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 transition-colors text-xs font-medium"
                     >
-                      <ShoppingCart className="w-4 h-4 text-emerald-600" />
-                      <span>New Order</span>
-                    </Link>
-
-                    <Link
-                      href="/member/payment"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 transition-colors text-xs font-medium"
-                    >
-                      <CreditCard className="w-4 h-4 text-emerald-600" />
-                      <span>Deposit Funds</span>
-                    </Link>
-
-                    <Link
-                      href="/member/history/order"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 transition-colors text-xs font-medium"
-                    >
-                      <History className="w-4 h-4 text-emerald-600" />
-                      <span>Order History</span>
+                      <User className="w-4 h-4 text-emerald-600" />
+                      <span>Account</span>
                     </Link>
 
                     <Link
@@ -392,6 +376,13 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
             </div>
 
             <div className="pt-2">
+              <Link
+                href="/member/account"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                <User className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>Account Settings</span>
+              </Link>
               <Link
                 href="/page/service"
                 className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"

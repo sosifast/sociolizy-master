@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import {
   ShieldCheck,
   Lock,
@@ -12,14 +13,51 @@ import {
   Clock,
 } from "lucide-react";
 import { Topbar, Navbar, Footer } from "@/app/layouts";
+import { getSiteSetting } from "@/lib/setting";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Sociolizy (Smmfollowom)",
+  title: {
+    absolute: "Privacy Policy & 256-Bit SSL Data Protection | Sociolizy",
+  },
   description:
-    "Learn how Sociolizy (Smmfollowom) collects, uses, and protects your personal data and social media information.",
+    "Discover how Sociolizy safeguards your personal data, protects transaction credentials with SSL encryption, and never asks for social media account passwords.",
+  alternates: {
+    canonical: "https://sociolizy.com/page/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy & 256-Bit SSL Data Protection | Sociolizy",
+    description:
+      "Discover how Sociolizy safeguards your personal data, protects transaction credentials with SSL encryption, and never asks for social media account passwords.",
+    url: "https://sociolizy.com/page/privacy",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy & 256-Bit SSL Data Protection | Sociolizy",
+    description:
+      "Discover how Sociolizy safeguards your personal data, protects transaction credentials with SSL encryption, and never asks for social media account passwords.",
+    images: ["/og-image.jpg"],
+  },
 };
 
-export default function PrivacyPolicyPage() {
+export const instant = false;
+
+export default async function PrivacyPolicyPage() {
+  await connection();
+  const setting = await getSiteSetting();
+  const siteName = setting.site_name;
+  const email = setting.email || "support@sociolizy.com";
+
   const sections = [
     { id: "info-we-collect", title: "1. Information We Collect" },
     { id: "how-we-use", title: "2. How We Use Your Information" },
@@ -53,7 +91,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-3xl">
-            At <strong className="text-slate-900">Sociolizy (Smmfollowom)</strong>, your privacy is not an afterthought; it is a core part of how we operate. This Privacy Policy explains exactly what data we collect, why we collect it, how we protect it, and what rights you have over it.
+            At <strong className="text-slate-900">{siteName}</strong>, your privacy is not an afterthought; it is a core part of how we operate. This Privacy Policy explains exactly what data we collect, why we collect it, how we protect it, and what rights you have over it.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
@@ -66,7 +104,7 @@ export default function PrivacyPolicyPage() {
               SSL 256-Bit Protection
             </span>
             <span className="w-1 h-1 rounded-full bg-slate-300" />
-            <span>Contact: info@smmfollowom.com</span>
+            <span>Contact: {email}</span>
           </div>
         </div>
       </div>
@@ -97,11 +135,11 @@ export default function PrivacyPolicyPage() {
               <div className="mt-6 pt-4 border-t border-slate-200">
                 <div className="text-[11px] text-slate-500 mb-2">Need help or account deletion?</div>
                 <a
-                  href="mailto:info@smmfollowom.com"
+                  href={`mailto:${email}`}
                   className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>info@smmfollowom.com</span>
+                  <span>{email}</span>
                 </a>
               </div>
             </div>
@@ -113,8 +151,8 @@ export default function PrivacyPolicyPage() {
             {/* Overview Intro Banner */}
             <div className="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-200 text-slate-700 text-sm leading-relaxed shadow-xs">
               By accessing and using our website and services, you agree to the practices described in this policy. If you have any questions or require clarification about how your data is handled, our dedicated privacy team is always reachable at{" "}
-              <a href="mailto:info@smmfollowom.com" className="text-emerald-700 underline font-semibold">
-                info@smmfollowom.com
+              <a href={`mailto:${email}`} className="text-emerald-700 underline font-semibold">
+                {email}
               </a>.
             </div>
 
@@ -225,7 +263,7 @@ export default function PrivacyPolicyPage() {
 
               <div className="grid sm:grid-cols-2 gap-3 pt-2">
                 {[
-                  "Create and manage your Sociolizy (Smmfollowom) account securely",
+                  `Create and manage your ${siteName} account securely`,
                   "Process and deliver the social media services you have ordered",
                   "Communicate with you regarding your orders, balance, or support tickets",
                   "Send important service updates, announcements, or policy revisions",
@@ -327,7 +365,7 @@ export default function PrivacyPolicyPage() {
                 We Do Not Sell Your Data — Ever
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy (Smmfollowom) does <strong className="text-slate-900">not sell, rent, trade, or share</strong> your personal information with third parties for their own marketing or commercial purposes. Full stop.
+                {siteName} does <strong className="text-slate-900">not sell, rent, trade, or share</strong> your personal information with third parties for their own marketing or commercial purposes. Full stop.
               </p>
 
               <div className="space-y-3 pt-2">
@@ -424,7 +462,7 @@ export default function PrivacyPolicyPage() {
                 You Are in Control
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                As a valued user of Sociolizy (Smmfollowom), you have the following rights regarding your personal information:
+                As a valued user of {siteName}, you have the following rights regarding your personal information:
               </p>
 
               <div className="space-y-2.5 pt-2">
@@ -462,12 +500,8 @@ export default function PrivacyPolicyPage() {
 
               <p className="text-xs text-slate-600 pt-2">
                 To exercise any of these rights, please email us directly at{" "}
-                <a href="mailto:infosmmfollowom@gmail.com" className="text-emerald-700 underline font-semibold">
-                  infosmmfollowom@gmail.com
-                </a>{" "}
-                or{" "}
-                <a href="mailto:info@smmfollowom.com" className="text-emerald-700 underline font-semibold">
-                  info@smmfollowom.com
+                <a href={`mailto:${email}`} className="text-emerald-700 underline font-semibold">
+                  {email}
                 </a>
                 . We will respond to all verified requests within a reasonable timeframe.
               </p>
@@ -538,7 +572,7 @@ export default function PrivacyPolicyPage() {
                 Our website may contain links to external websites, social media platforms, or partner resources. These links are provided for your convenience and do not signify our endorsement of those sites.
               </p>
               <p className="text-sm text-slate-500 leading-relaxed">
-                Sociolizy (Smmfollowom) is not responsible for the privacy practices, content, or security of any external websites. We strongly recommend reviewing the privacy policy of any third-party site before sharing personal information.
+                {siteName} is not responsible for the privacy practices, content, or security of any external websites. We strongly recommend reviewing the privacy policy of any third-party site before sharing personal information.
               </p>
             </section>
 
@@ -554,7 +588,7 @@ export default function PrivacyPolicyPage() {
                 Keeping You Informed of Updates
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sociolizy (Smmfollowom) may update this Privacy Policy from time to time to reflect changes in our operational practices, technological improvements, legal requirements, or other operational factors.
+                {siteName} may update this Privacy Policy from time to time to reflect changes in our operational practices, technological improvements, legal requirements, or other operational factors.
               </p>
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-2">
                 <p>When significant changes occur, we will:</p>
@@ -580,12 +614,12 @@ export default function PrivacyPolicyPage() {
                 Your Agreement to This Policy
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                By accessing and using the Sociolizy (Smmfollowom) website and automated services, you acknowledge that you have read, understood, and agreed to this Privacy Policy and our Terms of Service.
+                By accessing and using the {siteName} website and automated services, you acknowledge that you have read, understood, and agreed to this Privacy Policy and our Terms of Service.
               </p>
               <p className="text-xs text-slate-500 leading-relaxed">
                 If you do not agree with any part of this policy, please discontinue your use of our platform immediately and contact us at{" "}
-                <a href="mailto:infosmmfollowom@gmail.com" className="text-emerald-700 underline font-medium">
-                  infosmmfollowom@gmail.com
+                <a href={`mailto:${email}`} className="text-emerald-700 underline font-medium">
+                  {email}
                 </a>{" "}
                 to request complete account deletion.
               </p>
@@ -614,10 +648,10 @@ export default function PrivacyPolicyPage() {
                   <h3 className="font-bold text-sm text-slate-900 mb-1">Primary Privacy Email</h3>
                   <p className="text-xs text-slate-500 mb-3">For general privacy and policy inquiries</p>
                   <a
-                    href="mailto:info@smmfollowom.com"
+                    href={`mailto:${email}`}
                     className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 break-all"
                   >
-                    info@smmfollowom.com
+                    {email}
                   </a>
                 </div>
 
@@ -625,14 +659,14 @@ export default function PrivacyPolicyPage() {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-3 text-emerald-600">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-1">Account &amp; Data Deletion</h3>
-                  <p className="text-xs text-slate-500 mb-3">For data access, correction, or deletion requests</p>
-                  <a
-                    href="mailto:infosmmfollowom@gmail.com"
+                  <h3 className="font-bold text-sm text-slate-900 mb-1">Customer Support Desk</h3>
+                  <p className="text-xs text-slate-500 mb-3">For data access, correction, or order support</p>
+                  <Link
+                    href="/page/contact-us"
                     className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 break-all"
                   >
-                    infosmmfollowom@gmail.com
-                  </a>
+                    Contact Support Team
+                  </Link>
                 </div>
               </div>
             </section>

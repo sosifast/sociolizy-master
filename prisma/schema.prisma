@@ -13,18 +13,19 @@ enum Level {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  uuid      String   @unique @default(uuid())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  balance   Decimal  @default(0) @db.Decimal(15, 2)
-  level       Level    @default(Member)
-  api_key     String?  @unique
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  name         String?
+  password     String
+  balance      Decimal  @default(0) @db.Decimal(15, 2)
+  level        Level    @default(Member)
+  api_key      String?  @unique
   callback_url String?
-  server_area String   @default("SG")
-  create_at   DateTime @default(now())
-  update_at   DateTime @updatedAt
+  server_area  String   @default("SG")
+  create_at    DateTime @default(now())
+  update_at    DateTime @updatedAt
 
   @@map("user")
 }

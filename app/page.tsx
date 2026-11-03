@@ -30,9 +30,38 @@ import gscConfig from "@/app/data/gsc.json";
 import GoogleTag from "@/app/components/google-tag";
 
 export const metadata: Metadata = {
-  title: "The Best Social Media Panel in The Market! - MasterSMM",
+  title: {
+    absolute: "World's #1 Cheapest & Best SMM Services Provider | Sociolizy",
+  },
   description:
-    "Manage all social media networks from a single panel, quality and cheap. We provide services on Instagram, Twitter, Facebook, Youtube, TikTok, Spotify and many more services.",
+    "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
+  alternates: {
+    canonical: "https://www.sociolizy.com",
+  },
+  openGraph: {
+    title: "World's #1 Cheapest & Best SMM Services Provider | Sociolizy",
+    description:
+      "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
+    url: "https://www.sociolizy.com",
+    siteName: "Sociolizy",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sociolizy - Your Ultimate SMM Partner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sociolizy - #1 Best & Cheapest SMM Panel for Resellers",
+    description:
+      "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
+    images: ["/og-image.jpg"],
+  },
   verification: {
     google: gscConfig.googleSiteVerification || gscConfig.content,
   },
