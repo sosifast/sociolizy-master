@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
 import { verifyCryptomusWebhookSignature } from "@/lib/cryptomus";
+import { sendDepositSuccessEmail } from "@/lib/resend";
 
 export async function POST(request: Request) {
   try {
@@ -61,12 +62,29 @@ export async function POST(request: Request) {
               increment: depositAmount,
             },
           },
-          select: { uuid: true, username: true, balance: true },
+          select: { uuid: true, username: true, email: true, balance: true },
         });
 
         newBalance = Number(updatedUser.balance);
         userUuid = updatedUser.uuid;
         username = updatedUser.username;
+
+        // Send Deposit Success Email via Resend
+        if (updatedUser.email) {
+          try {
+            await sendDepositSuccessEmail({
+              email: updatedUser.email,
+              username: updatedUser.username,
+              orderId: tx.order_id,
+              amount: depositAmount,
+              currency: tx.currency,
+              newBalance,
+              txid: txid ? String(txid) : tx.txid,
+            });
+          } catch (emailErr) {
+            console.warn("[Resend] Failed to send deposit webhook email:", emailErr);
+          }
+        }
       }
     } else if (tx.user_id) {
       const u = await prisma.user.findUnique({

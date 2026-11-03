@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
 import { submitOrderToProvider } from "@/lib/provider-api";
 import { createOrderInMongo, getOrdersFromMongo } from "@/lib/mongodb";
+import { sendOrderCreatedEmail } from "@/lib/resend";
 
 /**
  * Generate a unique invoice ID: INV-YYYYMMDD-XXXXX
@@ -282,6 +283,26 @@ export async function POST(request: Request) {
       });
     } catch (pErr) {
       console.warn("[Pusher] Failed to broadcast order event:", pErr);
+    }
+
+    // Send Order Confirmation Email via Resend
+    try {
+      if (user.email) {
+        await sendOrderCreatedEmail({
+          email: user.email,
+          username: user.username,
+          invoice: newMongoOrder.invoice,
+          orderId: newMongoOrder.order_id,
+          serviceName: service.service_name,
+          target: newMongoOrder.target,
+          quantity: newMongoOrder.amount,
+          price: newMongoOrder.price_sale,
+          status: newMongoOrder.status,
+          remainingBalance: Number(updatedUser.balance),
+        });
+      }
+    } catch (emailErr) {
+      console.warn("[Resend] Failed to send order confirmation email:", emailErr);
     }
 
     return NextResponse.json({

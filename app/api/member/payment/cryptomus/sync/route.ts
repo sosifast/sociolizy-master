@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
 import { pusherServer } from "@/lib/pusher";
 import { getCryptomusPaymentInfo } from "@/lib/cryptomus";
+import { sendDepositSuccessEmail } from "@/lib/resend";
 
 export async function POST(request: Request) {
   await connection();
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { uuid: session.uuid },
-      select: { id: true, uuid: true, username: true, balance: true },
+      select: { id: true, uuid: true, username: true, email: true, balance: true },
     });
 
     if (!user) {
@@ -114,6 +115,23 @@ export async function POST(request: Request) {
         select: { balance: true },
       });
       newBalance = Number(updatedUser.balance);
+
+      // Send Deposit Success Email via Resend
+      if (user.email) {
+        try {
+          await sendDepositSuccessEmail({
+            email: user.email,
+            username: user.username,
+            orderId: tx.order_id,
+            amount: depositAmount,
+            currency: tx.currency,
+            newBalance,
+            txid: info.txid ? String(info.txid) : tx.txid,
+          });
+        } catch (emailErr) {
+          console.warn("[Resend] Failed to send deposit sync email:", emailErr);
+        }
+      }
     }
 
     // Trigger Pusher broadcast

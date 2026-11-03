@@ -22,10 +22,12 @@ model User {
   balance      Decimal  @default(0) @db.Decimal(15, 2)
   level        Level    @default(Member)
   api_key      String?  @unique
-  callback_url String?
-  server_area  String   @default("SG")
-  create_at    DateTime @default(now())
-  update_at    DateTime @updatedAt
+  callback_url       String?
+  server_area        String    @default("SG")
+  reset_token        String?
+  reset_token_expiry DateTime?
+  create_at          DateTime  @default(now())
+  update_at          DateTime  @updatedAt
 
   @@map("user")
 }

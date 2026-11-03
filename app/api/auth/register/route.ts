@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDiscoveredRegions, getActiveClusterConfig } from "@/lib/server-db";
 import { allocateRollingServerNode } from "@/lib/mongodb";
+import { sendRegistrationEmail } from "@/lib/resend";
 
 /**
  * GET: Mengambil daftar server region yang aktif dan terdeteksi di .env
@@ -150,6 +151,17 @@ export async function POST(request: Request) {
       });
     } catch (pErr) {
       console.warn("Pusher user-registered trigger warning:", pErr);
+    }
+
+    // Send Welcome Email via Resend
+    try {
+      await sendRegistrationEmail({
+        email: newUser.email,
+        username: newUser.username,
+        serverArea: newUser.server_area,
+      });
+    } catch (emailErr) {
+      console.warn("[Resend] Failed to send registration email:", emailErr);
     }
 
     return NextResponse.json({

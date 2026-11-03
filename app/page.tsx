@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   description:
     "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
   alternates: {
-    canonical: "https://www.sociolizy.com",
+    canonical: "https://sociolizy.com",
   },
   openGraph: {
     title: "World's #1 Cheapest & Best SMM Services Provider | Sociolizy",
     description:
       "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
-    url: "https://www.sociolizy.com",
+    url: "https://sociolizy.com",
     siteName: "Sociolizy",
     images: [
       {
