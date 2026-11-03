@@ -3,6 +3,8 @@ import crypto from "crypto";
 export interface CryptomusCreatePaymentParams {
   amount: number | string;
   currency?: string;
+  to_currency?: string;
+  network?: string;
   orderId: string;
   merchantId: string;
   paymentKey: string;
@@ -18,6 +20,10 @@ export interface CryptomusCreatePaymentResult {
   amount: number;
   currency: string;
   status: string;
+  address?: string | null;
+  network?: string | null;
+  cryptoAmount?: string | number | null;
+  cryptoCurrency?: string | null;
   rawResponse?: any;
   error?: string;
 }
@@ -56,6 +62,8 @@ export function verifyCryptomusWebhookSignature(
 export async function createCryptomusInvoice({
   amount,
   currency = "USD",
+  to_currency,
+  network,
   orderId,
   merchantId,
   paymentKey,
@@ -74,6 +82,13 @@ export async function createCryptomusInvoice({
     is_payment_multiple: false,
     lifetime: 3600, // 1 hour expiration
   };
+
+  if (to_currency) {
+    payload.to_currency = to_currency.toUpperCase();
+  }
+  if (network) {
+    payload.network = network;
+  }
 
   if (isTestMode) {
     payload.is_test = true;
@@ -111,6 +126,12 @@ export async function createCryptomusInvoice({
     };
   }
 
+  // Extract address and network if returned directly by Cryptomus
+  const address = json.result?.address || null;
+  const returnedNetwork = json.result?.network || network || null;
+  const payerAmount = json.result?.payer_amount || null;
+  const payerCurrency = json.result?.payer_currency || to_currency || null;
+
   return {
     success: true,
     orderId,
@@ -118,7 +139,70 @@ export async function createCryptomusInvoice({
     amount: Number(json.result.amount || formattedAmount),
     currency: json.result.currency || currency.toUpperCase(),
     status: json.result.payment_status || "check",
+    address,
+    network: returnedNetwork,
+    cryptoAmount: payerAmount,
+    cryptoCurrency: payerCurrency,
     rawResponse: json,
   };
 }
+
+/**
+ * Call Cryptomus API to get payment details / status:
+ * POST https://api.cryptomus.com/v1/payment/info
+ */
+export async function getCryptomusPaymentInfo({
+  orderId,
+  merchantId,
+  paymentKey,
+}: {
+  orderId: string;
+  merchantId: string;
+  paymentKey: string;
+}): Promise<{
+  success: boolean;
+  status?: string;
+  isFinal?: boolean;
+  txid?: string;
+  amount?: number;
+  raw?: any;
+  error?: string;
+}> {
+  try {
+    const payload = { order_id: orderId };
+    const sign = generateCryptomusSignature(payload, paymentKey);
+
+    const response = await fetch("https://api.cryptomus.com/v1/payment/info", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        merchant: merchantId,
+        sign,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(12000),
+    });
+
+    const json = await response.json().catch(() => null);
+
+    if (!response.ok || !json || json.state !== 0 || !json.result) {
+      return {
+        success: false,
+        error: json?.message || `Cryptomus info error (${response.status})`,
+      };
+    }
+
+    return {
+      success: true,
+      status: json.result.payment_status || json.result.status,
+      isFinal: Boolean(json.result.is_final),
+      txid: json.result.txid,
+      amount: json.result.payment_amount ? parseFloat(json.result.payment_amount) : undefined,
+      raw: json.result,
+    };
+  } catch (err: any) {
+    return { success: false, error: err?.message || "Connection timeout" };
+  }
+}
+
 

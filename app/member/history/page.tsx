@@ -6,17 +6,9 @@ export default function MemberHistoryIndexPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
       <div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            Transaction History
-          </span>
-        </div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-          Activity &amp; Transaction Hub
+          History
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5 max-w-2xl">
-          Select a history category to view your SMM order transactions or account deposit records.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
@@ -33,12 +25,12 @@ export default function MemberHistoryIndexPage() {
               Order History
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
-              View all your social media service orders, including invoice IDs, provider references, target links, quantities, live statuses, and automatic balance refunds.
+              View all your service orders, including invoice IDs, target links, quantities, real-time statuses, and automatic balance refunds.
             </p>
           </div>
 
           <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 text-xs sm:text-sm font-semibold text-emerald-600 group-hover:text-emerald-700">
-            <span>View Order Records</span>
+            <span>View Order History</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>
@@ -56,7 +48,7 @@ export default function MemberHistoryIndexPage() {
               Deposit History
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
-              Track your complete account top-up history via cryptocurrency gateways (Cryptomus) or alternative payment options with real-time network confirmation statuses.
+              Track your complete account top-up history via cryptocurrency gateways with real-time network confirmation statuses.
             </p>
           </div>
 

@@ -122,9 +122,6 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
                 className="h-9 sm:h-10 w-auto object-contain"
                 priority
               />
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
-                Member
-              </span>
             </Link>
 
             {/* Desktop Navigation Links */}

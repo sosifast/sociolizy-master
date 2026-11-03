@@ -156,19 +156,16 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
-          <Link href="/admin" className="flex items-center gap-2.5 group">
+        <div className="h-16 px-5 border-b border-slate-100 flex items-center bg-white shrink-0">
+          <Link href="/admin" className="flex items-center group py-1">
             <Image
               src="/logo/logo.png"
               alt="sociolizy"
-              width={125}
-              height={46}
-              className="h-8 w-auto object-contain"
+              width={160}
+              height={58}
+              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
               priority
             />
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200">
-              Admin
-            </span>
           </Link>
         </div>
 
@@ -198,7 +195,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
                     >
                       <div className="flex items-center gap-3">
                         <Icon
-                          className={`w-4 h-4 transition-transform group-hover:scale-110 ${
+                          className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${
                             active
                               ? "text-white"
                               : "text-slate-400 group-hover:text-emerald-600"

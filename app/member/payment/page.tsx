@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Wallet,
   CheckCircle2,
   Clock,
   ArrowRight,
-  Receipt,
-  ExternalLink,
   AlertCircle,
   Loader2,
   X,
   Shield,
   HelpCircle,
+  Coins,
 } from "lucide-react";
 
 interface GatewaySetting {
@@ -35,10 +35,34 @@ interface PendingInvoice {
   create_at: string;
 }
 
+interface CryptoOption {
+  id: string;
+  name: string;
+  symbol: string;
+  network: string;
+  networkLabel: string;
+  badge?: string;
+}
+
+const CRYPTO_OPTIONS: CryptoOption[] = [
+  { id: "usdt-trc20", name: "Tether USD", symbol: "USDT", network: "tron", networkLabel: "Tron (TRC-20)", badge: "Popular" },
+  { id: "usdt-bep20", name: "Tether USD", symbol: "USDT", network: "bsc", networkLabel: "BNB Smart Chain (BEP-20)" },
+  { id: "usdt-polygon", name: "Tether USD", symbol: "USDT", network: "polygon", networkLabel: "Polygon Network" },
+  { id: "usdt-ton", name: "Tether USD", symbol: "USDT", network: "ton", networkLabel: "TON Network" },
+  { id: "btc", name: "Bitcoin", symbol: "BTC", network: "btc", networkLabel: "Bitcoin Network" },
+  { id: "eth", name: "Ethereum", symbol: "ETH", network: "eth", networkLabel: "Ethereum (ERC-20)" },
+  { id: "sol", name: "Solana", symbol: "SOL", network: "sol", networkLabel: "Solana Network" },
+  { id: "trx", name: "Tron", symbol: "TRX", network: "tron", networkLabel: "Tron Network" },
+  { id: "ltc", name: "Litecoin", symbol: "LTC", network: "ltc", networkLabel: "Litecoin Network" },
+  { id: "doge", name: "Dogecoin", symbol: "DOGE", network: "doge", networkLabel: "Dogecoin Network" },
+];
+
 const PRESET_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
 export default function MemberPaymentPage() {
+  const router = useRouter();
   const [amount, setAmount] = useState<number | string>(25);
+  const [selectedCrypto, setSelectedCrypto] = useState<CryptoOption>(CRYPTO_OPTIONS[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,15 +76,6 @@ export default function MemberPaymentPage() {
   });
 
   const [pendingInvoices, setPendingInvoices] = useState<PendingInvoice[]>([]);
-  const [userBalance, setUserBalance] = useState<number>(0);
-
-  // Success modal
-  const [createdInvoice, setCreatedInvoice] = useState<{
-    order_id: string;
-    amount: number;
-    currency: string;
-    invoice_url: string;
-  } | null>(null);
 
   const fetchGatewayData = async () => {
     try {
@@ -68,7 +83,6 @@ export default function MemberPaymentPage() {
       const json = await res.json();
       if (json.success && json.data) {
         if (json.data.setting) setSetting(json.data.setting);
-        if (json.data.user?.balance !== undefined) setUserBalance(json.data.user.balance);
         if (Array.isArray(json.data.pending_invoices)) setPendingInvoices(json.data.pending_invoices);
       }
     } catch (err) {
@@ -89,6 +103,18 @@ export default function MemberPaymentPage() {
   const totalToPay = parsedAmount + feeAmount;
   const isAmountValid = parsedAmount >= setting.min_deposit && parsedAmount <= setting.max_deposit;
 
+  const estimatedCrypto = useMemo(() => {
+    if (!totalToPay || totalToPay <= 0) return "0.00";
+    if (selectedCrypto.symbol === "USDT") return totalToPay.toFixed(2);
+    if (selectedCrypto.symbol === "BTC") return (totalToPay / 95000).toFixed(6);
+    if (selectedCrypto.symbol === "ETH") return (totalToPay / 3400).toFixed(6);
+    if (selectedCrypto.symbol === "SOL") return (totalToPay / 185).toFixed(4);
+    if (selectedCrypto.symbol === "TRX") return (totalToPay / 0.2).toFixed(2);
+    if (selectedCrypto.symbol === "LTC") return (totalToPay / 100).toFixed(4);
+    if (selectedCrypto.symbol === "DOGE") return (totalToPay / 0.25).toFixed(2);
+    return totalToPay.toFixed(2);
+  }, [totalToPay, selectedCrypto.symbol]);
+
   const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isProcessing || !isAmountValid) return;
@@ -99,32 +125,30 @@ export default function MemberPaymentPage() {
       const res = await fetch("/api/member/payment/cryptomus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parsedAmount, currency: setting.currency || "USD" }),
+        body: JSON.stringify({
+          amount: parsedAmount,
+          currency: setting.currency || "USD",
+          to_currency: selectedCrypto.symbol,
+          network: selectedCrypto.network,
+        }),
       });
 
       const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to create invoice");
+      if (!res.ok || !json.success || !json.data?.order_id) {
+        throw new Error(json.message || "Failed to create deposit invoice.");
       }
 
-      setCreatedInvoice({
-        order_id: json.data.order_id,
-        amount: json.data.amount,
-        currency: json.data.currency,
-        invoice_url: json.data.invoice_url,
-      });
-
-      fetchGatewayData();
+      // Direct to our own website invoice page with Wallet Address and QR Code
+      router.push(`/member/history/deposit/${json.data.order_id}`);
     } catch (err: any) {
       setError(err.message || "Failed to connect to payment gateway.");
-    } finally {
       setIsProcessing(false);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6 bg-white text-slate-900">
-      {/* Header section */}
+      {/* Header section - Clean without fluff */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
@@ -132,14 +156,6 @@ export default function MemberPaymentPage() {
             <span>Deposit Funds</span>
           </h1>
         </div>
-
-        <Link
-          href="/member/history/deposit"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-700 transition-colors shadow-xs self-start sm:self-auto"
-        >
-          <Receipt className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Deposit History</span>
-        </Link>
       </div>
 
       {/* Main Container */}
@@ -161,16 +177,12 @@ export default function MemberPaymentPage() {
                   </span>
                 </div>
               </div>
-              {pendingInvoices[0].invoice_url && (
-                <a
-                  href={pendingInvoices[0].invoice_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-colors text-center shadow-xs"
-                >
-                  Pay Now
-                </a>
-              )}
+              <Link
+                href={`/member/history/deposit/${pendingInvoices[0].order_id}`}
+                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-colors text-center shadow-xs"
+              >
+                Pay Now
+              </Link>
             </div>
           )}
 
@@ -182,19 +194,69 @@ export default function MemberPaymentPage() {
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
-                <button onClick={() => setError(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setError(null)}
+                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
 
+            <form onSubmit={handleDepositSubmit} className="space-y-5">
+              {/* 1. Crypto Selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                  <Coins className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Select Cryptocurrency &amp; Network</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {CRYPTO_OPTIONS.map((crypto) => {
+                    const isSelected = selectedCrypto.id === crypto.id;
+                    return (
+                      <button
+                        key={crypto.id}
+                        type="button"
+                        onClick={() => setSelectedCrypto(crypto)}
+                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                          isSelected
+                            ? "bg-emerald-50/70 border-emerald-500 ring-1 ring-emerald-500 text-slate-900 shadow-2xs"
+                            : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700"
+                        }`}
+                      >
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs">{crypto.symbol}</span>
+                            <span className="text-[11px] text-slate-500">({crypto.name})</span>
+                            {crypto.badge && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                {crypto.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-500 font-mono">{crypto.networkLabel}</p>
+                        </div>
+                        <div
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                            isSelected
+                              ? "border-emerald-600 bg-emerald-600 text-white"
+                              : "border-slate-300 bg-white"
+                          }`}
+                        >
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-            <form onSubmit={handleDepositSubmit} className="space-y-4">
-              {/* Amount Input */}
+              {/* 2. Amount Input */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-700">
-                    Amount (USD)
+                    Deposit Amount (USD)
                   </label>
                   <span className="text-[11px] text-slate-500 font-mono">
                     Min: ${setting.min_deposit.toFixed(2)} | Max: ${setting.max_deposit.toLocaleString()}
@@ -243,12 +305,22 @@ export default function MemberPaymentPage() {
                 </div>
               </div>
 
-              {/* Total Calculation */}
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-slate-600 font-medium">Total to Pay:</span>
-                <span className="font-mono font-bold text-slate-900 text-base sm:text-lg">
-                  ${totalToPay.toFixed(2)} USD
-                </span>
+              {/* Estimation Box */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Payment Currency:</span>
+                  <span className="font-bold text-slate-900">{selectedCrypto.name} ({selectedCrypto.symbol})</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Network:</span>
+                  <span className="font-semibold text-emerald-700 font-mono">{selectedCrypto.networkLabel}</span>
+                </div>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-700 font-bold">Estimated Crypto to Send:</span>
+                  <span className="font-mono font-extrabold text-emerald-600 text-sm sm:text-base">
+                    ≈ {estimatedCrypto} {selectedCrypto.symbol}
+                  </span>
+                </div>
               </div>
 
               {/* Submit CTA */}
@@ -260,7 +332,7 @@ export default function MemberPaymentPage() {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Connecting Gateway...</span>
+                    <span>Creating Payment Invoice...</span>
                   </>
                 ) : (
                   <>
@@ -278,7 +350,7 @@ export default function MemberPaymentPage() {
           <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-3">
             <h3 className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
               <Shield className="w-4 h-4 text-emerald-600" />
-              <span>Deposit Notes</span>
+              <span>Deposit Terms</span>
             </h3>
 
             <ul className="space-y-2 text-slate-600 text-xs leading-relaxed">
@@ -288,11 +360,11 @@ export default function MemberPaymentPage() {
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-600 font-bold">•</span>
-                <span>Invoices are valid for <strong>60 minutes</strong>.</span>
+                <span>Invoices directly generate an official deposit wallet address and QR code.</span>
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-600 font-bold">•</span>
-                <span>Your account balance will be credited automatically once the blockchain transaction is confirmed.</span>
+                <span>Your account balance will be credited automatically once the transaction is confirmed on the blockchain.</span>
               </li>
             </ul>
           </div>
@@ -311,58 +383,6 @@ export default function MemberPaymentPage() {
           </div>
         </div>
       </div>
-
-      {/* Invoice Generated Modal */}
-      {createdInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-4 text-center animate-in zoom-in-95 duration-150">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-900">Invoice Created Successfully</h3>
-              <p className="text-xs text-slate-500">
-                Complete your cryptocurrency payment using the secure link below.
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs text-left">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Invoice ID:</span>
-                <span className="font-mono font-bold text-slate-900">{createdInvoice.order_id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Total Amount:</span>
-                <span className="font-mono font-bold text-emerald-600 text-sm">
-                  ${createdInvoice.amount.toFixed(2)} {createdInvoice.currency}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-1">
-              <a
-                href={createdInvoice.invoice_url}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => setCreatedInvoice(null)}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>Pay via Cryptomus</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
-              <button
-                type="button"
-                onClick={() => setCreatedInvoice(null)}
-                className="w-full py-2 px-3 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

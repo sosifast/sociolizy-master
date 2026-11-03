@@ -1,15 +1,15 @@
 import React from "react";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { Zap, Wallet, ShoppingCart, User, Globe, LogOut, Shield, History } from "lucide-react";
 import LogoutButton from "@/app/components/logout-button";
 import { verifySessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countOrdersInMongo } from "@/lib/mongodb";
 
-export const instant = false;
-
 export default async function MemberDashboardPage() {
+  await connection();
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("user_session")?.value;
   const session = await verifySessionToken(sessionCookie);
@@ -31,20 +31,9 @@ export default async function MemberDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
       {/* Welcome banner */}
       <div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            Verified Member
-          </span>
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-            Node: {user?.server_area || session?.server_area || "SG"}
-          </span>
-        </div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
           Welcome Back, {session?.username || "Member"}!
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-          Your central dashboard for automated SMM orders, live balance, and transaction records.
-        </p>
       </div>
 
       {/* Quick summary cards */}

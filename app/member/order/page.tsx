@@ -8,10 +8,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  ExternalLink,
   Info,
-  Clock,
-  RefreshCw,
 } from "lucide-react";
 
 interface ServiceItem {
@@ -42,19 +39,6 @@ interface CategoryWithServices {
   services: ServiceItem[];
 }
 
-interface OrderHistoryItem {
-  id: number;
-  invoice: string;
-  order_id: string | null;
-  service_id: string;
-  amount: number;
-  price_sale: string | number;
-  target: string;
-  status: string;
-  server_area?: string;
-  create_at: string;
-}
-
 export default function MemberOrderPage() {
   const [categories, setCategories] = useState<CategoryWithServices[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
@@ -75,10 +59,6 @@ export default function MemberOrderPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
-
-  // Order History State
-  const [orders, setOrders] = useState<OrderHistoryItem[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
 
   // Category search filter
   const [searchCategory, setSearchCategory] = useState("");
@@ -102,31 +82,23 @@ export default function MemberOrderPage() {
     }
   };
 
-  // 2. Fetch user balance & recent orders
-  const fetchOrderHistory = async () => {
+  // 2. Fetch user balance
+  const fetchUserData = async () => {
     try {
-      setLoadingOrders(true);
-      const res = await fetch("/api/member/order?limit=20");
+      const res = await fetch("/api/member/order?limit=1");
       const json = await res.json();
-      if (json.success) {
-        if (json.user) {
-          setUserBalance(Number(json.user.balance || 0));
-          setServerArea(json.user.server_area || "SG");
-        }
-        if (Array.isArray(json.data)) {
-          setOrders(json.data);
-        }
+      if (json.success && json.user) {
+        setUserBalance(Number(json.user.balance || 0));
+        setServerArea(json.user.server_area || "SG");
       }
     } catch (err) {
-      console.error("Failed to load order history:", err);
-    } finally {
-      setLoadingOrders(false);
+      console.error("Failed to load user info:", err);
     }
   };
 
   useEffect(() => {
     fetchServices();
-    fetchOrderHistory();
+    fetchUserData();
   }, []);
 
   // Filtered categories
@@ -218,7 +190,7 @@ export default function MemberOrderPage() {
         if (typeof json.data?.remaining_balance === "number") {
           setUserBalance(json.data.remaining_balance);
         }
-        fetchOrderHistory();
+        fetchUserData();
       } else {
         setAlertInfo({
           type: "error",
@@ -237,21 +209,13 @@ export default function MemberOrderPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
-      {/* Page Title & Breadcrumb Header */}
+      {/* Page Title Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              SMM Order Engine
-            </span>
-          </div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
             <ShoppingCart className="w-5 h-5 text-emerald-600" />
             <span>New Order</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Select a category and social media service to place an instant automated order.
-          </p>
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
@@ -261,13 +225,6 @@ export default function MemberOrderPage() {
           >
             <Wallet className="w-3.5 h-3.5 text-emerald-600" />
             <span>Deposit</span>
-          </Link>
-          <Link
-            href="/member/history/order"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Order Records</span>
           </Link>
         </div>
       </div>
@@ -530,104 +487,6 @@ export default function MemberOrderPage() {
             <p>• Orders are automatically dispatched to the server provider clusters.</p>
           </div>
         </div>
-      </div>
-
-      {/* Bottom: Recent Orders History */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600" />
-              <span>Recent Orders</span>
-            </h3>
-            <span className="text-xs text-slate-500">List of your recent order transactions</span>
-          </div>
-          <button
-            onClick={fetchOrderHistory}
-            disabled={loadingOrders}
-            className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingOrders ? "animate-spin" : ""}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
-
-        {loadingOrders ? (
-          <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-            <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
-            <span className="text-xs">Loading history...</span>
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="py-10 text-center text-slate-400 text-xs sm:text-sm">
-            No orders placed yet. Place your first order using the form above.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-700 font-bold bg-slate-50">
-                  <th className="py-2.5 px-3">Invoice</th>
-                  <th className="py-2.5 px-3">Node</th>
-                  <th className="py-2.5 px-3">Order ID</th>
-                  <th className="py-2.5 px-3">Target</th>
-                  <th className="py-2.5 px-3 text-right">Quantity</th>
-                  <th className="py-2.5 px-3 text-right">Price ($)</th>
-                  <th className="py-2.5 px-3 text-center">Status</th>
-                  <th className="py-2.5 px-3 text-right">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {orders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">
-                      {ord.invoice}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 font-mono border border-slate-200">
-                        {ord.server_area || "SG"}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3 font-mono text-slate-600 text-xs">
-                      {ord.order_id || "-"}
-                    </td>
-                    <td className="py-2.5 px-3 max-w-[220px] truncate text-slate-800" title={ord.target}>
-                      {ord.target}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-900 font-semibold">
-                      {ord.amount.toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-emerald-600 font-semibold">
-                      ${Number(ord.price_sale).toFixed(4)}
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                          ord.status === "Processing" || ord.status === "In progress"
-                            ? "bg-sky-50 text-sky-700 border-sky-200"
-                            : ord.status === "Completed"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : ord.status === "Canceled" || ord.status === "Error"
-                            ? "bg-rose-50 text-rose-700 border-rose-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
-                        }`}
-                      >
-                        {ord.status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap text-[11px]">
-                      {new Date(ord.create_at).toLocaleDateString("en-US", {
-                        day: "2-digit",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </div>
   );

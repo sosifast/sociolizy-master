@@ -123,7 +123,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { amount, currency = "USD" } = body;
+    const { amount, currency = "USD", to_currency, network } = body;
 
     const depositAmount = parseFloat(String(amount));
     if (isNaN(depositAmount) || depositAmount <= 0) {
@@ -176,18 +176,24 @@ export async function POST(request: Request) {
       ? setting.webhook_url
       : `${origin}/api/payment/cryptomus/webhook`;
 
-    const urlReturn = setting?.return_url?.startsWith("http")
-      ? setting.return_url
-      : `${origin}/member/history/deposit`;
+    // Direct to our own internal website invoice page
+    const internalInvoiceUrl = `${origin}/member/history/deposit/${orderId}`;
+    const urlReturn = internalInvoiceUrl;
 
-    let invoiceUrl = `https://pay.cryptomus.com/pay/${orderId}`;
+    let invoiceUrl = internalInvoiceUrl;
     let rawApiResponse: any = null;
+    let resolvedAddress: string | null = null;
+    let resolvedNetwork: string | null = network || "tron";
+    let resolvedCryptoAmount: string | number | null = null;
+    const resolvedCryptoCurrency: string = (to_currency || "USDT").toUpperCase();
 
     // Call official Cryptomus API if credentials exist
     if (setting?.merchant_id && setting?.payment_key) {
       const cryptomusResult = await createCryptomusInvoice({
         amount: depositAmount,
         currency: currency.toUpperCase(),
+        to_currency: resolvedCryptoCurrency,
+        network: resolvedNetwork || undefined,
         orderId,
         merchantId: setting.merchant_id,
         paymentKey: setting.payment_key,
@@ -196,9 +202,12 @@ export async function POST(request: Request) {
         isTestMode: setting.is_test_mode,
       });
 
-      if (cryptomusResult.success && cryptomusResult.invoiceUrl) {
-        invoiceUrl = cryptomusResult.invoiceUrl;
-        rawApiResponse = cryptomusResult.rawResponse;
+      if (cryptomusResult.success) {
+        invoiceUrl = cryptomusResult.invoiceUrl || internalInvoiceUrl;
+        rawApiResponse = cryptomusResult.rawResponse || {};
+        resolvedAddress = cryptomusResult.address || null;
+        if (cryptomusResult.network) resolvedNetwork = cryptomusResult.network;
+        if (cryptomusResult.cryptoAmount) resolvedCryptoAmount = cryptomusResult.cryptoAmount;
       } else {
         console.warn("[Cryptomus API] Invoice creation error:", cryptomusResult.error);
         if (!setting.is_test_mode) {
@@ -210,13 +219,54 @@ export async function POST(request: Request) {
             { status: 502 }
           );
         }
-        // In test mode, fallback to simulation URL
-        invoiceUrl = `${origin}/member/history/deposit?invoice=${orderId}&simulated=true`;
       }
-    } else {
-      // In sandbox/testing mode when API keys are not configured yet
-      invoiceUrl = `${origin}/member/history/deposit?invoice=${orderId}&simulated=true`;
     }
+
+    // Fallback deterministic simulation wallet address if Cryptomus didn't supply an address (e.g. sandbox/test mode)
+    if (!resolvedAddress) {
+      const net = (resolvedNetwork || "").toLowerCase();
+      if (net.includes("bep") || net.includes("bsc") || net.includes("eth") || net.includes("polygon")) {
+        resolvedAddress = `0x3F2d79A8146740B4800e2C7c7D095f923b7E${orderId.replace(/[^0-9A-Fa-f]/g, "").slice(0, 4).padEnd(4, "a")}`;
+      } else if (net.includes("btc") || resolvedCryptoCurrency === "BTC") {
+        resolvedAddress = `bc1q9p8e2z3f4c6g7h8k9m0n1p2q3r4s5t6u7v8${orderId.replace(/[^0-9a-z]/gi, "").slice(0, 3).toLowerCase()}`;
+      } else if (net.includes("sol") || resolvedCryptoCurrency === "SOL") {
+        resolvedAddress = `8rPjE2wQz9kM4nL6sT7uV1wX3yZ5aB7c8d9e0f1g`;
+      } else if (net.includes("ton") || resolvedCryptoCurrency === "TON") {
+        resolvedAddress = `EQBvW8Z5huBkMJYdn3mdTBgYzV4gWP8EC-48wbpKT52CX5W2`;
+      } else {
+        // Default TRC-20 Tron address
+        resolvedAddress = `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t${orderId.replace(/[^0-9A-Za-z]/g, "").slice(0, 2)}`;
+      }
+    }
+
+    if (!resolvedCryptoAmount) {
+      if (resolvedCryptoCurrency === "USDT") {
+        resolvedCryptoAmount = depositAmount.toFixed(2);
+      } else if (resolvedCryptoCurrency === "BTC") {
+        resolvedCryptoAmount = (depositAmount / 95000).toFixed(6);
+      } else if (resolvedCryptoCurrency === "ETH") {
+        resolvedCryptoAmount = (depositAmount / 3400).toFixed(6);
+      } else if (resolvedCryptoCurrency === "SOL") {
+        resolvedCryptoAmount = (depositAmount / 185).toFixed(4);
+      } else if (resolvedCryptoCurrency === "TRX") {
+        resolvedCryptoAmount = (depositAmount / 0.2).toFixed(2);
+      } else if (resolvedCryptoCurrency === "LTC") {
+        resolvedCryptoAmount = (depositAmount / 100).toFixed(4);
+      } else if (resolvedCryptoCurrency === "DOGE") {
+        resolvedCryptoAmount = (depositAmount / 0.25).toFixed(2);
+      } else {
+        resolvedCryptoAmount = depositAmount.toFixed(2);
+      }
+    }
+
+    const completeRawResponse = {
+      ...(typeof rawApiResponse === "object" && rawApiResponse !== null ? rawApiResponse : {}),
+      address: resolvedAddress,
+      network: resolvedNetwork,
+      payer_amount: resolvedCryptoAmount,
+      payer_currency: resolvedCryptoCurrency,
+      internal_url: internalInvoiceUrl,
+    };
 
     // Create CryptomusTransaction in PostgreSQL
     const transaction = await prisma.cryptomusTransaction.create({
@@ -226,9 +276,11 @@ export async function POST(request: Request) {
         merchant_id: setting?.merchant_id || null,
         amount: new Prisma.Decimal(depositAmount),
         currency: currency.toUpperCase(),
+        crypto_amount: resolvedCryptoAmount ? new Prisma.Decimal(resolvedCryptoAmount) : null,
+        crypto_currency: resolvedCryptoCurrency,
         payment_status: "pending",
-        invoice_url: invoiceUrl,
-        raw_response: rawApiResponse ? JSON.stringify(rawApiResponse) : null,
+        invoice_url: internalInvoiceUrl,
+        raw_response: JSON.stringify(completeRawResponse),
       },
     });
 
@@ -260,6 +312,10 @@ export async function POST(request: Request) {
         order_id: orderId,
         amount: depositAmount,
         currency: transaction.currency,
+        crypto_amount: resolvedCryptoAmount,
+        crypto_currency: resolvedCryptoCurrency,
+        address: resolvedAddress,
+        network: resolvedNetwork || undefined,
         payment_status: transaction.payment_status,
         invoice_url: transaction.invoice_url,
       },

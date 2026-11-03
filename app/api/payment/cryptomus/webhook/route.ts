@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     let username: string = "";
 
     // If payment is paid and wasn't already paid, credit user's balance!
-    if ((newStatus === "paid" || newStatus === "paid_over") && currentStatus !== "paid") {
+    if ((newStatus === "paid" || newStatus === "paid_over") && currentStatus !== "paid" && currentStatus !== "paid_over") {
       if (tx.user_id) {
         const depositAmount = payment_amount ? parseFloat(payment_amount) : Number(tx.amount);
         const updatedUser = await prisma.user.update({
@@ -85,7 +85,10 @@ export async function POST(request: Request) {
       const payload = {
         order_id: tx.order_id,
         status: newStatus,
+        payment_status: newStatus,
         amount: Number(tx.amount),
+        currency: tx.currency,
+        txid: txid ? String(txid) : tx.txid,
         username,
         new_balance: newBalance,
       };
