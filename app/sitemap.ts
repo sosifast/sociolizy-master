@@ -19,37 +19,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // 2. Public Static & Service Pages (/page)
     {
-      url: `${baseUrl}/page/service`,
+      url: `${baseUrl}/service`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/page/doc`,
+      url: `${baseUrl}/doc`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/page/about-us`,
+      url: `${baseUrl}/about-us`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/page/contact-us`,
+      url: `${baseUrl}/contact-us`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/page/policy`,
+      url: `${baseUrl}/policy`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/page/privacy`,
+      url: `${baseUrl}/privacy`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
