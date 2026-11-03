@@ -24,12 +24,12 @@ export default function ContactForm() {
 
   if (isSubmitted) {
     return (
-      <div className="p-8 rounded-3xl bg-indigo-950/30 border border-indigo-500/30 text-center flex flex-col items-center justify-center space-y-4">
-        <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+      <div className="p-8 rounded-3xl bg-emerald-50/60 border border-emerald-200 text-center flex flex-col items-center justify-center space-y-4 shadow-xs">
+        <div className="w-14 h-14 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600">
           <CheckCircle2 className="w-7 h-7" />
         </div>
-        <h4 className="text-xl font-bold text-white">Thank You for Reaching Out!</h4>
-        <p className="text-xs sm:text-sm text-slate-300 max-w-md">
+        <h4 className="text-xl font-bold text-slate-900">Thank You for Reaching Out!</h4>
+        <p className="text-xs sm:text-sm text-slate-600 max-w-md">
           Your inquiry has been received. Our support team typically responds via email within 1–2 hours during business hours.
         </p>
         <button
@@ -41,7 +41,7 @@ export default function ContactForm() {
             setSubject("");
             setMessage("");
           }}
-          className="mt-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+          className="mt-2 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-xs transition-colors cursor-pointer"
         >
           Send Another Message
         </button>
@@ -52,22 +52,22 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-6 sm:p-8 rounded-3xl bg-slate-900/40 border border-slate-800 shadow-xl space-y-5"
+      className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-5"
     >
-      <div className="border-b border-slate-800/80 pb-4">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo-400" />
+      <div className="border-b border-slate-100 pb-4">
+        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-emerald-600" />
           <span>Send Us a Direct Message</span>
         </h3>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Have questions regarding billing, enterprise API keys, or custom volumes? Leave us a note.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Your Name <span className="text-indigo-400">*</span>
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            Your Name <span className="text-emerald-600">*</span>
           </label>
           <input
             type="text"
@@ -75,13 +75,13 @@ export default function ContactForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="John Doe"
-            className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50/80 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Email Address <span className="text-indigo-400">*</span>
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            Email Address <span className="text-emerald-600">*</span>
           </label>
           <input
             type="email"
@@ -89,14 +89,14 @@ export default function ContactForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="john@example.com"
-            className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50/80 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-          Subject <span className="text-indigo-400">*</span>
+        <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+          Subject <span className="text-emerald-600">*</span>
         </label>
         <input
           type="text"
@@ -104,13 +104,13 @@ export default function ContactForm() {
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder="Service question, Custom order, or Reseller inquiry"
-          className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+          className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50/80 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-          Message <span className="text-indigo-400">*</span>
+        <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+          Message <span className="text-emerald-600">*</span>
         </label>
         <textarea
           rows={4}
@@ -118,14 +118,14 @@ export default function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Please describe how we can help you in detail..."
-          className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-800/60 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all resize-none"
+          className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50/80 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
         />
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60"
       >
         {isSubmitting ? (
           <>

@@ -25,6 +25,8 @@ export interface OrderSmmDocument {
   start: number;
   refill: boolean;
   status: string;
+  callback_url?: string | null;
+  callback_status?: string | null;
   server_area?: string | null;
   refund_amount?: number;
   refunded?: boolean;
@@ -368,6 +370,8 @@ export async function createOrderInMongo(
     start: data.start !== undefined ? Number(data.start) : 0,
     refill: Boolean(data.refill),
     status: data.status || "Pending",
+    callback_url: data.callback_url || null,
+    callback_status: data.callback_status || (data.callback_url ? "pending" : null),
     server_area: targetNode,
     create_at: data.create_at || new Date(),
     update_at: data.update_at || new Date(),
@@ -482,6 +486,161 @@ export async function countOrdersInMongo(
   }
 }
 
+/**
+ * Retrieve a single order for a specific user by its numeric ID, invoice, or provider order_id
+ */
+export async function getOrderByIdForUser(
+  userUuid: string,
+  orderIdentifier: number | string,
+  serverArea?: string
+): Promise<OrderSmmDocument | null> {
+  try {
+    const regionServers = getServersForRegion(serverArea);
+    const numericId = Number(orderIdentifier);
+    const isNum = !isNaN(numericId);
+
+    const conditions: any[] = [
+      { invoice: String(orderIdentifier) },
+      { order_id: String(orderIdentifier) },
+    ];
+    if (isNum) {
+      conditions.unshift({ id: numericId });
+    }
+
+    const filter = {
+      uuid_user: userUuid,
+      $or: conditions,
+    };
+
+    if (regionServers.length <= 1) {
+      const col = await getOrderSmmCollection(serverArea, userUuid);
+      if (!col) return null;
+      const doc = await col.findOne(filter);
+      return doc ? mapOrderDocs([doc], serverArea || "SG")[0] : null;
+    }
+
+    const promises = regionServers.map(async (srv) => {
+      try {
+        const client = await getMongoClient(srv.id);
+        if (!client) return null;
+        const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+        const doc = await col.findOne(filter);
+        return doc ? mapOrderDocs([doc], srv.id)[0] : null;
+      } catch {
+        return null;
+      }
+    });
+
+    const results = await Promise.allSettled(promises);
+    for (const res of results) {
+      if (res.status === "fulfilled" && res.value) {
+        return res.value;
+      }
+    }
+
+    // Fallback: If not found in primary region (e.g. user was migrated or serverArea changed),
+    // perform a quick check across all other configured servers
+    const otherServers = getDiscoveredServers().filter(
+      (s) => s.isConfigured && !regionServers.some((rs) => rs.id === s.id)
+    );
+    if (otherServers.length > 0) {
+      const fallbackPromises = otherServers.map(async (srv) => {
+        try {
+          const client = await getMongoClient(srv.id);
+          if (!client) return null;
+          const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+          const doc = await col.findOne(filter);
+          return doc ? mapOrderDocs([doc], srv.id)[0] : null;
+        } catch {
+          return null;
+        }
+      });
+      const fallbackResults = await Promise.allSettled(fallbackPromises);
+      for (const res of fallbackResults) {
+        if (res.status === "fulfilled" && res.value) {
+          return res.value;
+        }
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`[MongoDB] getOrderByIdForUser error:`, error);
+    return null;
+  }
+}
+
+/**
+ * Retrieve multiple orders for a user given a list of IDs/invoices
+ */
+export async function getOrdersByIdsForUser(
+  userUuid: string,
+  orderIdentifiers: Array<number | string>,
+  serverArea?: string
+): Promise<Map<string, OrderSmmDocument>> {
+  const resultMap = new Map<string, OrderSmmDocument>();
+  if (!orderIdentifiers || orderIdentifiers.length === 0) return resultMap;
+
+  try {
+    const regionServers = getServersForRegion(serverArea);
+    const numIds: number[] = [];
+    const strIds: string[] = [];
+
+    for (const raw of orderIdentifiers) {
+      const str = String(raw).trim();
+      if (!str) continue;
+      const num = Number(str);
+      if (!isNaN(num)) numIds.push(num);
+      strIds.push(str);
+    }
+
+    const orConditions: any[] = [
+      { invoice: { $in: strIds } },
+      { order_id: { $in: strIds } },
+    ];
+    if (numIds.length > 0) {
+      orConditions.push({ id: { $in: numIds } });
+    }
+
+    const filter = {
+      uuid_user: userUuid,
+      $or: orConditions,
+    };
+
+    const targetServers =
+      regionServers.length > 0
+        ? regionServers
+        : [{ id: serverArea || "SG_1", isConfigured: true, group: "SG" } as any];
+
+    const promises = targetServers.map(async (srv: any) => {
+      try {
+        const client = await getMongoClient(srv.id);
+        if (!client) return [];
+        const col = client.db("master_smm").collection<OrderSmmDocument>("order_smm");
+        const docs = await col.find(filter).toArray();
+        return mapOrderDocs(docs, srv.id);
+      } catch {
+        return [];
+      }
+    });
+
+    const results = await Promise.allSettled(promises);
+    for (const res of results) {
+      if (res.status === "fulfilled" && Array.isArray(res.value)) {
+        for (const doc of res.value) {
+          resultMap.set(String(doc.id), doc);
+          resultMap.set(doc.invoice, doc);
+          if (doc.order_id) resultMap.set(doc.order_id, doc);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`[MongoDB] getOrdersByIdsForUser error:`, error);
+  }
+
+  return resultMap;
+}
+
 function mapOrderDocs(docs: any[], defaultArea: string): OrderSmmDocument[] {
   return docs.map((doc: any) => ({
     id: doc.id,
@@ -498,6 +657,8 @@ function mapOrderDocs(docs: any[], defaultArea: string): OrderSmmDocument[] {
     start: doc.start ?? 0,
     refill: Boolean(doc.refill),
     status: doc.status || "Pending",
+    callback_url: doc.callback_url || null,
+    callback_status: doc.callback_status || null,
     server_area: doc.server_area || defaultArea,
     create_at: doc.create_at ? new Date(doc.create_at) : new Date(),
     update_at: doc.update_at ? new Date(doc.update_at) : new Date(),

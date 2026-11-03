@@ -118,22 +118,22 @@ export default function AdminCategoryPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Cari kategori..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none transition-all"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
               />
             </div>
 
             <button
               onClick={() => fetchCategories()}
               disabled={isLoading || isRefreshing}
-              className="p-2 rounded-xl text-slate-600 hover:text-red-600 bg-slate-50 border border-slate-200 hover:border-red-200 transition-colors shadow-xs cursor-pointer"
+              className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 bg-slate-50 border border-slate-200 hover:border-emerald-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-600" : ""}`} />
             </button>
 
             <Link
               href="/admin/category/create"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/25 transition-all whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all whitespace-nowrap cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Kategori</span>
@@ -144,7 +144,7 @@ export default function AdminCategoryPage() {
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600 mb-2" />
               <p className="text-xs">Memuat data kategori...</p>
             </div>
           ) : (
@@ -172,7 +172,7 @@ export default function AdminCategoryPage() {
                   </tr>
                 ) : (
                   paginated.map((c) => (
-                    <tr key={c.id} className="hover:bg-red-50/30 transition-colors">
+                    <tr key={c.id} className="hover:bg-emerald-50/30 transition-colors">
                       <td className="py-3.5 px-5 font-bold font-mono text-slate-900">
                         #{c.id}
                       </td>
@@ -180,7 +180,7 @@ export default function AdminCategoryPage() {
                         {c.name}
                       </td>
                       <td className="py-3.5 px-5">
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-600 border border-red-200">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
                           {c.platform?.name || `Platform #${c.id_platform}`}
                         </span>
                       </td>
@@ -194,7 +194,7 @@ export default function AdminCategoryPage() {
                         <div className="flex items-center justify-end gap-1.5">
                           <Link
                             href={`/admin/category/${c.id}/edit`}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                             title="Edit"
                           >
                             <Edit className="w-3.5 h-3.5" />

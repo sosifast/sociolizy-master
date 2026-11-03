@@ -93,7 +93,7 @@ export default function CreateCategoryPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/category"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -115,14 +115,14 @@ export default function CreateCategoryPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Pilih Platform Induk <span className="text-red-600">*</span>
+              Pilih Platform Induk <span className="text-emerald-600">*</span>
             </label>
             {isLoadingPlatforms ? (
               <div className="p-2 text-xs text-slate-400">Memuat platform...</div>
             ) : platforms.length === 0 ? (
               <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
                 Belum ada platform di database. Silakan{" "}
-                <Link href="/admin/platform/create" className="font-bold underline text-red-600">
+                <Link href="/admin/platform/create" className="font-bold underline text-emerald-600">
                   Tambah Platform
                 </Link>{" "}
                 terlebih dahulu.
@@ -132,7 +132,7 @@ export default function CreateCategoryPage() {
                 value={idPlatform}
                 onChange={(e) => setIdPlatform(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               >
                 {platforms.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -145,7 +145,7 @@ export default function CreateCategoryPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Nama Kategori <span className="text-red-600">*</span>
+              Nama Kategori <span className="text-emerald-600">*</span>
             </label>
             <input
               type="text"
@@ -158,7 +158,7 @@ export default function CreateCategoryPage() {
                 }
               }}
               placeholder="Contoh: Instagram Followers Indonesia"
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -171,7 +171,7 @@ export default function CreateCategoryPage() {
               value={slug}
               onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
               placeholder="instagram-followers-indonesia"
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function CreateCategoryPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Deskripsi layanan kategori ini..."
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -198,7 +198,7 @@ export default function CreateCategoryPage() {
             <button
               type="submit"
               disabled={isSaving || platforms.length === 0}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
             >
               {isSaving ? (
                 <>

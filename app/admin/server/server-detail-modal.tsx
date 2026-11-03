@@ -145,7 +145,7 @@ export default function ServerDetailModal({
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   NODE AKTIF (MULTI-ACTIVE PARALEL)
                 </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <Users className="w-3.5 h-3.5" />
                   {server.assignedUsers ?? 0} Pengguna Tersegmentasi
                 </span>
@@ -208,7 +208,7 @@ export default function ServerDetailModal({
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Query Throughput</span>
-              <Zap className="w-4 h-4 text-indigo-600" />
+              <Zap className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-2xl font-extrabold text-slate-900 flex items-baseline gap-1">
               <span>{server.qps.toLocaleString("id-ID")}</span>
@@ -250,7 +250,7 @@ export default function ServerDetailModal({
         {/* Resource Allocation Bars */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
           <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-red-600" />
+            <Cpu className="w-4 h-4 text-emerald-600" />
             <span>Alokasi & Utilisasi Hardware Server</span>
           </h3>
 
@@ -278,14 +278,14 @@ export default function ServerDetailModal({
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-bold">
                 <span className="text-slate-700">Memory (RAM)</span>
-                <span className={server.memoryPercent > 80 ? "text-amber-600" : "text-indigo-600"}>
+                <span className={server.memoryPercent > 80 ? "text-amber-600" : "text-emerald-600"}>
                   {server.memoryPercent}%
                 </span>
               </div>
               <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    server.memoryPercent > 80 ? "bg-amber-500" : "bg-indigo-600"
+                    server.memoryPercent > 80 ? "bg-amber-500" : "bg-emerald-600"
                   }`}
                   style={{ width: `${server.memoryPercent}%` }}
                 />
@@ -328,7 +328,7 @@ export default function ServerDetailModal({
               </div>
               <div className="flex justify-between py-1 border-b border-slate-200/60">
                 <span className="text-slate-400">Cluster Role:</span>
-                <span className="font-bold text-indigo-600">{server.database.replicaRole}</span>
+                <span className="font-bold text-emerald-600">{server.database.replicaRole}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-200/60">
                 <span className="text-slate-400">Replication Lag:</span>
@@ -343,7 +343,7 @@ export default function ServerDetailModal({
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
             <h4 className="font-bold text-slate-900 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Protokol & Keamanan Koneksi</span>
             </h4>
             <div className="space-y-1 text-slate-600">
@@ -371,7 +371,7 @@ export default function ServerDetailModal({
         <div className="p-4 rounded-2xl bg-slate-900 text-slate-100 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-400 font-bold flex items-center gap-1.5">
-              <Server className="w-3.5 h-3.5 text-red-400" />
+              <Server className="w-3.5 h-3.5 text-emerald-400" />
               <span>Connection URI (Masked)</span>
             </span>
             <button

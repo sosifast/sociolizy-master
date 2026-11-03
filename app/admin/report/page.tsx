@@ -50,7 +50,7 @@ export default function AdminReportPage() {
           </p>
         </div>
 
-        <button className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-red-400 hover:text-red-600 transition-colors shadow-xs self-start sm:self-auto cursor-pointer">
+        <button className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-emerald-400 hover:text-emerald-600 transition-colors shadow-xs self-start sm:self-auto cursor-pointer">
           <Download className="w-4 h-4 text-slate-500" />
           <span>Export CSV</span>
         </button>
@@ -69,7 +69,7 @@ export default function AdminReportPage() {
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
           <span className="text-xs font-bold text-slate-400 uppercase">Estimasi Laba Bersih</span>
-          <div className="text-2xl font-extrabold text-red-600 mt-1">$42,180.00</div>
+          <div className="text-2xl font-extrabold text-emerald-600 mt-1">$42,180.00</div>
           <div className="text-xs text-slate-500 mt-1">Rata-rata margin: 32.8%</div>
         </div>
 
@@ -105,7 +105,7 @@ export default function AdminReportPage() {
                   <td className="py-3 px-4 font-semibold text-slate-800">{r.totalOrders} order</td>
                   <td className="py-3 px-4 font-bold font-mono text-slate-900">{r.omset}</td>
                   <td className="py-3 px-4 font-mono text-slate-500">{r.modal}</td>
-                  <td className="py-3 px-4 font-extrabold text-red-600 font-mono">{r.profit}</td>
+                  <td className="py-3 px-4 font-extrabold text-emerald-600 font-mono">{r.profit}</td>
                   <td className="py-3 px-4">
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       {r.successRate}

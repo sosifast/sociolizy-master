@@ -49,7 +49,7 @@ export default function RootLayout({
     >
       <body
         suppressHydrationWarning
-        className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-indigo-500 selection:text-white"
+        className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-emerald-500 selection:text-white"
       >
         <PostHogProvider>
           <PostHogErrorBoundary>

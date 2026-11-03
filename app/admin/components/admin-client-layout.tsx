@@ -20,7 +20,7 @@ export default function AdminClientLayout({
   return (
     <ToastProvider>
       <AdminRealtimeNotifier />
-      <div className="min-h-screen bg-white text-slate-900 antialiased font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+      <div className="min-h-screen bg-white text-slate-900 antialiased font-sans flex flex-col selection:bg-emerald-500 selection:text-white">
         {/* Sidebar Component */}
         <React.Suspense
           fallback={
@@ -43,7 +43,7 @@ export default function AdminClientLayout({
             <React.Suspense
               fallback={
                 <div className="flex items-center justify-center p-12 text-slate-400 text-xs">
-                  <span className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mr-2" />
+                  <span className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mr-2" />
                   <span>Memuat halaman admin...</span>
                 </div>
               }

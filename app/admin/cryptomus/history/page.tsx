@@ -139,7 +139,7 @@ export default function AdminCryptomusHistoryPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-xs">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-xs">
             <Coins className="w-5 h-5" />
           </div>
           <div>
@@ -163,7 +163,7 @@ export default function AdminCryptomusHistoryPage() {
           <button
             onClick={() => fetchTransactions()}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-colors border border-indigo-200"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-colors border border-emerald-200"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
             <span>Segarkan</span>
@@ -181,12 +181,12 @@ export default function AdminCryptomusHistoryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari berdasarkan Order ID, TXID, atau koin..."
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+              className="w-full pl-9 pr-3.5 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors shrink-0 shadow-xs"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shrink-0 shadow-xs"
           >
             Cari
           </button>
@@ -199,7 +199,7 @@ export default function AdminCryptomusHistoryPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3.5 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all cursor-pointer w-full md:w-auto"
+            className="px-3.5 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all cursor-pointer w-full md:w-auto"
           >
             <option value="all">Semua Status</option>
             <option value="paid">Lunas (Paid)</option>
@@ -228,7 +228,7 @@ export default function AdminCryptomusHistoryPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-500">
-                    <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mx-auto mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin text-emerald-600 mx-auto mb-2" />
                     <span>Memuat data riwayat transaksi...</span>
                   </td>
                 </tr>
@@ -253,7 +253,7 @@ export default function AdminCryptomusHistoryPage() {
                     </td>
                     <td className="py-3 px-4">
                       {tx.crypto_currency ? (
-                        <span className="font-bold text-indigo-600">
+                        <span className="font-bold text-emerald-600">
                           {tx.crypto_amount ? `${tx.crypto_amount} ` : ""}
                           {tx.crypto_currency}
                         </span>
@@ -275,7 +275,7 @@ export default function AdminCryptomusHistoryPage() {
                             href={tx.invoice_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 font-bold"
+                            className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-bold"
                           >
                             <span>Faktur</span>
                             <ExternalLink className="w-3 h-3" />

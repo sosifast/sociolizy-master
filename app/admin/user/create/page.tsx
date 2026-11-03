@@ -94,7 +94,7 @@ export default function CreateUserPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/user"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -117,7 +117,7 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Username <span className="text-red-600">*</span>
+                Username <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="text"
@@ -125,13 +125,13 @@ export default function CreateUserPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Contoh: reseller_jaya"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Email <span className="text-red-600">*</span>
+                Email <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="email"
@@ -139,7 +139,7 @@ export default function CreateUserPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Password <span className="text-red-600">*</span>
+                Password <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="password"
@@ -155,7 +155,7 @@ export default function CreateUserPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -166,7 +166,7 @@ export default function CreateUserPage() {
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               >
                 <option value="Member">Member</option>
                 <option value="Admin">Admin</option>
@@ -184,7 +184,7 @@ export default function CreateUserPage() {
                 min={0}
                 value={balance}
                 onChange={(e) => setBalance(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -195,7 +195,7 @@ export default function CreateUserPage() {
               <select
                 value={serverArea}
                 onChange={(e) => setServerArea(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               >
                 {regions.map((reg) => (
                   <option key={reg.code} value={reg.code}>
@@ -216,7 +216,7 @@ export default function CreateUserPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
             >
               {isLoading ? (
                 <>

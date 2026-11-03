@@ -39,7 +39,7 @@ export default function Menubar({
 
   if (orientation === "vertical") {
     return (
-      <nav className={`flex flex-col space-y-3 ${className}`}>
+      <nav className={`flex flex-col space-y-2 ${className}`}>
         {items.map((item, idx) => {
           const active = isItemActive(item.href);
           return (
@@ -47,10 +47,10 @@ export default function Menubar({
               key={idx}
               href={item.href}
               onClick={onItemClick}
-              className={`text-sm font-medium py-1.5 px-2 rounded-lg transition-colors ${
+              className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors ${
                 active
-                  ? "text-white bg-slate-800/60 font-semibold"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/40"
+                  ? "text-emerald-700 bg-emerald-50 font-semibold"
+                  : "text-slate-700 hover:text-emerald-600 hover:bg-slate-50"
               }`}
             >
               {item.label}
@@ -70,15 +70,15 @@ export default function Menubar({
             key={idx}
             href={item.href}
             onClick={onItemClick}
-            className={`transition-colors relative py-1 ${
+            className={`transition-colors relative py-1.5 ${
               active
-                ? "text-white font-semibold"
-                : "text-slate-300 hover:text-white"
+                ? "text-emerald-600 font-bold"
+                : "text-slate-600 hover:text-emerald-600"
             }`}
           >
             {item.label}
             {active && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full" />
             )}
           </Link>
         );

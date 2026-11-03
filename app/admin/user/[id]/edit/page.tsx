@@ -179,7 +179,7 @@ export default function EditUserPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/user"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -216,7 +216,7 @@ export default function EditUserPage() {
 
       {isLoading ? (
         <div className="bg-white rounded-3xl border border-slate-200/80 p-12 text-center text-slate-400">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
+          <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600 mb-2" />
           <p className="text-xs">Memuat data pengguna...</p>
         </div>
       ) : (
@@ -264,7 +264,7 @@ export default function EditUserPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
@@ -277,7 +277,7 @@ export default function EditUserPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -293,7 +293,7 @@ export default function EditUserPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Kosongkan jika tidak ingin diubah"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export default function EditUserPage() {
                 <select
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 >
                   <option value="Member">Member</option>
                   <option value="Admin">Admin</option>
@@ -322,7 +322,7 @@ export default function EditUserPage() {
                   <select
                     value={serverArea}
                     onChange={(e) => setServerArea(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                   >
                     {regions.map((reg) => (
                       <option key={reg.code} value={reg.code}>
@@ -342,7 +342,7 @@ export default function EditUserPage() {
                   min={0}
                   value={balance}
                   onChange={(e) => setBalance(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -357,7 +357,7 @@ export default function EditUserPage() {
                   type="button"
                   onClick={handleRegenerateKey}
                   disabled={isRegeneratingKey}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 hover:text-red-700 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 disabled:opacity-50 cursor-pointer"
                 >
                   <RefreshCw className={`w-3 h-3 ${isRegeneratingKey ? "animate-spin" : ""}`} />
                   <span>Regenerate API Key</span>
@@ -375,7 +375,7 @@ export default function EditUserPage() {
                   <button
                     type="button"
                     onClick={() => copyToClipboard(apiKey, "api")}
-                    className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-red-600 hover:bg-white transition-colors cursor-pointer flex-shrink-0"
+                    className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-emerald-600 hover:bg-white transition-colors cursor-pointer flex-shrink-0"
                     title="Salin API Key"
                   >
                     {copiedApiKey ? (
@@ -432,7 +432,7 @@ export default function EditUserPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSaving ? (
                   <>

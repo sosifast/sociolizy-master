@@ -429,8 +429,8 @@ export default function AdminHistoryOrderPage() {
     }
     if (s === "processing" || s === "in progress") {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
           <span>{status}</span>
         </span>
       );
@@ -480,7 +480,7 @@ export default function AdminHistoryOrderPage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Cari berdasarkan Invoice (INV-...), Order ID, Target, Username, atau Layanan..."
-              className="w-full pl-10 pr-4 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 focus:outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 focus:outline-none transition-all"
             />
           </div>
 
@@ -529,27 +529,27 @@ export default function AdminHistoryOrderPage() {
             <button
               onClick={() => fetchOrders(true)}
               disabled={isLoading || isRefreshing}
-              className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 bg-slate-50 border border-slate-200 hover:border-indigo-300 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+              className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 bg-slate-50 border border-slate-200 hover:border-emerald-300 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
               title="Segarkan data transaksi dari seluruh database"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-emerald-600" : ""}`} />
             </button>
 
             {/* Sync All Provider Button */}
             <button
               onClick={handleSyncAllVisible}
               disabled={isLoading || isBulkSyncing}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
               title="Perbarui status semua pesanan aktif dari Provider API & refund otomatis"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isBulkSyncing ? "animate-spin text-indigo-600" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isBulkSyncing ? "animate-spin text-emerald-600" : ""}`} />
               <span>{isBulkSyncing ? "Menyinkronkan..." : "Sinkron Provider"}</span>
             </button>
 
             {/* Export CSV Button */}
             <button
               onClick={handleExportCSV}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:text-indigo-600 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:text-emerald-600 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
               title="Unduh data dalam format CSV"
             >
               <Download className="w-3.5 h-3.5 text-slate-500" />
@@ -561,7 +561,7 @@ export default function AdminHistoryOrderPage() {
         {/* Row 2: Klaster Server Filter Pills */}
         <div className="pt-2 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-200">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-            <Server className="w-3.5 h-3.5 text-indigo-600" />
+            <Server className="w-3.5 h-3.5 text-emerald-600" />
             <span>Server:</span>
           </span>
 
@@ -572,7 +572,7 @@ export default function AdminHistoryOrderPage() {
             }}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               serverNode === "ALL"
-                ? "bg-indigo-600 text-white shadow-xs shadow-indigo-600/20"
+                ? "bg-emerald-600 text-white shadow-xs shadow-emerald-600/20"
                 : "bg-slate-50 border border-slate-200/80 text-slate-700 hover:bg-slate-100"
             }`}
           >
@@ -598,7 +598,7 @@ export default function AdminHistoryOrderPage() {
                 }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   isSelected
-                    ? "bg-indigo-600 text-white shadow-xs shadow-indigo-600/20"
+                    ? "bg-emerald-600 text-white shadow-xs shadow-emerald-600/20"
                     : "bg-slate-50 border border-slate-200/80 text-slate-700 hover:bg-slate-100"
                 }`}
               >
@@ -646,7 +646,7 @@ export default function AdminHistoryOrderPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={11} className="py-16 text-center text-slate-400">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600 mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 mb-2" />
                     <p className="text-xs font-semibold text-slate-600">
                       Memindai data pesanan dari seluruh klaster MongoDB...
                     </p>
@@ -678,7 +678,7 @@ export default function AdminHistoryOrderPage() {
                         </span>
                         <button
                           onClick={() => handleCopy(ord.invoice, "Invoice")}
-                          className="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
+                          className="text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer"
                           title="Salin Invoice"
                         >
                           {copiedKey === ord.invoice ? (
@@ -698,7 +698,7 @@ export default function AdminHistoryOrderPage() {
                     {/* Pengguna */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-xs shadow-xs">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center font-bold text-emerald-700 text-xs shadow-xs">
                           {ord.user_username.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
@@ -713,7 +713,7 @@ export default function AdminHistoryOrderPage() {
                     {/* Node Server MongoDB */}
                     <td className="py-3.5 px-4">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
-                        <Server className="w-3 h-3 text-indigo-600" />
+                        <Server className="w-3 h-3 text-emerald-600" />
                         <span>{ord.server_area || "SG_1"}</span>
                       </span>
                     </td>
@@ -730,7 +730,7 @@ export default function AdminHistoryOrderPage() {
                         </span>
                         <button
                           onClick={() => handleCopy(ord.target, "Target")}
-                          className="text-slate-400 hover:text-indigo-600 transition-colors ml-1 cursor-pointer shrink-0"
+                          className="text-slate-400 hover:text-emerald-600 transition-colors ml-1 cursor-pointer shrink-0"
                           title="Salin Target"
                         >
                           <Copy className="w-3 h-3" />
@@ -789,9 +789,9 @@ export default function AdminHistoryOrderPage() {
                           disabled={!ord.order_id || syncingInvoices.has(ord.invoice)}
                           className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                             syncingInvoices.has(ord.invoice)
-                              ? "bg-indigo-100 text-indigo-700"
+                              ? "bg-emerald-100 text-emerald-700"
                               : ord.order_id
-                              ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+                              ? "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
                               : "text-slate-300 cursor-not-allowed"
                           }`}
                           title={
@@ -802,7 +802,7 @@ export default function AdminHistoryOrderPage() {
                         >
                           <RefreshCw
                             className={`w-4 h-4 ${
-                              syncingInvoices.has(ord.invoice) ? "animate-spin text-indigo-600" : ""
+                              syncingInvoices.has(ord.invoice) ? "animate-spin text-emerald-600" : ""
                             }`}
                           />
                         </button>
@@ -812,7 +812,7 @@ export default function AdminHistoryOrderPage() {
                             setSelectedOrder(ord);
                             setIsDetailModalOpen(true);
                           }}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
                           title="Lihat Rincian Lengkap"
                         >
                           <Eye className="w-4 h-4" />
@@ -838,7 +838,7 @@ export default function AdminHistoryOrderPage() {
           <div>
             Menampilkan <strong>{orders.length}</strong> dari <strong>{totalOrders}</strong> total pesanan tercatat
             {serverNode !== "ALL" && (
-              <span className="ml-1 text-indigo-600 font-semibold">(Klaster: {serverNode})</span>
+              <span className="ml-1 text-emerald-600 font-semibold">(Klaster: {serverNode})</span>
             )}
           </div>
 
@@ -875,7 +875,7 @@ export default function AdminHistoryOrderPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-xs">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-xs">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
@@ -900,7 +900,7 @@ export default function AdminHistoryOrderPage() {
               {/* Box 1: Info Server MongoDB */}
               <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                 <span className="font-bold text-slate-900 text-xs block flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-indigo-600" />
+                  <Database className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Klaster Database MongoDB</span>
                 </span>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
@@ -920,7 +920,7 @@ export default function AdminHistoryOrderPage() {
               {/* Box 2: Info Pengguna */}
               <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                 <span className="font-bold text-slate-900 text-xs block flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-indigo-600" />
+                  <User className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Informasi Pemesan</span>
                 </span>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
@@ -942,7 +942,7 @@ export default function AdminHistoryOrderPage() {
               {/* Box 3: Layanan & Provider */}
               <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2 sm:col-span-2">
                 <span className="font-bold text-slate-900 text-xs block flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                  <Layers className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Detail Layanan &amp; Provider API</span>
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -956,7 +956,7 @@ export default function AdminHistoryOrderPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[11px]">API Provider:</span>
-                    <span className="font-bold text-indigo-600 block mt-0.5">
+                    <span className="font-bold text-emerald-600 block mt-0.5">
                       {selectedOrder.provider_name || "Layanan Manual"}
                     </span>
                   </div>
@@ -1009,7 +1009,7 @@ export default function AdminHistoryOrderPage() {
                   <span className="font-bold text-slate-900 text-xs">Target / Link Tujuan:</span>
                   <button
                     onClick={() => handleCopy(selectedOrder.target, "Target")}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:underline cursor-pointer"
                   >
                     <Copy className="w-3 h-3" />
                     <span>Salin Target</span>
@@ -1052,7 +1052,7 @@ export default function AdminHistoryOrderPage() {
                     type="button"
                     onClick={() => handleSyncProviderStatus(selectedOrder)}
                     disabled={syncingInvoices.has(selectedOrder.invoice)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-xs shadow-indigo-600/20 transition-all cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-xs shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <RefreshCw
                       className={`w-3.5 h-3.5 ${
@@ -1113,16 +1113,16 @@ export default function AdminHistoryOrderPage() {
 
             {/* Quick action: Sync directly from provider */}
             {selectedOrder.order_id && (
-              <div className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-between">
+              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold text-indigo-950">Ambil Status dari Provider</p>
-                  <p className="text-[11px] text-indigo-600 font-mono">ID: {selectedOrder.order_id}</p>
+                  <p className="text-xs font-bold text-emerald-950">Ambil Status dari Provider</p>
+                  <p className="text-[11px] text-emerald-600 font-mono">ID: {selectedOrder.order_id}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleSyncProviderStatus(selectedOrder)}
                   disabled={syncingInvoices.has(selectedOrder.invoice)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <RefreshCw
                     className={`w-3.5 h-3.5 ${
@@ -1142,7 +1142,7 @@ export default function AdminHistoryOrderPage() {
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all cursor-pointer"
                 >
                   <option value="Pending">Pending</option>
                   <option value="Processing">Processing</option>
@@ -1162,7 +1162,7 @@ export default function AdminHistoryOrderPage() {
                     type="number"
                     value={editStart}
                     onChange={(e) => setEditStart(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -1173,7 +1173,7 @@ export default function AdminHistoryOrderPage() {
                     type="number"
                     value={editRemains}
                     onChange={(e) => setEditRemains(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                 </div>
               </div>
@@ -1221,7 +1221,7 @@ export default function AdminHistoryOrderPage() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-xs shadow-indigo-600/20 transition-all cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isUpdating ? (
                     <>

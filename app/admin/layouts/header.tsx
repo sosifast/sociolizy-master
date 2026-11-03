@@ -30,7 +30,7 @@ export default function AdminHeader({ onToggleSidebar }: HeaderProps) {
         <button
           onClick={onToggleSidebar}
           aria-label="Buka Menu Navigasi"
-          className="p-2 -ml-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 lg:hidden transition-colors"
+          className="p-2 -ml-2 rounded-xl text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 lg:hidden transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -52,7 +52,7 @@ export default function AdminHeader({ onToggleSidebar }: HeaderProps) {
             }}
             className="flex items-center gap-2 p-1 pl-2 rounded-xl border border-slate-200/80 hover:bg-slate-50 transition-colors"
           >
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
               AD
             </div>
             <span className="text-xs font-bold text-slate-800 hidden sm:inline-block">Admin</span>
@@ -70,7 +70,7 @@ export default function AdminHeader({ onToggleSidebar }: HeaderProps) {
               <Link
                 href="/admin/setting"
                 onClick={() => setShowProfileMenu(false)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors font-medium"
               >
                 <Settings className="w-3.5 h-3.5" />
                 <span>Pengaturan Sistem</span>

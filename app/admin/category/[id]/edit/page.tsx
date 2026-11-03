@@ -100,7 +100,7 @@ export default function EditCategoryPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/category"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -120,7 +120,7 @@ export default function EditCategoryPage() {
 
       {isLoading ? (
         <div className="bg-white rounded-3xl border border-slate-200/80 p-12 text-center text-slate-400">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600 mb-2" />
+          <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600 mb-2" />
           <p className="text-xs">Memuat data kategori...</p>
         </div>
       ) : (
@@ -133,7 +133,7 @@ export default function EditCategoryPage() {
               <select
                 value={idPlatform}
                 onChange={(e) => setIdPlatform(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               >
                 {platforms.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -152,7 +152,7 @@ export default function EditCategoryPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -165,7 +165,7 @@ export default function EditCategoryPage() {
                 required
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -177,7 +177,7 @@ export default function EditCategoryPage() {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -191,7 +191,7 @@ export default function EditCategoryPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSaving ? (
                   <>

@@ -3,10 +3,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   ShoppingCart,
   Wallet,
-  Globe,
   CheckCircle2,
   AlertCircle,
   Loader2,
@@ -14,7 +12,6 @@ import {
   Info,
   Clock,
   RefreshCw,
-  Search,
 } from "lucide-react";
 
 interface ServiceItem {
@@ -161,7 +158,6 @@ export default function MemberOrderPage() {
   // Set default service when category changes
   useEffect(() => {
     if (activeServices.length > 0) {
-      // Keep existing selection if it belongs to current category, else select first
       const stillValid = activeServices.some((s) => s.id === Number(selectedServiceId));
       if (!stillValid) {
         setSelectedServiceId(activeServices[0].id);
@@ -217,10 +213,8 @@ export default function MemberOrderPage() {
           type: "success",
           message: `Order placed successfully! Invoice: ${json.data.invoice} (Order ID: ${json.data.order_id || "Processing"})`,
         });
-        // Reset form input
         setTarget("");
         setQuantity("");
-        // Refresh balance and history
         if (typeof json.data?.remaining_balance === "number") {
           setUserBalance(json.data.remaining_balance);
         }
@@ -242,401 +236,398 @@ export default function MemberOrderPage() {
   };
 
   return (
-    <div className="max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
       {/* Page Title & Breadcrumb Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              SMM Order
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              SMM Order Engine
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <ShoppingCart className="w-6 h-6 text-indigo-400" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+            <ShoppingCart className="w-5 h-5 text-emerald-600" />
             <span>New Order</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Select a category and social media service to place an instant order.
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Select a category and social media service to place an instant automated order.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <Link
             href="/member/payment"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs font-bold text-emerald-400 hover:bg-emerald-900/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors shadow-xs"
           >
-            <Wallet className="w-4 h-4" />
+            <Wallet className="w-3.5 h-3.5 text-emerald-600" />
             <span>Deposit</span>
           </Link>
           <Link
             href="/member/history/order"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#0c1222] border border-slate-800 text-xs font-bold text-slate-300 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs"
           >
-            <ExternalLink className="w-4 h-4 text-indigo-400" />
-            <span>History</span>
+            <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Order Records</span>
           </Link>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="space-y-8">
-        {/* Notification Alert */}
-        {alertInfo && (
-          <div
-            className={`p-4 rounded-2xl border flex items-start gap-3 transition-all ${
-              alertInfo.type === "success"
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                : "bg-rose-500/10 border-rose-500/30 text-rose-300"
-            }`}
+      {/* Notification Alert */}
+      {alertInfo && (
+        <div
+          className={`p-3.5 sm:p-4 rounded-xl border flex items-start gap-2.5 transition-all text-xs sm:text-sm ${
+            alertInfo.type === "success"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
+          }`}
+        >
+          {alertInfo.type === "success" ? (
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
+          ) : (
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+          )}
+          <div className="font-medium flex-1">{alertInfo.message}</div>
+          <button
+            onClick={() => setAlertInfo(null)}
+            className="text-xs opacity-70 hover:opacity-100 cursor-pointer"
           >
-            {alertInfo.type === "success" ? (
-              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-            ) : (
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            )}
-            <div className="text-sm font-medium flex-1">{alertInfo.message}</div>
-            <button
-              onClick={() => setAlertInfo(null)}
-              className="text-xs opacity-70 hover:opacity-100 cursor-pointer"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+            ✕
+          </button>
+        </div>
+      )}
 
-        {/* Order Form & Live Summary Grid */}
-        <div className="grid lg:grid-cols-12 gap-6 items-start">
-          {/* Left: Order Form (7 Cols) */}
-          <div className="lg:col-span-7 bg-[#0c1222] border border-slate-800 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
-              <span>Order Form</span>
-            </h2>
+      {/* Order Form & Live Summary Grid */}
+      <div className="grid lg:grid-cols-12 gap-6 items-start">
+        {/* Left: Order Form (7 Cols) */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+          <h2 className="text-sm sm:text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span>Order Configuration</span>
+          </h2>
 
-            {loadingCatalog ? (
-              <div className="py-16 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-                <span className="text-sm">Loading service catalog...</span>
+          {loadingCatalog ? (
+            <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+              <span className="text-xs">Loading service catalog...</span>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="py-10 text-center text-slate-500 text-xs sm:text-sm">
+              No active services available. Please contact support.
+            </div>
+          ) : (
+            <form onSubmit={handleOrderSubmit} className="space-y-4">
+              {/* 1. Category */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Service Category
+                </label>
+                <select
+                  value={selectedCategoryId}
+                  onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                >
+                  {filteredCategories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.platform?.name ? `[${cat.platform.name}] ` : ""}
+                      {cat.name} ({cat.services.length} services)
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : categories.length === 0 ? (
-              <div className="py-12 text-center text-slate-400">
-                No active services available. Please contact support.
+
+              {/* 2. Service */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Service
+                </label>
+                <select
+                  value={selectedServiceId}
+                  onChange={(e) => setSelectedServiceId(Number(e.target.value))}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                >
+                  {activeServices.map((svc) => (
+                    <option key={svc.id} value={svc.id}>
+                      {svc.service_name} — ${Number(svc.rate_sale).toFixed(4)} / 1K
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              <form onSubmit={handleOrderSubmit} className="space-y-5">
-                {/* 1. Category */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Service Category
-                  </label>
-                  <select
-                    value={selectedCategoryId}
-                    onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                  >
-                    {filteredCategories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.platform?.name ? `[${cat.platform.name}] ` : ""}
-                        {cat.name} ({cat.services.length} services)
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
-                {/* 2. Service */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Service
-                  </label>
-                  <select
-                    value={selectedServiceId}
-                    onChange={(e) => setSelectedServiceId(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
-                  >
-                    {activeServices.map((svc) => (
-                      <option key={svc.id} value={svc.id}>
-                        {svc.service_name} — ${Number(svc.rate_sale).toFixed(4)} / 1K
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Service Details Card */}
-                {currentService && (
-                  <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 text-xs space-y-2">
-                    <div className="grid grid-cols-3 gap-2 text-center border-b border-slate-800 pb-2">
-                      <div>
-                        <span className="text-slate-400 block">Price / 1K</span>
-                        <span className="font-bold text-emerald-400 font-mono text-sm">
-                          ${Number(currentService.rate_sale).toFixed(4)}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block">Min Order</span>
-                        <span className="font-bold text-white">
-                          {currentService.min.toLocaleString()}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block">Max Order</span>
-                        <span className="font-bold text-white">
-                          {currentService.max > 0
-                            ? currentService.max.toLocaleString()
-                            : "Unlimited"}
-                        </span>
-                      </div>
+              {/* Service Details Card */}
+              {currentService && (
+                <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5">
+                  <div className="grid grid-cols-3 gap-2 text-center border-b border-slate-200 pb-2.5">
+                    <div>
+                      <span className="text-slate-500 block text-[11px]">Rate / 1K</span>
+                      <span className="font-bold text-emerald-600 font-mono text-sm">
+                        ${Number(currentService.rate_sale).toFixed(4)}
+                      </span>
                     </div>
-                    {currentService.desc && (
-                      <div className="text-slate-400 pt-1 leading-relaxed whitespace-pre-line text-[11px]">
-                        {currentService.desc}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* 3. Target / Link */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">
-                    Target Link / Username
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={target}
-                    onChange={(e) => setTarget(e.target.value)}
-                    placeholder="https://instagram.com/p/... or username"
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                  />
-                  <span className="text-[11px] text-slate-500 mt-1 block">
-                    Make sure the target account or post is set to public (not private).
-                  </span>
-                </div>
-
-                {/* 4. Quantity */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-semibold text-slate-300">
-                      Quantity
-                    </label>
-                    {currentService && (
-                      <span className="text-[11px] text-slate-400">
-                        Min: {currentService.min.toLocaleString()} | Max:{" "}
+                    <div>
+                      <span className="text-slate-500 block text-[11px]">Min Order</span>
+                      <span className="font-bold text-slate-800 text-xs sm:text-sm font-mono">
+                        {currentService.min.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[11px]">Max Order</span>
+                      <span className="font-bold text-slate-800 text-xs sm:text-sm font-mono">
                         {currentService.max > 0
                           ? currentService.max.toLocaleString()
                           : "Unlimited"}
                       </span>
-                    )}
+                    </div>
                   </div>
-                  <input
-                    type="number"
-                    required
-                    min={currentService?.min || 1}
-                    max={currentService?.max || undefined}
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="Enter quantity..."
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors font-mono"
-                  />
-                  {quantity && !isQtyValid && (
-                    <span className="text-[11px] text-rose-400 mt-1 block">
-                      Quantity must be between {currentService?.min.toLocaleString()} and{" "}
-                      {currentService?.max.toLocaleString()}.
+                  {currentService.desc && (
+                    <div className="text-slate-600 pt-0.5 leading-relaxed whitespace-pre-line text-[11px]">
+                      {currentService.desc}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 3. Target / Link */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Target Link / Username
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                  placeholder="https://instagram.com/p/... or username"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                />
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Ensure the target account or post is set to public (not private).
+                </span>
+              </div>
+
+              {/* 4. Quantity */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    Quantity
+                  </label>
+                  {currentService && (
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      Min: {currentService.min.toLocaleString()} | Max:{" "}
+                      {currentService.max > 0
+                        ? currentService.max.toLocaleString()
+                        : "Unlimited"}
                     </span>
                   )}
                 </div>
+                <input
+                  type="number"
+                  required
+                  min={currentService?.min || 1}
+                  max={currentService?.max || undefined}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Enter quantity..."
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors font-mono font-bold"
+                />
+                {quantity && !isQtyValid && (
+                  <span className="text-[11px] text-rose-500 mt-1 block font-medium">
+                    Quantity must be between {currentService?.min.toLocaleString()} and{" "}
+                    {currentService?.max.toLocaleString()}.
+                  </span>
+                )}
+              </div>
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={!canSubmit}
-                  className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-sm text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 mt-4"
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-xs sm:text-sm text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 mt-4"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Processing Order...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Place Order Now</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Right: Live Summary & Guide (5 Cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Live Order Summary Card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+              <Info className="w-4 h-4 text-emerald-600" />
+              <span>Order Summary</span>
+            </h3>
+
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between py-1.5 border-b border-slate-100">
+                <span className="text-slate-500">Service:</span>
+                <span className="text-slate-800 font-medium text-right max-w-[200px] truncate">
+                  {currentService?.service_name || "-"}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1.5 border-b border-slate-100">
+                <span className="text-slate-500">Target:</span>
+                <span className="text-slate-800 font-medium text-right max-w-[200px] truncate">
+                  {target.trim() || "-"}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1.5 border-b border-slate-100">
+                <span className="text-slate-500">Quantity:</span>
+                <span className="text-slate-900 font-mono font-bold">
+                  {parsedQty > 0 ? parsedQty.toLocaleString() : "0"}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1.5 border-b border-slate-100">
+                <span className="text-slate-500">Price per 1K:</span>
+                <span className="text-slate-900 font-mono font-medium">
+                  ${rateSale.toFixed(4)}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2 border-b border-slate-100">
+                <span className="text-slate-800 font-bold text-xs sm:text-sm">Total Cost:</span>
+                <span className="text-emerald-600 font-mono font-bold text-base sm:text-lg">
+                  ${totalPrice.toFixed(4)}
+                </span>
+              </div>
+
+              <div className="flex justify-between py-1.5 text-xs">
+                <span className="text-slate-500">Remaining Balance:</span>
+                <span
+                  className={`font-mono font-bold text-xs sm:text-sm ${
+                    isBalanceSufficient ? "text-slate-800" : "text-rose-600"
+                  }`}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Processing Order...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>Place Order Now</span>
-                    </>
-                  )}
-                </button>
-              </form>
+                  ${remainingBalanceAfter.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {!isBalanceSufficient && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+                Insufficient balance to place this order. Please deposit funds first.
+              </div>
             )}
           </div>
 
-          {/* Right: Live Summary & Guide (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* Live Order Summary Card */}
-            <div className="bg-[#0c1222] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Info className="w-4 h-4 text-indigo-400" />
-                Order Summary
-              </h3>
-
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Service:</span>
-                  <span className="text-white font-medium text-right max-w-[200px] truncate">
-                    {currentService?.service_name || "-"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Target:</span>
-                  <span className="text-white font-medium text-right max-w-[200px] truncate">
-                    {target.trim() || "-"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Quantity:</span>
-                  <span className="text-white font-mono font-bold">
-                    {parsedQty > 0 ? parsedQty.toLocaleString() : "0"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                  <span className="text-slate-400">Price per 1K:</span>
-                  <span className="text-white font-mono font-medium">
-                    ${rateSale.toFixed(4)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-2 border-b border-slate-800/80 text-sm">
-                  <span className="text-slate-200 font-semibold">Total Cost:</span>
-                  <span className="text-emerald-400 font-mono font-extrabold">
-                    ${totalPrice.toFixed(4)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 text-xs">
-                  <span className="text-slate-400">Remaining Balance:</span>
-                  <span
-                    className={`font-mono font-bold ${
-                      isBalanceSufficient ? "text-slate-300" : "text-rose-400"
-                    }`}
-                  >
-                    ${remainingBalanceAfter.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              {!isBalanceSufficient && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
-                  Insufficient balance to place this order.
-                </div>
-              )}
-            </div>
-
-            {/* Quick Rules */}
-            <div className="bg-[#0c1222] border border-slate-800 rounded-2xl p-5 text-xs space-y-2 text-slate-400">
-              <span className="font-bold text-slate-300 block mb-1">Order Guidelines:</span>
-              <p>• Target account or post must be public (not private).</p>
-              <p>• Do not place duplicate orders for the same target before completion.</p>
-              <p>• Orders are automatically dispatched to the server provider.</p>
-            </div>
+          {/* Quick Rules */}
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs space-y-2 text-slate-600">
+            <span className="font-bold text-slate-900 text-xs block">Order Guidelines:</span>
+            <p>• Target account or post must be public (not private).</p>
+            <p>• Do not place duplicate orders for the same target link before completion.</p>
+            <p>• Orders are automatically dispatched to the server provider clusters.</p>
           </div>
         </div>
+      </div>
 
-        {/* Bottom: Recent Orders History */}
-        <div className="bg-[#0c1222] border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Clock className="w-4 h-4 text-indigo-400" />
-                Recent Orders
-              </h3>
-              <span className="text-xs text-slate-400">List of your recent order transactions</span>
-            </div>
-            <button
-              onClick={fetchOrderHistory}
-              disabled={loadingOrders}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingOrders ? "animate-spin" : ""}`} />
-              <span>Refresh</span>
-            </button>
+      {/* Bottom: Recent Orders History */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-emerald-600" />
+              <span>Recent Orders</span>
+            </h3>
+            <span className="text-xs text-slate-500">List of your recent order transactions</span>
           </div>
+          <button
+            onClick={fetchOrderHistory}
+            disabled={loadingOrders}
+            className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loadingOrders ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
 
-          {loadingOrders ? (
-            <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-              <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
-              <span className="text-xs">Loading history...</span>
-            </div>
-          ) : orders.length === 0 ? (
-            <div className="py-12 text-center text-slate-500 text-xs">
-              No orders placed yet. Place your first order using the form above.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 font-semibold bg-slate-900/40">
-                    <th className="py-3 px-3">Invoice</th>
-                    <th className="py-3 px-3">Node</th>
-                    <th className="py-3 px-3">Order ID</th>
-                    <th className="py-3 px-3">Target</th>
-                    <th className="py-3 px-3 text-right">Quantity</th>
-                    <th className="py-3 px-3 text-right">Price ($)</th>
-                    <th className="py-3 px-3 text-center">Status</th>
-                    <th className="py-3 px-3 text-right">Date</th>
+        {loadingOrders ? (
+          <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+            <span className="text-xs">Loading history...</span>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="py-10 text-center text-slate-400 text-xs sm:text-sm">
+            No orders placed yet. Place your first order using the form above.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-700 font-bold bg-slate-50">
+                  <th className="py-2.5 px-3">Invoice</th>
+                  <th className="py-2.5 px-3">Node</th>
+                  <th className="py-2.5 px-3">Order ID</th>
+                  <th className="py-2.5 px-3">Target</th>
+                  <th className="py-2.5 px-3 text-right">Quantity</th>
+                  <th className="py-2.5 px-3 text-right">Price ($)</th>
+                  <th className="py-2.5 px-3 text-center">Status</th>
+                  <th className="py-2.5 px-3 text-right">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {orders.map((ord) => (
+                  <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">
+                      {ord.invoice}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 font-mono border border-slate-200">
+                        {ord.server_area || "SG"}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-slate-600 text-xs">
+                      {ord.order_id || "-"}
+                    </td>
+                    <td className="py-2.5 px-3 max-w-[220px] truncate text-slate-800" title={ord.target}>
+                      {ord.target}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-900 font-semibold">
+                      {ord.amount.toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono text-emerald-600 font-semibold">
+                      ${Number(ord.price_sale).toFixed(4)}
+                    </td>
+                    <td className="py-2.5 px-3 text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                          ord.status === "Processing" || ord.status === "In progress"
+                            ? "bg-sky-50 text-sky-700 border-sky-200"
+                            : ord.status === "Completed"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : ord.status === "Canceled" || ord.status === "Error"
+                            ? "bg-rose-50 text-rose-700 border-rose-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}
+                      >
+                        {ord.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap text-[11px]">
+                      {new Date(ord.create_at).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {orders.map((ord) => (
-                    <tr key={ord.id} className="hover:bg-slate-900/30 transition-colors">
-                      <td className="py-3 px-3 font-mono font-medium text-indigo-400">
-                        {ord.invoice}
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-indigo-300 font-mono border border-slate-700">
-                          {ord.server_area || "SG"}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 font-mono text-slate-300">
-                        {ord.order_id || "-"}
-                      </td>
-                      <td className="py-3 px-3 max-w-[200px] truncate text-slate-300" title={ord.target}>
-                        {ord.target}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-white">
-                        {ord.amount.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-emerald-400 font-medium">
-                        ${Number(ord.price_sale).toFixed(4)}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                            ord.status === "Processing" || ord.status === "In progress"
-                              ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-                              : ord.status === "Completed"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                              : ord.status === "Canceled" || ord.status === "Error"
-                              ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                              : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                          }`}
-                        >
-                          {ord.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-right text-slate-400 whitespace-nowrap">
-                        {new Date(ord.create_at).toLocaleDateString("en-US", {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -122,7 +122,7 @@ export default function ConfirmModal({
             disabled={isLoading}
             className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.98] shadow-sm cursor-pointer disabled:opacity-60 ${
               type === "danger"
-                ? "bg-red-600 hover:bg-red-700 shadow-red-600/30"
+                ? "bg-red-600 hover:bg-red-700 shadow-red-600/25"
                 : type === "warning"
                 ? "bg-amber-600 hover:bg-amber-700 shadow-amber-600/30"
                 : "bg-blue-600 hover:bg-blue-700 shadow-blue-600/30"

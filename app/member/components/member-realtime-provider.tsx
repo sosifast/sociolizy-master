@@ -189,10 +189,10 @@ export default function MemberRealtimeProvider({
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`pointer-events-auto p-4 rounded-2xl border shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-3 duration-200 transition-all ${
+            className={`pointer-events-auto p-4 rounded-2xl border shadow-xl backdrop-blur-xl animate-in slide-in-from-bottom-3 duration-200 transition-all ${
               t.type === "success"
-                ? "bg-[#0c1a24]/95 border-emerald-500/40 text-emerald-200"
-                : "bg-[#0e162b]/95 border-indigo-500/40 text-indigo-200"
+                ? "bg-white/95 border-emerald-300 text-slate-800"
+                : "bg-white/95 border-emerald-300 text-slate-800"
             }`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -200,8 +200,8 @@ export default function MemberRealtimeProvider({
                 <div
                   className={`p-1.5 rounded-xl shrink-0 mt-0.5 ${
                     t.type === "success"
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : "bg-indigo-500/20 text-indigo-400"
+                      ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                      : "bg-emerald-50 text-emerald-600 border border-emerald-200"
                   }`}
                 >
                   {t.type === "success" ? (
@@ -211,13 +211,13 @@ export default function MemberRealtimeProvider({
                   )}
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white leading-tight">{t.title}</h4>
-                  <p className="text-[11px] text-slate-300 mt-0.5 leading-snug">{t.message}</p>
+                  <h4 className="text-xs font-bold text-slate-900 leading-tight">{t.title}</h4>
+                  <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">{t.message}</p>
                 </div>
               </div>
               <button
                 onClick={() => removeToast(t.id)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800/60 transition-colors"
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
                 aria-label="Close"
               >
                 <X className="w-3.5 h-3.5" />

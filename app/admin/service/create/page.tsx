@@ -115,7 +115,7 @@ export default function CreateServicePage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/service"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -138,14 +138,14 @@ export default function CreateServicePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Kategori Layanan <span className="text-red-600">*</span>
+                Kategori Layanan <span className="text-emerald-600">*</span>
               </label>
               {isLoadingInitial ? (
                 <div className="p-2 text-xs text-slate-400">Memuat kategori...</div>
               ) : categories.length === 0 ? (
                 <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
                   Belum ada kategori di database. Silakan{" "}
-                  <Link href="/admin/category/create" className="font-bold underline text-red-600">
+                  <Link href="/admin/category/create" className="font-bold underline text-emerald-600">
                     Tambah Kategori
                   </Link>{" "}
                   terlebih dahulu.
@@ -155,7 +155,7 @@ export default function CreateServicePage() {
                   value={idCategory}
                   onChange={(e) => setIdCategory(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -173,7 +173,7 @@ export default function CreateServicePage() {
               <select
                 value={idApiProvider}
                 onChange={(e) => setIdApiProvider(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               >
                 <option value="">Manual (Tanpa API Provider)</option>
                 {providers.map((p) => (
@@ -187,7 +187,7 @@ export default function CreateServicePage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Nama Layanan (service_name) <span className="text-red-600">*</span>
+              Nama Layanan (service_name) <span className="text-emerald-600">*</span>
             </label>
             <input
               type="text"
@@ -200,14 +200,14 @@ export default function CreateServicePage() {
                 }
               }}
               placeholder="Contoh: Instagram Followers Indonesia [Real Aktif]"
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Service ID Provider (service_id) <span className="text-red-600">*</span>
+                Service ID Provider (service_id) <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="text"
@@ -215,7 +215,7 @@ export default function CreateServicePage() {
                 value={serviceId}
                 onChange={(e) => setServiceId(e.target.value)}
                 placeholder="1042"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -228,7 +228,7 @@ export default function CreateServicePage() {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
                 placeholder="ig-followers-indo-real"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function CreateServicePage() {
                 type="number"
                 value={min}
                 onChange={(e) => setMin(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -254,7 +254,7 @@ export default function CreateServicePage() {
                 type="number"
                 value={max}
                 onChange={(e) => setMax(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function CreateServicePage() {
                 value={rateApi}
                 onChange={(e) => setRateApi(e.target.value)}
                 placeholder="0.0450"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -284,7 +284,7 @@ export default function CreateServicePage() {
                 value={rateSale}
                 onChange={(e) => setRateSale(e.target.value)}
                 placeholder="0.0540"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function CreateServicePage() {
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               placeholder="Catatan garansi, drop rate, kecepatan masuk..."
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -312,7 +312,7 @@ export default function CreateServicePage() {
             <button
               type="submit"
               disabled={isSaving || categories.length === 0}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
             >
               {isSaving ? (
                 <>

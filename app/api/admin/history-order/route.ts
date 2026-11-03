@@ -362,6 +362,25 @@ export async function POST(request: Request) {
         console.warn("[Pusher] Failed to broadcast order sync status:", pErr);
       }
 
+      // Automated Webhook / Callback trigger to client endpoint
+      if (order.callback_url) {
+        try {
+          const { dispatchOrderWebhook } = await import("@/lib/webhook-dispatcher");
+          dispatchOrderWebhook(
+            {
+              ...order,
+              status: normalizedStatus,
+              remains,
+              start: startCount,
+            },
+            null,
+            "order.updated"
+          ).catch((wErr) => console.warn("[Webhook] Delivery error:", wErr));
+        } catch (wErr) {
+          console.warn("[Webhook] Failed to dispatch order callback:", wErr);
+        }
+      }
+
       syncResults.push({
         invoice: inv,
         success: true,
@@ -525,6 +544,25 @@ export async function PATCH(request: Request) {
       await pusherServer.trigger("admin-notifications", "order-status-updated", orderStatusPayload);
     } catch (pErr) {
       console.warn("[Pusher] Failed to broadcast manual order status update:", pErr);
+    }
+
+    // Automated Webhook / Callback trigger to client endpoint
+    if (order.callback_url) {
+      try {
+        const { dispatchOrderWebhook } = await import("@/lib/webhook-dispatcher");
+        dispatchOrderWebhook(
+          {
+            ...order,
+            status: normStatus,
+            remains: newRemains,
+            start: newStart,
+          },
+          null,
+          "order.updated"
+        ).catch((wErr) => console.warn("[Webhook] Delivery error:", wErr));
+      } catch (wErr) {
+        console.warn("[Webhook] Failed to dispatch order callback:", wErr);
+      }
     }
 
     return NextResponse.json({

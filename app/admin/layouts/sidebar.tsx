@@ -14,15 +14,15 @@ import {
   Users,
   BarChart3,
   Settings,
-  Zap,
   ChevronRight,
-  Shield,
   Activity,
   Coins,
   Receipt,
   Sparkles,
-  Database,
   MessageSquare,
+  ShoppingCart,
+  Wallet,
+  ShieldCheck,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -33,113 +33,99 @@ interface SidebarProps {
 export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
-  const menuGroups = [
+  const menuSections = [
     {
-      group: "UTAMA",
+      title: "RINGKASAN",
       items: [
         {
           name: "Dashboard",
           href: "/admin",
           icon: LayoutDashboard,
-          badge: null,
         },
+      ],
+    },
+    {
+      title: "TRANSAKSI & PESANAN",
+      items: [
         {
           name: "Riwayat Order",
           href: "/admin/history-order",
-          icon: Database,
-          badge: null,
-        },
-        {
-          name: "Laporan & Transaksi",
-          href: "/admin/report",
-          icon: BarChart3,
-          badge: null,
-        },
-        {
-          name: "Tiket Bantuan",
-          href: "/admin/ticket",
-          icon: MessageSquare,
-          badge: null,
-        },
-      ],
-    },
-    {
-      group: "KATALOG & LAYANAN",
-      items: [
-        {
-          name: "Platform",
-          href: "/admin/platform",
-          icon: Layers,
-          badge: null,
-        },
-        {
-          name: "Kategori",
-          href: "/admin/category",
-          icon: FolderTree,
-          badge: null,
-        },
-        {
-          name: "Daftar Layanan",
-          href: "/admin/service",
-          icon: PackageCheck,
-          badge: null,
-        },
-        {
-          name: "Import Layanan",
-          href: "/admin/import",
-          icon: FileDown,
-          badge: null,
-        },
-      ],
-    },
-    {
-      group: "PAYMENT GATEWAY",
-      items: [
-        {
-          name: "Setup Cryptomus",
-          href: "/admin/cryptomus/setup",
-          icon: Coins,
-          badge: null,
+          icon: ShoppingCart,
         },
         {
           name: "Riwayat Deposit",
           href: "/admin/cryptomus/history",
           icon: Receipt,
-          badge: null,
+        },
+        {
+          name: "Laporan & Profit",
+          href: "/admin/report",
+          icon: BarChart3,
         },
       ],
     },
     {
-      group: "INFRASTRUKTUR & SERVER",
+      title: "KATALOG LAYANAN",
       items: [
         {
-          name: "Monitoring Server",
-          href: "/admin/server",
-          icon: Activity,
-          badge: null,
+          name: "Platform",
+          href: "/admin/platform",
+          icon: Layers,
         },
         {
-          name: "API Provider",
-          href: "/admin/provider",
-          icon: Server,
-          badge: null,
+          name: "Kategori",
+          href: "/admin/category",
+          icon: FolderTree,
+        },
+        {
+          name: "Daftar Layanan",
+          href: "/admin/service",
+          icon: PackageCheck,
+        },
+        {
+          name: "Import Layanan",
+          href: "/admin/import",
+          icon: FileDown,
         },
       ],
     },
     {
-      group: "PENGGUNA & SISTEM",
+      title: "PENGGUNA & BANTUAN",
       items: [
         {
           name: "Kelola Pengguna",
           href: "/admin/user",
           icon: Users,
-          badge: null,
+        },
+        {
+          name: "Tiket Dukungan",
+          href: "/admin/ticket",
+          icon: MessageSquare,
+        },
+      ],
+    },
+    {
+      title: "INTEGRASI & SISTEM",
+      items: [
+        {
+          name: "API Provider",
+          href: "/admin/provider",
+          icon: Server,
+        },
+        {
+          name: "Monitoring Server",
+          href: "/admin/server",
+          icon: Activity,
+        },
+        {
+          name: "Setup Cryptomus",
+          href: "/admin/cryptomus/setup",
+          icon: Coins,
         },
         {
           name: "Pengaturan Sistem",
           href: "/admin/setting",
           icon: Settings,
-          badge: null,
         },
       ],
     },
@@ -154,11 +140,11 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop Overlay */}
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden transition-opacity"
         />
       )}
 
@@ -169,20 +155,20 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         {/* Brand Logo Header */}
-        <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <Link href="/admin" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 p-[1px] shadow-md shadow-indigo-600/20">
-              <div className="w-full h-full bg-indigo-600 rounded-[11px] flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 p-[1px] shadow-sm shadow-emerald-600/30">
+              <div className="w-full h-full bg-emerald-600 rounded-[11px] flex items-center justify-center text-white">
                 <Sparkles className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-lg tracking-tight text-slate-900">
-                  MASTER<span className="text-indigo-600">SMM</span>
+                  MASTER<span className="text-emerald-600">SMM</span>
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block -mt-1">
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block -mt-1">
                 Admin Console
               </span>
             </div>
@@ -191,66 +177,55 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation Menu */}
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 bg-white">
-          {menuGroups.map((group, groupIdx) => (
-            <div key={groupIdx} className="space-y-1">
-              <h3 className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">
-                {group.group}
+          {menuSections.map((section, idx) => (
+            <div key={idx} className="space-y-1">
+              <h3 className="px-3 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
+                {section.title}
               </h3>
-              {group.items.map((item) => {
-                const active = isActive(item.href);
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => {
-                      if (window.innerWidth < 1024) onClose();
-                    }}
-                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 ${
-                      active
-                        ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/25 font-semibold"
-                        : "text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/60"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        className={`w-4 h-4 transition-transform group-hover:scale-110 ${
-                          active
-                            ? "text-white"
-                            : "text-slate-400 group-hover:text-indigo-600"
-                        }`}
-                      />
-                      <span>{item.name}</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      {item.badge && (
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const active = isActive(item.href);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => {
+                        if (window.innerWidth < 1024) onClose();
+                      }}
+                      className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 ${
+                        active
+                          ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 font-semibold"
+                          : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon
+                          className={`w-4 h-4 transition-transform group-hover:scale-110 ${
                             active
-                              ? "bg-white/20 text-white"
-                              : "bg-indigo-50 text-indigo-600 border border-indigo-200/60"
+                              ? "text-white"
+                              : "text-slate-400 group-hover:text-emerald-600"
                           }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
+                        />
+                        <span>{item.name}</span>
+                      </div>
+
                       {active && (
-                        <ChevronRight className="w-3.5 h-3.5 text-white/80" />
+                        <ChevronRight className="w-3.5 h-3.5 text-white/90" />
                       )}
-                    </div>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
 
         {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-slate-100 bg-white">
-          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <div className="p-4 border-t border-slate-100 bg-white shrink-0">
+          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-indigo-100 border border-indigo-200/80 flex items-center justify-center font-bold text-indigo-700 text-xs shadow-inner">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-200/80 flex items-center justify-center font-bold text-emerald-800 text-xs shadow-inner">
                 SA
               </div>
               <div className="overflow-hidden">

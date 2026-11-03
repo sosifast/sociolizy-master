@@ -229,7 +229,7 @@ export default function AdminNotificationsDropdown() {
       case "register":
         return <UserPlus className="w-4 h-4 text-emerald-600" />;
       case "order":
-        return <ShoppingCart className="w-4 h-4 text-indigo-600" />;
+        return <ShoppingCart className="w-4 h-4 text-emerald-600" />;
       case "order_status":
         return <CheckCircle2 className="w-4 h-4 text-sky-600" />;
       case "ticket":
@@ -238,7 +238,7 @@ export default function AdminNotificationsDropdown() {
       case "deposit_status":
         return <Wallet className="w-4 h-4 text-emerald-600" />;
       default:
-        return <Sparkles className="w-4 h-4 text-indigo-600" />;
+        return <Sparkles className="w-4 h-4 text-emerald-600" />;
     }
   };
 
@@ -247,7 +247,7 @@ export default function AdminNotificationsDropdown() {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+        className="relative p-2 rounded-xl text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
         aria-label="Notifikasi Realtime Admin"
         title="Notifikasi Realtime"
       >
@@ -267,7 +267,7 @@ export default function AdminNotificationsDropdown() {
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-900 text-sm">Notifikasi Realtime</span>
               {unreadCount > 0 && (
-                <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/50">
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/50">
                   {unreadCount} baru
                 </span>
               )}
@@ -278,7 +278,7 @@ export default function AdminNotificationsDropdown() {
                 <button
                   onClick={markAllRead}
                   title="Tandai semua dibaca"
-                  className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                  className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                 >
                   <CheckCheck className="w-3.5 h-3.5" />
                 </button>
@@ -309,7 +309,7 @@ export default function AdminNotificationsDropdown() {
                   key={n.id}
                   className={`p-3 rounded-xl border transition-all ${
                     !n.isRead
-                      ? "bg-indigo-50/40 border-indigo-100/80"
+                      ? "bg-emerald-50/40 border-emerald-100/80"
                       : "bg-slate-50/70 border-slate-100 hover:bg-slate-50"
                   }`}
                 >
@@ -341,7 +341,7 @@ export default function AdminNotificationsDropdown() {
                               )
                             );
                           }}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-700 mt-1.5 hover:underline"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 mt-1.5 hover:underline"
                         >
                           <span>Buka Detail</span>
                           <ExternalLink className="w-3 h-3" />

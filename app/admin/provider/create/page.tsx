@@ -69,7 +69,7 @@ export default function CreateProviderPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/provider"
-          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-xs"
+          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -92,7 +92,7 @@ export default function CreateProviderPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Nama Provider <span className="text-red-600">*</span>
+                Nama Provider <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="text"
@@ -105,7 +105,7 @@ export default function CreateProviderPage() {
                   }
                 }}
                 placeholder="Contoh: SMM Kings API"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -118,14 +118,14 @@ export default function CreateProviderPage() {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
                 placeholder="smm-kings-api"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              URL Endpoint API Provider <span className="text-red-600">*</span>
+              URL Endpoint API Provider <span className="text-emerald-600">*</span>
             </label>
             <input
               type="url"
@@ -133,7 +133,7 @@ export default function CreateProviderPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://provider.com/api/v2"
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
             <p className="text-[11px] text-slate-400 mt-1">
               URL endpoint API penyedia untuk melakukan request order, balance check, dan status layanan.
@@ -142,7 +142,7 @@ export default function CreateProviderPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              API Key Provider <span className="text-red-600">*</span>
+              API Key Provider <span className="text-emerald-600">*</span>
             </label>
             <input
               type="text"
@@ -150,7 +150,7 @@ export default function CreateProviderPage() {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Masukkan API Key yang diberikan provider..."
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function CreateProviderPage() {
               type="number"
               value={balance}
               onChange={(e) => setBalance(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -176,7 +176,7 @@ export default function CreateProviderPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.98] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-60"
             >
               {isLoading ? (
                 <>

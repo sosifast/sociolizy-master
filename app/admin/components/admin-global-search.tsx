@@ -159,12 +159,12 @@ export default function AdminGlobalSearch() {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Cari pesanan, pengguna, layanan, tiket..."
-          className="w-full pl-10 pr-9 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 focus:outline-none transition-all shadow-2xs"
+          className="w-full pl-10 pr-9 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 focus:outline-none transition-all shadow-2xs"
         />
 
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
           {isLoading ? (
-            <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+            <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
           ) : query ? (
             <button
               type="button"
@@ -198,13 +198,13 @@ export default function AdminGlobalSearch() {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
-                      <User className="w-3 h-3 text-indigo-600" />
+                      <User className="w-3 h-3 text-emerald-600" />
                       Pengguna ({results.users.length})
                     </span>
                     <Link
                       href={`/admin/user?search=${encodeURIComponent(query)}`}
                       onClick={() => setIsOpen(false)}
-                      className="text-indigo-600 hover:underline"
+                      className="text-emerald-600 hover:underline"
                     >
                       Lihat Semua
                     </Link>
@@ -215,14 +215,14 @@ export default function AdminGlobalSearch() {
                         key={u.id}
                         href={`/admin/user?search=${encodeURIComponent(u.username)}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-indigo-50/50 transition-colors group"
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50/50 transition-colors group"
                       >
                         <div className="flex items-center gap-2.5 overflow-hidden">
-                          <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 font-bold text-[10px] flex items-center justify-center shrink-0">
                             {u.username.slice(0, 2).toUpperCase()}
                           </div>
                           <div className="truncate">
-                            <p className="text-xs font-bold text-slate-800 truncate group-hover:text-indigo-600">
+                            <p className="text-xs font-bold text-slate-800 truncate group-hover:text-emerald-600">
                               @{u.username}
                             </p>
                             <p className="text-[10px] text-slate-400 truncate">{u.email}</p>
@@ -253,7 +253,7 @@ export default function AdminGlobalSearch() {
                     <Link
                       href={`/admin/service?search=${encodeURIComponent(query)}`}
                       onClick={() => setIsOpen(false)}
-                      className="text-indigo-600 hover:underline"
+                      className="text-emerald-600 hover:underline"
                     >
                       Lihat Semua
                     </Link>
@@ -264,14 +264,14 @@ export default function AdminGlobalSearch() {
                         key={s.id}
                         href={`/admin/service?search=${encodeURIComponent(s.service_id)}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-indigo-50/50 transition-colors group"
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50/50 transition-colors group"
                       >
                         <div className="overflow-hidden pr-2">
-                          <p className="text-xs font-bold text-slate-800 truncate group-hover:text-indigo-600">
+                          <p className="text-xs font-bold text-slate-800 truncate group-hover:text-emerald-600">
                             {s.service_name}
                           </p>
                           <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                            <span className="font-mono text-indigo-600 font-semibold">
+                            <span className="font-mono text-emerald-600 font-semibold">
                               #{s.service_id}
                             </span>
                             {s.category?.name && <span>• {s.category.name}</span>}
@@ -297,7 +297,7 @@ export default function AdminGlobalSearch() {
                     <Link
                       href={`/admin/history-order?search=${encodeURIComponent(query)}`}
                       onClick={() => setIsOpen(false)}
-                      className="text-indigo-600 hover:underline"
+                      className="text-emerald-600 hover:underline"
                     >
                       Lihat Semua
                     </Link>
@@ -308,10 +308,10 @@ export default function AdminGlobalSearch() {
                         key={o.invoice}
                         href={`/admin/history-order?search=${encodeURIComponent(o.invoice)}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-indigo-50/50 transition-colors group"
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50/50 transition-colors group"
                       >
                         <div className="overflow-hidden pr-2">
-                          <p className="text-xs font-mono font-bold text-indigo-600 truncate">
+                          <p className="text-xs font-mono font-bold text-emerald-600 truncate">
                             {o.invoice}
                           </p>
                           <p className="text-[10px] text-slate-400 truncate">
@@ -347,7 +347,7 @@ export default function AdminGlobalSearch() {
                     <Link
                       href={`/admin/ticket?search=${encodeURIComponent(query)}`}
                       onClick={() => setIsOpen(false)}
-                      className="text-indigo-600 hover:underline"
+                      className="text-emerald-600 hover:underline"
                     >
                       Lihat Semua
                     </Link>
@@ -358,15 +358,15 @@ export default function AdminGlobalSearch() {
                         key={t.ticket_id}
                         href={`/admin/ticket/${t.ticket_id}`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-indigo-50/50 transition-colors group"
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50/50 transition-colors group"
                       >
                         <div className="overflow-hidden pr-2">
-                          <div className="flex items-center gap-1.5 text-[10px] font-mono text-indigo-600 font-bold">
+                          <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 font-bold">
                             <span>{t.ticket_id}</span>
                             <span className="text-slate-300">•</span>
                             <span className="text-slate-500 font-sans">@{t.username}</span>
                           </div>
-                          <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-indigo-600">
+                          <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-emerald-600">
                             {t.subject}
                           </p>
                         </div>

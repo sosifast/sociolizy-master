@@ -65,7 +65,7 @@ export default function TablePagination({
               onItemsPerPageChange(Number(e.target.value));
               onPageChange(1);
             }}
-            className="px-2 py-1 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold focus:outline-none focus:border-red-500 cursor-pointer shadow-2xs"
+            className="px-2 py-1 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
           >
             {pageSizeOptions.map((opt) => (
               <option key={opt} value={opt}>
@@ -82,7 +82,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
-          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-red-600 hover:border-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           title="Halaman Pertama"
         >
           <ChevronsLeft className="w-3.5 h-3.5" />
@@ -92,7 +92,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-red-600 hover:border-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           title="Halaman Sebelumnya"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
@@ -115,8 +115,8 @@ export default function TablePagination({
               onClick={() => onPageChange(pageNum)}
               className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 isActive
-                  ? "bg-indigo-600 text-white shadow-xs shadow-indigo-600/25"
-                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200"
+                  ? "bg-emerald-600 text-white shadow-xs shadow-emerald-600/25"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-200"
               }`}
             >
               {pageNum}
@@ -128,7 +128,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-red-600 hover:border-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           title="Halaman Selanjutnya"
         >
           <ChevronRight className="w-3.5 h-3.5" />
@@ -138,7 +138,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-red-600 hover:border-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           title="Halaman Terakhir"
         >
           <ChevronsRight className="w-3.5 h-3.5" />

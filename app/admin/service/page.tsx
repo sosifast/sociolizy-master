@@ -192,22 +192,22 @@ export default function AdminServicePage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Cari ID / layanan..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 focus:outline-none transition-all"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 focus:outline-none transition-all"
               />
             </div>
 
             <button
               onClick={() => fetchServices()}
               disabled={isLoading || isRefreshing}
-              className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 bg-slate-50 border border-slate-200 hover:border-indigo-200 transition-colors shadow-xs cursor-pointer"
+              className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 bg-slate-50 border border-slate-200 hover:border-emerald-200 transition-colors shadow-xs cursor-pointer"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-600" : ""}`} />
             </button>
 
             <Link
               href="/admin/import"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-colors whitespace-nowrap cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:text-emerald-600 transition-colors whitespace-nowrap cursor-pointer shadow-xs"
             >
               <FileDown className="w-3.5 h-3.5 text-slate-500" />
               <span>Import</span>
@@ -215,7 +215,7 @@ export default function AdminServicePage() {
 
             <Link
               href="/admin/service/create"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] shadow-xs shadow-indigo-600/20 transition-all whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] shadow-xs shadow-emerald-600/20 transition-all whitespace-nowrap cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Layanan</span>
@@ -225,10 +225,10 @@ export default function AdminServicePage() {
 
         {/* Bulk Action Bar */}
         {selectedIds.size > 0 && (
-          <div className="mx-5 my-3 p-3 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="mx-5 my-3 p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-              <span className="text-xs font-bold text-red-900">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+              <span className="text-xs font-bold text-emerald-900">
                 {selectedIds.size} layanan dipilih
               </span>
             </div>
@@ -244,7 +244,7 @@ export default function AdminServicePage() {
               <button
                 type="button"
                 onClick={() => setBulkDeleteModal({ isOpen: true, isDeleting: false })}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm shadow-red-600/25 active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-600/25 active:scale-[0.98] transition-all cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Hapus Terpilih ({selectedIds.size})</span>
@@ -256,7 +256,7 @@ export default function AdminServicePage() {
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-indigo-600 mb-2" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600 mb-2" />
               <p className="text-xs">Memuat data layanan...</p>
             </div>
           ) : (
@@ -269,7 +269,7 @@ export default function AdminServicePage() {
                       checked={isAllPageSelected}
                       onChange={toggleSelectAllPage}
                       title="Pilih semua di halaman ini"
-                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                      className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-600"
                     />
                   </th>
                   <th className="py-3.5 px-4">ID</th>
@@ -300,7 +300,7 @@ export default function AdminServicePage() {
                       <tr
                         key={s.id}
                         className={`transition-colors ${
-                          isSelected ? "bg-indigo-50/40" : "hover:bg-slate-50/70"
+                          isSelected ? "bg-emerald-50/40" : "hover:bg-slate-50/70"
                         }`}
                       >
                         <td className="py-3.5 px-4 text-center">
@@ -308,7 +308,7 @@ export default function AdminServicePage() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(s.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                            className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-600"
                           />
                         </td>
                         <td className="py-3.5 px-4 font-bold font-mono text-slate-900">
@@ -326,7 +326,7 @@ export default function AdminServicePage() {
                           {s.api_provider ? (
                             <div>
                               <span
-                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200"
+                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
                                 title={s.api_provider.uuid ? `Provider UUID: ${s.api_provider.uuid}` : undefined}
                               >
                                 {s.api_provider.name}
@@ -361,7 +361,7 @@ export default function AdminServicePage() {
                           <div className="flex items-center justify-end gap-1.5">
                             <Link
                               href={`/admin/service/${s.id}/edit`}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                               title="Edit"
                             >
                               <Edit className="w-3.5 h-3.5" />

@@ -46,21 +46,21 @@ export default function Navbar({
   const dashboardHref = sessionData?.user?.level === "Admin" ? "/admin" : "/member";
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#070b14]/85 border-b border-white/[0.06] transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/95 border-b border-slate-200/80 transition-all shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="group flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-cyan-400 p-[1px] shadow-lg shadow-indigo-500/25">
-            <div className="w-full h-full bg-[#0a0f1d] rounded-[11px] flex items-center justify-center">
-              <Zap className="w-5 h-5 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 p-[1px] shadow-sm shadow-emerald-600/30">
+            <div className="w-full h-full bg-emerald-600 rounded-[11px] flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">
+            <span className="font-extrabold text-2xl tracking-tight text-slate-900">
               sociolizy
             </span>
             {currentBadge && (
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
                 {currentBadge}
               </span>
             )}
@@ -75,11 +75,11 @@ export default function Navbar({
         {/* Action Buttons */}
         <div className="hidden sm:flex items-center gap-3">
           {!mounted || isLoading ? (
-            <div className="h-9 w-28 rounded-xl bg-slate-800/40 animate-pulse" />
+            <div className="h-9 w-28 rounded-xl bg-slate-100 animate-pulse" />
           ) : isLoggedIn ? (
             <Link
               href={dashboardHref}
-              className="relative inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all"
+              className="relative inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
             >
               <LayoutDashboard className="w-4 h-4" />
               <span>Dashboard</span>
@@ -88,13 +88,13 @@ export default function Navbar({
             <>
               <Link
                 href="/auth/login"
-                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/80 transition-all"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 transition-all shadow-xs"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/register"
-                className="relative px-5 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-[0.98] transition-all"
+                className="relative px-5 py-2 text-sm font-semibold text-white rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
               >
                 Get Started
               </Link>
@@ -105,7 +105,7 @@ export default function Navbar({
         {/* Mobile Menu Toggle Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none"
+          className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg focus:outline-none cursor-pointer"
           aria-label="Toggle navigation menu"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -114,20 +114,20 @@ export default function Navbar({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0c1222] border-b border-slate-800 px-6 py-6 space-y-4 shadow-2xl">
+        <div className="md:hidden bg-white border-b border-slate-200 px-6 py-6 space-y-4 shadow-xl">
           <Menubar
             items={navItems}
             orientation="vertical"
             onItemClick={() => setMobileMenuOpen(false)}
           />
-          <div className="pt-4 border-t border-slate-800 flex flex-col gap-3">
+          <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
             {!mounted || isLoading ? (
-              <div className="h-10 w-full rounded-xl bg-slate-800/40 animate-pulse" />
+              <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
             ) : isLoggedIn ? (
               <Link
                 href={dashboardHref}
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 shadow-lg shadow-indigo-600/30 active:scale-[0.98] transition-all"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -137,14 +137,14 @@ export default function Navbar({
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 text-sm font-medium text-slate-300 rounded-xl border border-slate-800 bg-slate-900/60"
+                  className="w-full text-center py-2.5 text-sm font-medium text-slate-700 rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600"
+                  className="w-full text-center py-2.5 text-sm font-semibold text-white rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20"
                 >
                   Get Started
                 </Link>

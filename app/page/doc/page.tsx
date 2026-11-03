@@ -15,6 +15,10 @@ import {
   ArrowRight,
   RotateCcw,
   Sparkles,
+  Send,
+  Globe,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Topbar, Navbar, Footer } from "@/app/layouts";
 
@@ -27,6 +31,8 @@ export default function ApiDocumentationPage() {
   const [origin, setOrigin] = useState("https://sociolizy.com");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [orderMode, setOrderMode] = useState<"Default" | "Custom Comments">("Default");
+  const [userApiKey, setUserApiKey] = useState<string | null>(null);
+  const [showKey, setShowKey] = useState(false);
 
   // State for cards (collapse and dismiss)
   const [cards, setCards] = useState<Record<string, CardState>>({
@@ -34,15 +40,93 @@ export default function ApiDocumentationPage() {
     order: { collapsed: false, dismissed: false },
     status: { collapsed: false, dismissed: false },
     multipleStatus: { collapsed: false, dismissed: false },
+    callback: { collapsed: false, dismissed: false },
     services: { collapsed: false, dismissed: false },
     balance: { collapsed: false, dismissed: false },
   });
+
+  // State for callback manager
+  const [defaultCallbackUrl, setDefaultCallbackUrl] = useState("");
+  const [callbackSaving, setCallbackSaving] = useState(false);
+  const [callbackTesting, setCallbackTesting] = useState(false);
+  const [callbackMessage, setCallbackMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setOrigin(window.location.origin);
     }
+
+    // Fetch member's API key if logged in
+    fetch("/api/member/api-key")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && data?.api_key) {
+          setUserApiKey(data.api_key);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch member's current callback URL if logged in
+    fetch("/api/member/callback")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && data?.callback_url) {
+          setDefaultCallbackUrl(data.callback_url);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const handleSaveCallback = async () => {
+    setCallbackSaving(true);
+    setCallbackMessage(null);
+    try {
+      const res = await fetch("/api/member/callback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callback_url: defaultCallbackUrl.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCallbackMessage({ type: "success", text: data.message || "Default callback URL saved successfully." });
+      } else {
+        setCallbackMessage({ type: "error", text: data.message || "Failed to save callback URL." });
+      }
+    } catch {
+      setCallbackMessage({ type: "error", text: "Network error occurred." });
+    } finally {
+      setCallbackSaving(false);
+    }
+  };
+
+  const handleTestCallback = async () => {
+    if (!defaultCallbackUrl.trim()) {
+      setCallbackMessage({ type: "error", text: "Please enter a valid callback URL to test." });
+      return;
+    }
+    setCallbackTesting(true);
+    setCallbackMessage(null);
+    try {
+      const res = await fetch("/api/member/callback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "test", callback_url: defaultCallbackUrl.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCallbackMessage({ type: "success", text: data.message || "Webhook delivered successfully." });
+      } else {
+        setCallbackMessage({ type: "error", text: data.message || "Webhook delivery test failed." });
+      }
+    } catch {
+      setCallbackMessage({ type: "error", text: "Failed to connect to the target endpoint." });
+    } finally {
+      setCallbackTesting(false);
+    }
+  };
 
   const toggleCollapse = (id: string) => {
     setCards((prev) => ({
@@ -64,6 +148,7 @@ export default function ApiDocumentationPage() {
       order: { collapsed: false, dismissed: false },
       status: { collapsed: false, dismissed: false },
       multipleStatus: { collapsed: false, dismissed: false },
+      callback: { collapsed: false, dismissed: false },
       services: { collapsed: false, dismissed: false },
       balance: { collapsed: false, dismissed: false },
     });
@@ -112,6 +197,24 @@ export default function ApiDocumentationPage() {
   }
 }`;
 
+  const webhookPayloadExample = `{
+  "event": "order.updated",
+  "order": 32,
+  "invoice": "INV-20261102-45812",
+  "service_id": "5",
+  "status": "completed",
+  "charge": "0.0360",
+  "start_count": 1250,
+  "remains": 0,
+  "currency": "USD",
+  "target": "https://instagram.com/p/Cxyz123",
+  "timestamp": "2026-11-02T12:00:00.000Z"
+}`;
+
+  const webhookClientResponse = `{
+  "status": "ok"
+}`;
+
   const servicesResponse = `[
   {
     "service": "5",
@@ -143,55 +246,50 @@ export default function ApiDocumentationPage() {
 }`;
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col overflow-x-hidden selection:bg-indigo-500 selection:text-white">
-      {/* Ambient background lighting */}
-      <div className="fixed inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
-      <div className="fixed -top-40 -left-40 w-[550px] h-[550px] bg-gradient-to-tr from-indigo-600/15 via-violet-600/10 to-transparent blur-[140px] rounded-full pointer-events-none" />
-      <div className="fixed -bottom-40 -right-40 w-[550px] h-[550px] bg-gradient-to-bl from-cyan-500/10 via-blue-600/10 to-transparent blur-[140px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
       {/* Topbar Announcement */}
       <Topbar />
 
       {/* Main Navigation Header */}
-      <Navbar currentBadge="API Documentation" />
+      <Navbar />
 
       {/* Hero Header */}
-      <section className="relative z-10 border-b border-slate-800/80 bg-slate-900/30 py-12 lg:py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-5">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
+      <section className="relative z-10 border-b border-slate-200 bg-white py-14 lg:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold mb-5">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
             <span>Developer REST API v1</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             API Documentation
           </h1>
 
-          <p className="mt-4 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Integrate directly with our automated social media marketing infrastructure. Connect your panel, bot, or CRM seamlessly with full support for orders, refills, and balance queries.
+          <p className="mt-4 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Integrate directly with our automated social media marketing infrastructure. Connect your panel, bot, or CRM seamlessly with full support for orders, refills, automated callbacks, and balance queries.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>API Status: Online (99.98% Uptime)</span>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-slate-300">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-xs">
               <span>Endpoint:</span>
-              <code className="text-indigo-300 font-mono">{apiUrl}</code>
+              <code className="text-emerald-600 font-mono font-semibold">{apiUrl}</code>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Documentation Container */}
-      <main className="relative z-10 flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+      <main className="relative z-10 flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
         {hasDismissedCards && (
-          <div className="mb-6 p-3 rounded-lg bg-indigo-950/60 border border-indigo-800/50 flex items-center justify-between text-xs text-indigo-200">
+          <div className="mb-6 p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
             <span>Some documentation sections are currently hidden.</span>
             <button
               onClick={resetAllCards}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Reset All Sections
@@ -288,8 +386,52 @@ export default function ApiDocumentationPage() {
                           <td className="w-1/3 py-3 px-4 font-normal text-slate-800 bg-[#fbfbfb]">
                             API Key
                           </td>
-                          <td className="py-3 px-4 text-slate-500 italic">
-                            Your personal API Key (Generate or view in Account Settings)
+                          <td className="py-3 px-4">
+                            {userApiKey ? (
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-mono text-xs sm:text-sm text-slate-900 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
+                                  {showKey
+                                    ? userApiKey
+                                    : `${userApiKey.slice(0, 8)}••••••••••••••••`}
+                                </span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <button
+                                    onClick={() => setShowKey(!showKey)}
+                                    className="px-2 py-1 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded transition font-medium"
+                                  >
+                                    {showKey ? "Hide" : "Show"}
+                                  </button>
+                                  <button
+                                    onClick={() => copyToClipboard(userApiKey, "api-key")}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded transition"
+                                  >
+                                    {copiedKey === "api-key" ? (
+                                      <>
+                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                        <span className="text-emerald-700">Copied</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className="w-3.5 h-3.5" />
+                                        <span>Copy</span>
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500 italic text-xs sm:text-sm">
+                                  Your personal API key
+                                </span>
+                                <Link
+                                  href="/auth/login"
+                                  className="text-xs text-emerald-600 hover:text-emerald-800 font-semibold underline underline-offset-2 shrink-0"
+                                >
+                                  Sign In to view Key
+                                </Link>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       </tbody>
@@ -425,6 +567,15 @@ export default function ApiDocumentationPage() {
                             </td>
                           </tr>
                         )}
+
+                        <tr className="hover:bg-slate-50/70 transition bg-emerald-50/30">
+                          <td className="py-3 px-4 font-mono font-medium text-emerald-700">
+                            callback (optional)
+                          </td>
+                          <td className="py-3 px-4 text-slate-700">
+                            Callback URL to receive instant order status updates
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -675,6 +826,227 @@ export default function ApiDocumentationPage() {
             </div>
           )}
 
+          {/* CARD: Order Callback */}
+          {!cards.callback.dismissed && (
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden text-slate-800 transition-all">
+              {/* Card Header */}
+              <div className="px-5 py-4 flex items-center justify-between border-b border-slate-100 bg-white">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                  Order Callback
+                </h2>
+                <div className="flex items-center gap-3 text-slate-400">
+                  <button
+                    onClick={() => toggleCollapse("callback")}
+                    title={cards.callback.collapsed ? "Expand" : "Collapse"}
+                    className="hover:text-slate-700 transition p-1"
+                  >
+                    {cards.callback.collapsed ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronUp className="w-4 h-4" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => dismissCard("callback")}
+                    title="Close"
+                    className="hover:text-red-500 transition p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Card Content */}
+              {!cards.callback.collapsed && (
+                <div className="p-5 sm:p-6 space-y-5">
+                  {/* Specifications Table */}
+                  <div className="overflow-x-auto rounded border border-slate-200">
+                    <table className="w-full text-left text-xs sm:text-sm">
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-slate-50/70 transition">
+                          <td className="w-1/3 py-3 px-4 font-normal text-slate-800 bg-[#fbfbfb]">
+                            HTTP Method
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-slate-900">
+                            POST
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-50/70 transition">
+                          <td className="w-1/3 py-3 px-4 font-normal text-slate-800 bg-[#fbfbfb]">
+                            Response format
+                          </td>
+                          <td className="py-3 px-4 font-mono text-slate-900">
+                            application/json
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-50/70 transition">
+                          <td className="w-1/3 py-3 px-4 font-normal text-slate-800 bg-[#fbfbfb]">
+                            Headers
+                          </td>
+                          <td className="py-3 px-4 space-y-1">
+                            <div className="font-mono text-xs text-slate-800">
+                              <span className="text-emerald-600 font-semibold">User-Agent:</span> Master-SMM-Webhook-Engine/1.0
+                            </div>
+                            <div className="font-mono text-xs text-slate-800">
+                              <span className="text-emerald-600 font-semibold">X-SMM-Event:</span> order.updated
+                            </div>
+                            <div className="font-mono text-xs text-slate-800">
+                              <span className="text-emerald-600 font-semibold">X-SMM-Signature:</span> HMAC-SHA256 signature
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-50/70 transition">
+                          <td className="w-1/3 py-3 px-4 font-normal text-slate-800 bg-[#fbfbfb]">
+                            Setup
+                          </td>
+                          <td className="py-3 px-4 text-slate-700 space-y-1">
+                            <div>
+                              Pass <code className="text-emerald-600 font-mono font-semibold">callback</code> parameter in <code className="font-mono text-xs">action=add</code>, or configure your default Callback URL below.
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Webhook JSON Payload Example */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                        Example payload:
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard(webhookPayloadExample, "webhook-payload")}
+                        className="text-xs text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 font-medium"
+                      >
+                        {copiedKey === "webhook-payload" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-emerald-700">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy JSON</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <pre className="bg-[#202938] text-slate-100 rounded-md p-4 text-xs sm:text-sm font-mono overflow-x-auto leading-relaxed border border-slate-700/60 shadow-inner">
+                      <code>{webhookPayloadExample}</code>
+                    </pre>
+                  </div>
+
+                  {/* Expected Response */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                        Expected response (HTTP 200 OK):
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard(webhookClientResponse, "webhook-response")}
+                        className="text-xs text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 font-medium"
+                      >
+                        {copiedKey === "webhook-response" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-emerald-700">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy JSON</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <pre className="bg-[#202938] text-slate-100 rounded-md p-4 text-xs sm:text-sm font-mono overflow-x-auto leading-relaxed border border-slate-700/60 shadow-inner">
+                      <code>{webhookClientResponse}</code>
+                    </pre>
+                  </div>
+
+                  {/* Interactive Live Webhook Tester & Setup */}
+                  <div className="rounded-lg border border-slate-200 bg-[#fafafa] p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-900">
+                        Default Callback URL
+                      </h3>
+                    </div>
+
+                    {userApiKey ? (
+                      <div className="space-y-3">
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="url"
+                            value={defaultCallbackUrl}
+                            onChange={(e) => setDefaultCallbackUrl(e.target.value)}
+                            placeholder="https://yourdomain.com/api/smm/webhook"
+                            className="flex-1 px-3.5 py-2 text-xs sm:text-sm text-slate-800 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSaveCallback}
+                            disabled={callbackSaving}
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold rounded-md transition shrink-0 cursor-pointer"
+                          >
+                            {callbackSaving ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Check className="w-3.5 h-3.5" />
+                            )}
+                            <span>Save URL</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleTestCallback}
+                            disabled={callbackTesting || !defaultCallbackUrl.trim()}
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-900 disabled:opacity-50 text-white text-xs font-semibold rounded-md transition shrink-0 cursor-pointer"
+                          >
+                            {callbackTesting ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Send className="w-3.5 h-3.5" />
+                            )}
+                            <span>Send Test Ping</span>
+                          </button>
+                        </div>
+
+                        {callbackMessage && (
+                          <div
+                            className={`p-3 rounded-lg text-xs font-medium flex items-center gap-2 border ${
+                              callbackMessage.type === "success"
+                                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                                : "bg-rose-50 border-rose-200 text-rose-800"
+                            }`}
+                          >
+                            {callbackMessage.type === "success" ? (
+                              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                            )}
+                            <span>{callbackMessage.text}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-lg bg-slate-100 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600">
+                        <span>Sign in to configure and test your default callback URL.</span>
+                        <Link
+                          href="/auth/login"
+                          className="inline-flex items-center justify-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded transition shrink-0"
+                        >
+                          Sign In
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* CARD 5: Services Lists */}
           {!cards.services.dismissed && (
             <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden text-slate-800 transition-all">
@@ -874,4 +1246,3 @@ export default function ApiDocumentationPage() {
     </div>
   );
 }
-

@@ -426,13 +426,13 @@ export default function AdminImportPage() {
               }`}
             >
               {currentStep === 1 && (
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-600" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600" />
               )}
               <div className="flex items-center justify-center sm:justify-start gap-2.5">
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     currentStep === 1
-                      ? "bg-red-600 text-white"
+                      ? "bg-emerald-600 text-white"
                       : hasFetched
                       ? "bg-emerald-100 text-emerald-700"
                       : "bg-slate-200 text-slate-600"
@@ -460,13 +460,13 @@ export default function AdminImportPage() {
               }`}
             >
               {currentStep === 2 && (
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-600" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600" />
               )}
               <div className="flex items-center justify-center sm:justify-start gap-2.5">
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     currentStep === 2
-                      ? "bg-red-600 text-white"
+                      ? "bg-emerald-600 text-white"
                       : selectedIds.size > 0
                       ? "bg-emerald-100 text-emerald-700"
                       : "bg-slate-200 text-slate-600"
@@ -496,13 +496,13 @@ export default function AdminImportPage() {
               }`}
             >
               {currentStep === 3 && (
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-600" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600" />
               )}
               <div className="flex items-center justify-center sm:justify-start gap-2.5">
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     currentStep === 3
-                      ? "bg-red-600 text-white"
+                      ? "bg-emerald-600 text-white"
                       : importResult
                       ? "bg-emerald-100 text-emerald-700"
                       : "bg-slate-200 text-slate-600"
@@ -530,7 +530,7 @@ export default function AdminImportPage() {
                   ) : providers.length === 0 ? (
                     <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
                       Belum ada provider.{" "}
-                      <Link href="/admin/provider" className="font-bold underline text-red-600">
+                      <Link href="/admin/provider" className="font-bold underline text-emerald-600">
                         Tambah Provider &rarr;
                       </Link>
                     </div>
@@ -544,7 +544,7 @@ export default function AdminImportPage() {
                         setSelectedIds(new Set());
                         setImportResult(null);
                       }}
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-semibold focus:bg-white focus:border-red-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none"
                     >
                       {providers.map((p) => (
                         <option key={p.id} value={p.id}>
@@ -560,7 +560,7 @@ export default function AdminImportPage() {
                     type="button"
                     onClick={handleFetchServices}
                     disabled={isLoadingServices || !selectedProviderId}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
                   >
                     {isLoadingServices ? (
                       <>
@@ -619,7 +619,7 @@ export default function AdminImportPage() {
                       setCurrentPage(1);
                     }}
                     placeholder="Cari ID / nama..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-red-500 focus:outline-none"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
 
@@ -630,7 +630,7 @@ export default function AdminImportPage() {
                       setCategoryFilter(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                    className="px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                   >
                     <option value="all">Semua Kategori ({providerCategories.length})</option>
                     {providerCategories.map((c) => (
@@ -646,14 +646,14 @@ export default function AdminImportPage() {
                       setStatusFilter(e.target.value as any);
                       setCurrentPage(1);
                     }}
-                    className="px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                    className="px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                   >
                     <option value="all">Semua Status</option>
                     <option value="new">Baru</option>
                     <option value="existing">Sudah Ada</option>
                   </select>
 
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-50 text-red-600 border border-red-200">
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
                     {selectedIds.size} Dipilih
                   </span>
                 </div>
@@ -686,7 +686,7 @@ export default function AdminImportPage() {
                   <button
                     type="button"
                     onClick={deselectAll}
-                    className="px-2.5 py-1 rounded-lg font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer"
                   >
                     Batal Pilihan
                   </button>
@@ -704,7 +704,7 @@ export default function AdminImportPage() {
                         type="checkbox"
                         checked={isAllPageSelected}
                         onChange={toggleSelectPage}
-                        className="w-4 h-4 rounded text-red-600 accent-red-600 cursor-pointer"
+                        className="w-4 h-4 rounded text-emerald-600 accent-emerald-600 cursor-pointer"
                       />
                     </th>
                     <th className="py-3 px-3 w-20">ID</th>
@@ -731,7 +731,7 @@ export default function AdminImportPage() {
                         <tr
                           key={item.service_id}
                           className={`hover:bg-slate-50/70 transition-colors ${
-                            isSelected ? "bg-red-50/30" : ""
+                            isSelected ? "bg-emerald-50/30" : ""
                           }`}
                         >
                           <td className="py-3 px-4 text-center">
@@ -739,7 +739,7 @@ export default function AdminImportPage() {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleSelectRow(item.service_id)}
-                              className="w-4 h-4 rounded text-red-600 accent-red-600 cursor-pointer"
+                              className="w-4 h-4 rounded text-emerald-600 accent-emerald-600 cursor-pointer"
                             />
                           </td>
                           <td className="py-3 px-3 font-mono font-bold text-slate-800">
@@ -826,7 +826,7 @@ export default function AdminImportPage() {
                   <button
                     type="button"
                     onClick={() => setShowNewCategoryModal(true)}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 hover:text-red-700 cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer"
                   >
                     <FolderPlus className="w-3 h-3" />
                     <span>+ Buat Kategori</span>
@@ -835,7 +835,7 @@ export default function AdminImportPage() {
                 <select
                   value={targetCategoryId}
                   onChange={(e) => setTargetCategoryId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-semibold focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -859,7 +859,7 @@ export default function AdminImportPage() {
                       }}
                       className={`py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
                         markupType === "percent"
-                          ? "bg-white text-red-600 shadow-xs"
+                          ? "bg-white text-emerald-600 shadow-xs"
                           : "text-slate-500"
                       }`}
                     >
@@ -873,7 +873,7 @@ export default function AdminImportPage() {
                       }}
                       className={`py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
                         markupType === "fixed"
-                          ? "bg-white text-red-600 shadow-xs"
+                          ? "bg-white text-emerald-600 shadow-xs"
                           : "text-slate-500"
                       }`}
                     >
@@ -895,7 +895,7 @@ export default function AdminImportPage() {
                       step={markupType === "percent" ? "1" : "0.01"}
                       value={markupValue}
                       onChange={(e) => setMarkupValue(Number(e.target.value) || 0)}
-                      className={`w-full py-2 pr-8 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:bg-white focus:border-red-500 focus:outline-none ${
+                      className={`w-full py-2 pr-8 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:bg-white focus:border-emerald-500 focus:outline-none ${
                         markupType === "fixed" ? "pl-7" : "pl-3.5"
                       }`}
                     />
@@ -910,7 +910,7 @@ export default function AdminImportPage() {
                   <select
                     value={roundingOption}
                     onChange={(e) => setRoundingOption(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                   >
                     <option value="4">4 Desimal ($0.0001)</option>
                     <option value="3">3 Desimal ($0.001)</option>
@@ -926,13 +926,13 @@ export default function AdminImportPage() {
                     type="checkbox"
                     checked={updateExisting}
                     onChange={(e) => setUpdateExisting(e.target.checked)}
-                    className="w-4 h-4 rounded text-red-600 accent-red-600"
+                    className="w-4 h-4 rounded text-emerald-600 accent-emerald-600"
                   />
                   <span>Perbarui jika sudah ada di database</span>
                 </label>
 
                 <div className="text-slate-600 font-mono text-[11px] flex items-center gap-3">
-                  <span>Simulasi $1.00 &rarr; <strong className="text-red-600">{formatUSD(calculatePrices(1).rateSale, Number(roundingOption))}</strong></span>
+                  <span>Simulasi $1.00 &rarr; <strong className="text-emerald-600">{formatUSD(calculatePrices(1).rateSale, Number(roundingOption))}</strong></span>
                   <span>(Profit +{formatUSD(calculatePrices(1).profit, Number(roundingOption))})</span>
                 </div>
               </div>
@@ -973,7 +973,7 @@ export default function AdminImportPage() {
                 type="button"
                 onClick={handleExecuteImport}
                 disabled={isSaving || selectedIds.size === 0}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-all cursor-pointer"
               >
                 {isSaving ? (
                   <>
@@ -998,7 +998,7 @@ export default function AdminImportPage() {
           <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <FolderPlus className="w-4 h-4 text-red-600" />
+                <FolderPlus className="w-4 h-4 text-emerald-600" />
                 <span>Buat Kategori Baru</span>
               </h3>
               <button
@@ -1017,7 +1017,7 @@ export default function AdminImportPage() {
                 <select
                   value={newCatPlatformId}
                   onChange={(e) => setNewCatPlatformId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 >
                   {platforms.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -1036,7 +1036,7 @@ export default function AdminImportPage() {
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
                   placeholder="Contoh: Instagram Followers"
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:bg-white focus:border-red-500 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-none"
                   autoFocus
                 />
               </div>
@@ -1052,7 +1052,7 @@ export default function AdminImportPage() {
                 <button
                   type="submit"
                   disabled={isCreatingCategory || !newCatName.trim()}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition-all cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isCreatingCategory ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

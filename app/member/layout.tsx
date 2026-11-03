@@ -49,7 +49,7 @@ export default async function MemberLayout({
 
   return (
     <MemberRealtimeProvider userUuid={session.uuid} initialBalance={userData.balance}>
-      <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+      <div className="min-h-screen bg-white text-slate-900 flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
         {/* Google tag (gtag.js) */}
         <GoogleTag />
 
@@ -60,7 +60,7 @@ export default async function MemberLayout({
         <MemberHeader user={userData} />
 
         {/* Page Content Body */}
-        <main className="flex-1 w-full flex flex-col">{children}</main>
+        <main className="flex-1 w-full flex flex-col bg-white">{children}</main>
 
         {/* Footer: Multi-column links & Security badge */}
         <MemberFooter />

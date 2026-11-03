@@ -7,7 +7,7 @@ export default function AdminFooter() {
       <div className="flex items-center gap-1.5 text-center sm:text-left">
         <span>© 2026</span>
         <span className="font-bold text-slate-800">
-          Master<span className="text-indigo-600">SMM</span>
+          Master<span className="text-emerald-600">SMM</span>
         </span>
         <span>• Seluruh hak cipta dilindungi.</span>
       </div>
@@ -22,7 +22,7 @@ export default function AdminFooter() {
         <span>•</span>
         <Link
           href="/admin/setting"
-          className="hover:text-indigo-600 transition-colors"
+          className="hover:text-emerald-600 transition-colors"
         >
           Pengaturan & Dokumentasi
         </Link>

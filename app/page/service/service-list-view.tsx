@@ -120,7 +120,19 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
   const filteredServices = useMemo(() => {
     return services
       .filter((svc) => {
-        // Platform filter
+        // 1. Text search
+        if (search.trim()) {
+          const query = search.toLowerCase();
+          const matchName = svc.service_name.toLowerCase().includes(query);
+          const matchId = String(svc.service_id || svc.id).includes(query);
+          const matchCat = svc.category?.name.toLowerCase().includes(query);
+          const matchPlat = svc.category?.platform?.name.toLowerCase().includes(query);
+          if (!matchName && !matchId && !matchCat && !matchPlat) {
+            return false;
+          }
+        }
+
+        // 2. Platform filter
         if (selectedPlatform !== "all") {
           const platName = svc.category?.platform?.name || "Other";
           if (platName.toLowerCase() !== selectedPlatform.toLowerCase()) {
@@ -128,25 +140,9 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
           }
         }
 
-        // Category filter
+        // 3. Category filter
         if (selectedCategory !== "all") {
           if (String(svc.category?.id) !== selectedCategory) {
-            return false;
-          }
-        }
-
-        // Text search
-        if (search.trim()) {
-          const q = search.toLowerCase().trim();
-          const matchName = svc.service_name.toLowerCase().includes(q);
-          const matchId =
-            String(svc.service_id).toLowerCase().includes(q) ||
-            String(svc.id).includes(q);
-          const matchCat = svc.category?.name?.toLowerCase().includes(q);
-          const matchPlat = svc.category?.platform?.name?.toLowerCase().includes(q);
-          const matchDesc = svc.desc?.toLowerCase().includes(q);
-
-          if (!matchName && !matchId && !matchCat && !matchPlat && !matchDesc) {
             return false;
           }
         }
@@ -156,7 +152,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
       .sort((a, b) => {
         switch (sortBy) {
           case "id_desc":
-            return b.id - a.id;
+            return Number(b.service_id || b.id) - Number(a.service_id || a.id);
           case "price_asc":
             return a.rate_sale - b.rate_sale;
           case "price_desc":
@@ -171,12 +167,12 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
             return b.max - a.max;
           case "id_asc":
           default:
-            return a.id - b.id;
+            return Number(a.service_id || a.id) - Number(b.service_id || b.id);
         }
       });
-  }, [services, selectedPlatform, selectedCategory, search, sortBy]);
+  }, [services, search, selectedPlatform, selectedCategory, sortBy]);
 
-  // Pagination calculations
+  // Pagination Math
   const totalItems = filteredServices.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
@@ -224,33 +220,33 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
   const getPlatformBadge = (platformName?: string) => {
     const name = platformName?.toLowerCase() || "";
     if (name.includes("instagram")) {
-      return "bg-gradient-to-r from-pink-500/15 via-rose-500/15 to-purple-500/15 text-rose-300 border-rose-500/30";
+      return "bg-pink-50 text-pink-700 border-pink-200";
     }
     if (name.includes("tiktok")) {
-      return "bg-gradient-to-r from-cyan-500/15 to-pink-500/15 text-cyan-300 border-cyan-500/30";
+      return "bg-slate-900 text-white border-slate-800";
     }
     if (name.includes("youtube")) {
-      return "bg-red-500/15 text-red-300 border-red-500/30";
+      return "bg-red-50 text-red-700 border-red-200";
     }
     if (name.includes("facebook")) {
-      return "bg-blue-500/15 text-blue-300 border-blue-500/30";
+      return "bg-blue-50 text-blue-700 border-blue-200";
     }
     if (name.includes("twitter") || name.includes(" x")) {
-      return "bg-sky-500/15 text-sky-300 border-sky-500/30";
+      return "bg-sky-50 text-sky-700 border-sky-200";
     }
     if (name.includes("telegram")) {
-      return "bg-sky-500/15 text-sky-200 border-sky-400/30";
+      return "bg-sky-50 text-sky-700 border-sky-200";
     }
     if (name.includes("spotify")) {
-      return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
     }
-    return "bg-indigo-500/15 text-indigo-300 border-indigo-500/30";
+    return "bg-slate-100 text-slate-700 border-slate-200";
   };
 
   return (
     <div className="w-full space-y-6">
       {/* Search & Filter Header Card */}
-      <div className="rounded-2xl bg-[#0c1222]/90 backdrop-blur-xl border border-slate-800 p-5 sm:p-6 shadow-2xl space-y-4">
+      <div className="rounded-2xl bg-white border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-4">
         {/* Top Control Bar: Search input & Refresh */}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search Box */}
@@ -263,13 +259,13 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search services by name, ID, category, platform..."
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl text-sm bg-slate-900/90 border border-slate-700/80 text-white placeholder-slate-400 focus:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all shadow-inner"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl text-sm bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all shadow-inner"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-4 h-4" />
@@ -288,7 +284,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                   setSelectedCategory("all");
                   setSortBy("id_asc");
                 }}
-                className="px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/70 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>Reset Filters</span>
@@ -299,27 +295,27 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
               type="button"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Refresh services list"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-indigo-400" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-emerald-600" : ""}`} />
               <span>{isRefreshing ? "Loading..." : "Refresh"}</span>
             </button>
           </div>
         </div>
 
         {/* Filter Controls Row: Platform, Category, Sorting, Per Page */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-800/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
           {/* Platform Filter Dropdown */}
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-indigo-400" />
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1.5">
+              <Globe className="w-3 h-3 text-emerald-600" />
               <span>Platform</span>
             </label>
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
             >
               <option value="all">All Platforms ({services.length})</option>
               {platformList.map((plat) => (
@@ -332,14 +328,14 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
           {/* Category Dropdown */}
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
-              <Filter className="w-3 h-3 text-indigo-400" />
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1.5">
+              <Filter className="w-3 h-3 text-emerald-600" />
               <span>Category</span>
             </label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
             >
               <option value="all">All Categories ({categoryList.length})</option>
               {categoryList.map((cat) => (
@@ -353,14 +349,14 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
           {/* Sort By Dropdown */}
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
-              <ArrowUpDown className="w-3 h-3 text-indigo-400" />
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1.5">
+              <ArrowUpDown className="w-3 h-3 text-emerald-600" />
               <span>Sort By</span>
             </label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
             >
               <option value="id_asc">Service ID (Low to High)</option>
               <option value="id_desc">Service ID (High to Low)</option>
@@ -375,14 +371,14 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
           {/* Per Page Selector */}
           <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
-              <SlidersHorizontal className="w-3 h-3 text-indigo-400" />
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1.5">
+              <SlidersHorizontal className="w-3 h-3 text-emerald-600" />
               <span>Per Page</span>
             </label>
             <select
               value={itemsPerPage}
               onChange={(e) => setItemsPerPage(Number(e.target.value))}
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
             >
               <option value={10}>10 per page (Default)</option>
               <option value={25}>25 per page</option>
@@ -394,20 +390,20 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
       </div>
 
       {/* Services Table Card */}
-      <div className="rounded-2xl bg-[#0c1222]/90 backdrop-blur-xl border border-slate-800 shadow-2xl overflow-hidden">
+      <div className="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden">
         {/* Table Header Summary */}
-        <div className="px-5 py-4 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-400 bg-slate-900/40">
+        <div className="px-5 py-4 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50/70">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-white">Available Services</span>
-            <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[11px] font-mono">
+            <span className="font-semibold text-slate-900">Available Services</span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-mono font-semibold">
               {totalItems} Services
             </span>
           </div>
           {totalItems > 0 && (
             <div>
-              Showing <strong className="text-white">{startItem}</strong> -{" "}
-              <strong className="text-white">{endItem}</strong> of{" "}
-              <strong className="text-white">{totalItems}</strong> services
+              Showing <strong className="text-slate-900">{startItem}</strong> -{" "}
+              <strong className="text-slate-900">{endItem}</strong> of{" "}
+              <strong className="text-slate-900">{totalItems}</strong> services
             </div>
           )}
         </div>
@@ -416,7 +412,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/70 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-slate-200 bg-slate-50/90 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                 <th className="py-3 px-4 w-20 text-center">ID</th>
                 <th className="py-3 px-4 min-w-[280px]">Service</th>
                 <th className="py-3 px-4 min-w-[140px]">Platform / Category</th>
@@ -426,16 +422,16 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                 <th className="py-3 px-4 w-28 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-slate-100 text-slate-700">
               {paginatedServices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-400">
+                  <td colSpan={7} className="py-16 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
                         <AlertCircle className="w-6 h-6" />
                       </div>
                       <div className="space-y-1">
-                        <p className="font-semibold text-white text-sm">No services found</p>
+                        <p className="font-semibold text-slate-800 text-sm">No services found</p>
                         <p className="text-xs text-slate-500">
                           {search
                             ? `No results matching "${search}". Try another keyword.`
@@ -450,7 +446,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                             setSelectedPlatform("all");
                             setSelectedCategory("all");
                           }}
-                          className="mt-2 px-4 py-2 rounded-xl text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all cursor-pointer"
+                          className="mt-2 px-4 py-2 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-all cursor-pointer"
                         >
                           Reset All Filters
                         </button>
@@ -466,11 +462,11 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                   return (
                     <tr
                       key={svc.id}
-                      className="hover:bg-indigo-500/[0.03] transition-colors group"
+                      className="hover:bg-slate-50/80 transition-colors group"
                     >
                       {/* 1. ID */}
-                      <td className="py-3.5 px-4 text-center font-mono text-slate-400 text-xs font-semibold">
-                        <span className="px-2 py-1 rounded-lg bg-slate-900 border border-slate-800/80 group-hover:border-slate-700 transition-colors">
+                      <td className="py-3.5 px-4 text-center font-mono text-slate-500 text-xs font-semibold">
+                        <span className="px-2 py-1 rounded-lg bg-slate-100 border border-slate-200 group-hover:border-slate-300 transition-colors">
                           #{svc.service_id || svc.id}
                         </span>
                       </td>
@@ -478,11 +474,11 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                       {/* 2. Service Name */}
                       <td className="py-3.5 px-4">
                         <div className="space-y-1">
-                          <span className="font-medium text-slate-100 group-hover:text-indigo-300 transition-colors leading-relaxed block">
+                          <span className="font-medium text-slate-900 group-hover:text-emerald-700 transition-colors leading-relaxed block">
                             {svc.service_name}
                           </span>
                           {svc.category?.name && (
-                            <span className="inline-block text-[11px] text-slate-400 font-normal">
+                            <span className="inline-block text-[11px] text-slate-500 font-normal">
                               {svc.category.name}
                             </span>
                           )}
@@ -502,18 +498,18 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
                       {/* 4. Price / 1K */}
                       <td className="py-3.5 px-4 text-right">
-                        <div className="font-mono font-bold text-emerald-400 text-sm">
+                        <div className="font-mono font-bold text-emerald-600 text-sm">
                           ${Number(svc.rate_sale).toFixed(4)}
                         </div>
-                        <span className="text-[10px] text-slate-500 font-medium">per 1,000</span>
+                        <span className="text-[10px] text-slate-400 font-medium">per 1,000</span>
                       </td>
 
                       {/* 5. Min / Max */}
                       <td className="py-3.5 px-4 text-center font-mono text-xs">
-                        <div className="text-slate-200">
+                        <div className="text-slate-800 font-medium">
                           {svc.min.toLocaleString()}
                         </div>
-                        <div className="text-[11px] text-slate-500">
+                        <div className="text-[11px] text-slate-400">
                           up to {svc.max.toLocaleString()}
                         </div>
                       </td>
@@ -523,10 +519,10 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                         <button
                           type="button"
                           onClick={() => setSelectedService(svc)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800 transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 shadow-2xs transition-all cursor-pointer"
                           title="View service details"
                         >
-                          <Info className="w-3.5 h-3.5 text-indigo-400" />
+                          <Info className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Details</span>
                         </button>
                       </td>
@@ -535,7 +531,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                       <td className="py-3.5 px-4 text-center">
                         <Link
                           href={`/member/order?service=${svc.id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-sm shadow-indigo-600/30 transition-all active:scale-[0.98] cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs shadow-emerald-600/20 transition-all active:scale-[0.98] cursor-pointer"
                         >
                           <ShoppingCart className="w-3 h-3" />
                           <span>Order</span>
@@ -551,12 +547,12 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
         {/* Pagination Footer */}
         {totalItems > 0 && (
-          <div className="px-5 py-4 border-t border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="px-5 py-4 border-t border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
             {/* Left: Summary */}
-            <div className="text-slate-400 text-center sm:text-left">
-              Showing <span className="font-semibold text-white">{startItem}</span> -{" "}
-              <span className="font-semibold text-white">{endItem}</span> of{" "}
-              <span className="font-semibold text-white">{totalItems}</span> services
+            <div className="text-slate-600 text-center sm:text-left">
+              Showing <span className="font-semibold text-slate-900">{startItem}</span> -{" "}
+              <span className="font-semibold text-slate-900">{endItem}</span> of{" "}
+              <span className="font-semibold text-slate-900">{totalItems}</span> services
             </div>
 
             {/* Right: Page Navigation Buttons */}
@@ -566,7 +562,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                 type="button"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title="First Page"
               >
                 <ChevronsLeft className="w-4 h-4" />
@@ -577,7 +573,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title="Previous Page"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -587,7 +583,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
               {pageNumbers.map((pageNum, idx) => {
                 if (pageNum === "...") {
                   return (
-                    <span key={`ellipsis-${idx}`} className="px-2 text-slate-600 select-none">
+                    <span key={`ellipsis-${idx}`} className="px-2 text-slate-400 select-none">
                       ...
                     </span>
                   );
@@ -601,8 +597,8 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                     onClick={() => setCurrentPage(Number(pageNum))}
                     className={`min-w-[32px] h-8 px-2.5 rounded-lg font-mono text-xs font-semibold transition-all cursor-pointer ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800/80"
+                        ? "bg-emerald-600 text-white shadow-xs shadow-emerald-600/20"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     {pageNum}
@@ -615,7 +611,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title="Next Page"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -626,7 +622,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                 type="button"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
                 title="Last Page"
               >
                 <ChevronsRight className="w-4 h-4" />
@@ -638,13 +634,13 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
       {/* Service Detail Modal */}
       {selectedService && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl rounded-2xl bg-[#0c1222] border border-slate-800 p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl rounded-2xl bg-white border border-slate-200 p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-4">
+            <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-600">
                     ID: #{selectedService.service_id || selectedService.id}
                   </span>
                   <span
@@ -655,11 +651,11 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
                     {selectedService.category?.platform?.name || "Platform"}
                   </span>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                   {selectedService.service_name}
                 </h3>
                 {selectedService.category?.name && (
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Category: {selectedService.category.name}
                   </p>
                 )}
@@ -667,7 +663,7 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
               <button
                 type="button"
                 onClick={() => setSelectedService(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 title="Close Modal"
               >
                 <X className="w-5 h-5" />
@@ -675,22 +671,22 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
             </div>
 
             {/* Quick Specs Grid */}
-            <div className="grid grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs">
+            <div className="grid grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
               <div>
-                <span className="text-[11px] text-slate-400 block mb-0.5">Rate / 1K</span>
-                <span className="text-emerald-400 font-bold font-mono text-sm">
+                <span className="text-[11px] text-slate-500 block mb-0.5">Rate / 1K</span>
+                <span className="text-emerald-600 font-bold font-mono text-sm">
                   ${Number(selectedService.rate_sale).toFixed(4)}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block mb-0.5">Min Order</span>
-                <span className="text-white font-bold font-mono">
+                <span className="text-[11px] text-slate-500 block mb-0.5">Min Order</span>
+                <span className="text-slate-900 font-bold font-mono">
                   {selectedService.min.toLocaleString()}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block mb-0.5">Max Order</span>
-                <span className="text-white font-bold font-mono">
+                <span className="text-[11px] text-slate-500 block mb-0.5">Max Order</span>
+                <span className="text-slate-900 font-bold font-mono">
                   {selectedService.max.toLocaleString()}
                 </span>
               </div>
@@ -698,15 +694,15 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
 
             {/* Description Body */}
             <div>
-              <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5 text-indigo-400" />
+              <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Service Description & Terms</span>
               </h4>
-              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/60 text-xs text-slate-300 leading-relaxed max-h-60 overflow-y-auto whitespace-pre-wrap font-sans">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed max-h-60 overflow-y-auto whitespace-pre-wrap font-sans">
                 {selectedService.desc ? (
                   selectedService.desc
                 ) : (
-                  <p className="text-slate-500 italic">
+                  <p className="text-slate-400 italic">
                     No specific description provided. Orders are processed automatically according to SMM server standards.
                   </p>
                 )}
@@ -714,25 +710,25 @@ export default function ServiceListView({ initialServices }: ServiceListViewProp
             </div>
 
             {/* Quality & Safety Notes */}
-            <div className="flex items-center gap-2 text-[11px] text-slate-400 p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <div className="flex items-center gap-2 text-[11px] text-emerald-800 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
               <span>
                 24/7 automated server. Ensure the destination account/post is public while the order is in progress.
               </span>
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setSelectedService(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer"
               >
                 Close
               </button>
               <Link
                 href={`/member/order?service=${selectedService.id}`}
-                className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
                 <span>Order Now</span>

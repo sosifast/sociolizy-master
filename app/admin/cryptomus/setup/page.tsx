@@ -155,7 +155,7 @@ export default function AdminCryptomusSetupPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-xs">
               <Coins className="w-5 h-5" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export default function AdminCryptomusSetupPage() {
             className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold ${
               isTestMode
                 ? "bg-amber-50 text-amber-700 border border-amber-200"
-                : "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
             }`}
           >
             {isTestMode ? "Sandbox (Test)" : "Live (Production)"}
@@ -199,7 +199,7 @@ export default function AdminCryptomusSetupPage() {
 
       {isLoading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-3" />
+          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-3" />
           <p className="text-sm font-semibold text-slate-600">Memuat konfigurasi Cryptomus...</p>
         </div>
       ) : (
@@ -207,7 +207,7 @@ export default function AdminCryptomusSetupPage() {
           {/* 1. Status & Mode Operasional */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Status & Mode Operasional</span>
             </h3>
 
@@ -259,7 +259,7 @@ export default function AdminCryptomusSetupPage() {
           {/* 2. Kredensial API Cryptomus */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Key className="w-4 h-4 text-indigo-600" />
+              <Key className="w-4 h-4 text-emerald-600" />
               <span>Kredensial API Cryptomus</span>
             </h3>
 
@@ -277,7 +277,7 @@ export default function AdminCryptomusSetupPage() {
                   value={merchantId}
                   onChange={(e) => setMerchantId(e.target.value)}
                   placeholder="Contoh: a8f7c9e0-1234-5678-9abc-def012345678"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                 />
               </div>
 
@@ -295,7 +295,7 @@ export default function AdminCryptomusSetupPage() {
                     value={paymentKey}
                     onChange={(e) => setPaymentKey(e.target.value)}
                     placeholder="Masukkan kunci API Payment Cryptomus"
-                    className="w-full pr-10 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="w-full pr-10 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
@@ -321,7 +321,7 @@ export default function AdminCryptomusSetupPage() {
                     value={payoutKey}
                     onChange={(e) => setPayoutKey(e.target.value)}
                     placeholder="Masukkan kunci API Payout Cryptomus (opsional)"
-                    className="w-full pr-10 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="w-full pr-10 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
@@ -338,7 +338,7 @@ export default function AdminCryptomusSetupPage() {
           {/* 3. URL Webhook Callback & Redirect */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Globe className="w-4 h-4 text-indigo-600" />
+              <Globe className="w-4 h-4 text-emerald-600" />
               <span>Integrasi Webhook Callback & Pengalihan</span>
             </h3>
 
@@ -357,7 +357,7 @@ export default function AdminCryptomusSetupPage() {
                     value={webhookUrl}
                     onChange={(e) => setWebhookUrl(e.target.value)}
                     placeholder="https://domain.com/api/payment/cryptomus/webhook"
-                    className="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
@@ -384,7 +384,7 @@ export default function AdminCryptomusSetupPage() {
                     value={returnUrl}
                     onChange={(e) => setReturnUrl(e.target.value)}
                     placeholder="https://domain.com/member/history/deposit"
-                    className="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
@@ -405,7 +405,7 @@ export default function AdminCryptomusSetupPage() {
           {/* 4. Mata Uang, Kurs & Batasan Deposit */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
             <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100 flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-indigo-600" />
+              <DollarSign className="w-4 h-4 text-emerald-600" />
               <span>Mata Uang, Kurs Konversi & Batasan Nominal</span>
             </h3>
 
@@ -418,7 +418,7 @@ export default function AdminCryptomusSetupPage() {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all cursor-pointer"
                 >
                   <option value="USD">USD (United States Dollar)</option>
                   <option value="USDT">USDT (Tether USD)</option>
@@ -438,7 +438,7 @@ export default function AdminCryptomusSetupPage() {
                   onChange={(e) => setRateUsd(e.target.value)}
                   required
                   placeholder="16000"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                 />
               </div>
 
@@ -454,7 +454,7 @@ export default function AdminCryptomusSetupPage() {
                   onChange={(e) => setMinDeposit(e.target.value)}
                   required
                   placeholder="5"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                 />
               </div>
 
@@ -470,7 +470,7 @@ export default function AdminCryptomusSetupPage() {
                   onChange={(e) => setMaxDeposit(e.target.value)}
                   required
                   placeholder="5000"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
@@ -488,7 +488,7 @@ export default function AdminCryptomusSetupPage() {
                   value={feePercent}
                   onChange={(e) => setFeePercent(e.target.value)}
                   placeholder="0"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
                   Masukkan nilai 0 jika tidak mengenakan biaya admin tambahan kepada pengguna.
@@ -509,13 +509,13 @@ export default function AdminCryptomusSetupPage() {
           </div>
 
           {/* 5. Panduan Singkat Cryptomus */}
-          <div className="p-5 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex flex-col md:flex-row md:items-start justify-between gap-4">
-            <div className="space-y-1.5 text-xs text-indigo-900 leading-relaxed">
-              <h4 className="font-bold text-sm text-indigo-950 flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-indigo-600" />
+          <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="space-y-1.5 text-xs text-emerald-900 leading-relaxed">
+              <h4 className="font-bold text-sm text-emerald-950 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-emerald-600" />
                 <span>Panduan Menghubungkan Cryptomus:</span>
               </h4>
-              <ol className="list-decimal list-inside space-y-1 text-indigo-800 pl-1">
+              <ol className="list-decimal list-inside space-y-1 text-emerald-800 pl-1">
                 <li>Buka akun merchant di dashboard Cryptomus dan selesaikan verifikasi profil.</li>
                 <li>Buat Merchant baru di menu <strong>Merchant &gt; Create</strong>.</li>
                 <li>Salin <strong>Merchant ID</strong> dan buat <strong>Payment API Key</strong>.</li>
@@ -528,7 +528,7 @@ export default function AdminCryptomusSetupPage() {
               href="https://cryptomus.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-indigo-200 text-indigo-700 text-xs font-bold hover:bg-indigo-100/50 shadow-xs transition-colors shrink-0"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-700 text-xs font-bold hover:bg-emerald-100/50 shadow-xs transition-colors shrink-0"
             >
               <span>Dashboard Cryptomus</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -540,7 +540,7 @@ export default function AdminCryptomusSetupPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-emerald-600/20 disabled:opacity-50 cursor-pointer"
             >
               {isSaving ? (
                 <>

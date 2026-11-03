@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
+import { verifyCryptomusWebhookSignature } from "@/lib/cryptomus";
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +10,20 @@ export async function POST(request: Request) {
 
     if (!order_id) {
       return NextResponse.json({ success: false, message: "order_id missing" }, { status: 400 });
+    }
+
+    // Retrieve Cryptomus setting for signature verification
+    const setting = await prisma.cryptomusSetting.findFirst({
+      orderBy: { id: "asc" },
+    });
+
+    // Verify webhook signature if payment_key is configured and body contains sign
+    if (setting?.payment_key && body.sign) {
+      const isValid = verifyCryptomusWebhookSignature(body, setting.payment_key);
+      if (!isValid && !setting.is_test_mode) {
+        console.warn("[Cryptomus Webhook] Invalid signature rejected for order:", order_id);
+        return NextResponse.json({ success: false, message: "Invalid signature" }, { status: 401 });
+      }
     }
 
     const tx = await prisma.cryptomusTransaction.findUnique({
@@ -22,7 +37,7 @@ export async function POST(request: Request) {
     const currentStatus = tx.payment_status;
     const newStatus = status ? String(status).toLowerCase() : "paid";
 
-    const updatedTx = await prisma.cryptomusTransaction.update({
+    await prisma.cryptomusTransaction.update({
       where: { order_id },
       data: {
         payment_status: newStatus,
@@ -99,4 +114,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
-

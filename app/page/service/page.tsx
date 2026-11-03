@@ -61,17 +61,28 @@ export default async function ServicesPage() {
   const services = await getServices();
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col overflow-x-hidden selection:bg-indigo-500 selection:text-white">
-      {/* Ambient background glows */}
-      <div className="fixed inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
-      <div className="fixed -top-40 -left-40 w-[550px] h-[550px] bg-gradient-to-tr from-indigo-600/15 via-violet-600/10 to-transparent blur-[140px] rounded-full pointer-events-none animate-glow" />
-      <div className="fixed -bottom-40 -right-40 w-[550px] h-[550px] bg-gradient-to-bl from-cyan-500/10 via-blue-600/10 to-transparent blur-[140px] rounded-full pointer-events-none animate-glow" />
-
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
       {/* Top Security & Updates Bar */}
       <Topbar />
 
       {/* Main Navbar */}
-      <Navbar currentBadge="Services" />
+      <Navbar />
+
+      {/* Hero Header */}
+      <section className="relative z-10 border-b border-slate-200 bg-slate-50/70 py-10 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-3">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Real-time Wholesale Catalog</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            SMM Services List &amp; Pricing
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+            Browse our full catalog of high-speed social media growth services. Filter by platform or category to find the exact service ID and rate for your campaigns or API integration.
+          </p>
+        </div>
+      </section>
 
       {/* Main Content Area */}
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
@@ -83,4 +94,3 @@ export default async function ServicesPage() {
     </div>
   );
 }
-
