@@ -3,12 +3,26 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+let datasourceUrl = process.env["DATABASE_URL"];
+if (datasourceUrl) {
+  try {
+    const parsed = new URL(datasourceUrl);
+    const sslmode = parsed.searchParams.get("sslmode");
+    if (sslmode === "require" || sslmode === "prefer" || sslmode === "verify-ca") {
+      parsed.searchParams.set("sslmode", "verify-full");
+      datasourceUrl = parsed.toString();
+    }
+  } catch {
+    datasourceUrl = datasourceUrl.replace(/sslmode=(?:require|prefer|verify-ca)/g, "sslmode=verify-full");
+  }
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: datasourceUrl,
   },
 });

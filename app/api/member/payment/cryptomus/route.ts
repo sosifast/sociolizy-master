@@ -168,12 +168,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Determine host for callback & return URLs
-    const url = new URL(request.url);
-    const origin = url.origin;
+    // Determine public host for callback & return URLs
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    const appUrlEnv = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
 
-    const urlCallback = setting?.webhook_url?.startsWith("http")
-      ? setting.webhook_url
+    const origin = forwardedHost
+      ? `${forwardedProto}://${forwardedHost}`
+      : (appUrlEnv ? appUrlEnv.replace(/\/$/, "") : new URL(request.url).origin);
+
+    const configuredWebhook = setting?.webhook_url?.trim();
+    const urlCallback = configuredWebhook?.startsWith("http")
+      ? configuredWebhook
+      : configuredWebhook?.startsWith("/")
+      ? `${origin}${configuredWebhook}`
       : `${origin}/api/payment/cryptomus/webhook`;
 
     // Direct to our own internal website invoice page

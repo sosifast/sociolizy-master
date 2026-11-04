@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const response = NextResponse.json({
     success: true,
-    message: "Berhasil keluar dari akun.",
+    message: "Logged out successfully.",
   });
 
-  // Hapus cookie user_session secara menyeluruh
+  // Clear user_session cookie completely
   response.cookies.set("user_session", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const response = NextResponse.redirect(new URL("/auth/login", url.origin));
 
-  // Hapus cookie user_session secara menyeluruh
+  // Clear user_session cookie completely
   response.cookies.set("user_session", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -92,45 +92,57 @@ export async function POST(request: Request) {
     }
 
     const newStatus = info.status.toLowerCase();
-    const currentStatus = tx.payment_status;
-
-    await prisma.cryptomusTransaction.update({
-      where: { order_id: tx.order_id },
-      data: {
-        payment_status: newStatus,
-        txid: info.txid ? String(info.txid) : tx.txid,
-        raw_response: JSON.stringify(info.raw),
-      },
-    });
-
+    const depositFiatAmount = info.amount ? info.amount : Number(tx.amount);
+    let isCreditedNow = false;
     let newBalance = Number(user.balance);
 
-    if ((newStatus === "paid" || newStatus === "paid_over") && currentStatus !== "paid" && currentStatus !== "paid_over") {
-      const depositAmount = info.amount ? info.amount : Number(tx.amount);
-      const updatedUser = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          balance: { increment: depositAmount },
-        },
-        select: { balance: true },
+    await prisma.$transaction(async (txPrisma) => {
+      const currentTx = await txPrisma.cryptomusTransaction.findUnique({
+        where: { id: tx.id },
       });
-      newBalance = Number(updatedUser.balance);
+      if (!currentTx) return;
 
-      // Send Deposit Success Email via Resend
-      if (user.email) {
-        try {
-          await sendDepositSuccessEmail({
-            email: user.email,
-            username: user.username,
-            orderId: tx.order_id,
-            amount: depositAmount,
-            currency: tx.currency,
-            newBalance,
-            txid: info.txid ? String(info.txid) : tx.txid,
-          });
-        } catch (emailErr) {
-          console.warn("[Resend] Failed to send deposit sync email:", emailErr);
-        }
+      const currentStatus = currentTx.payment_status.toLowerCase();
+      const willBePaid = newStatus === "paid" || newStatus === "paid_over";
+      const wasAlreadyPaid = currentStatus === "paid" || currentStatus === "paid_over";
+
+      await txPrisma.cryptomusTransaction.update({
+        where: { id: currentTx.id },
+        data: {
+          payment_status: newStatus,
+          txid: info.txid ? String(info.txid) : currentTx.txid,
+          crypto_amount: info.cryptoAmount !== undefined ? String(info.cryptoAmount) : currentTx.crypto_amount,
+          raw_response: JSON.stringify(info.raw),
+        },
+      });
+
+      if (willBePaid && !wasAlreadyPaid) {
+        const updatedUser = await txPrisma.user.update({
+          where: { id: user.id },
+          data: {
+            balance: { increment: depositFiatAmount },
+          },
+          select: { balance: true },
+        });
+        newBalance = Number(updatedUser.balance);
+        isCreditedNow = true;
+      }
+    });
+
+    // Send Deposit Success Email via Resend if just credited
+    if (isCreditedNow && user.email) {
+      try {
+        await sendDepositSuccessEmail({
+          email: user.email,
+          username: user.username,
+          orderId: tx.order_id,
+          amount: depositFiatAmount,
+          currency: tx.currency,
+          newBalance,
+          txid: info.txid ? String(info.txid) : tx.txid,
+        });
+      } catch (emailErr) {
+        console.warn("[Resend] Failed to send deposit sync email:", emailErr);
       }
     }
 

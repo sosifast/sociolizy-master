@@ -18,15 +18,15 @@ import {
   Copy,
   Check,
   ChevronRight,
+  ChevronLeft,
   Loader2,
   Layers,
   ArrowUpRight,
   Gauge,
-  LayoutGrid,
-  Table as TableIcon,
   ShieldCheck,
   Network,
   Users,
+  Eye,
 } from "lucide-react";
 import { useToast } from "@/app/admin/components/toast-context";
 import { useCachedFetch } from "@/lib/client-cache";
@@ -69,15 +69,16 @@ export default function AdminServerMonitoringPage() {
     servers: ServerData[];
   }>("/api/admin/server", { ttlMs: 10_000 });
 
-  // Filters & State
+  // Filters & Pagination State
   const [selectedRegion, setSelectedRegion] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [pageSize, setPageSize] = useState<number>(25);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Detail Modal
+  // Detail Modal State
   const [detailModal, setDetailModal] = useState<{
     isOpen: boolean;
     server: ServerData | null;
@@ -85,6 +86,11 @@ export default function AdminServerMonitoringPage() {
     isOpen: false,
     server: null,
   });
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedRegion, selectedStatus, searchQuery, pageSize]);
 
   // Auto-refresh interval (every 10s if toggled)
   useEffect(() => {
@@ -107,7 +113,6 @@ export default function AdminServerMonitoringPage() {
       const json = await res.json();
       if (json.success && json.data) {
         toast.success("Ping Responsif", `${serverId}: ${json.data.latencyMs} ms (${json.data.jitter} jitter)`);
-        // Update local latency in state
         setData((prev) => {
           if (!prev) return prev;
           return {
@@ -118,7 +123,7 @@ export default function AdminServerMonitoringPage() {
           };
         });
       }
-    } catch (err) {
+    } catch {
       toast.error("Ping Gagal", `Server ${serverId} tidak merespon.`);
     }
   };
@@ -154,497 +159,442 @@ export default function AdminServerMonitoringPage() {
     });
   }, [data?.servers, selectedRegion, selectedStatus, searchQuery]);
 
+  // Paginated servers
+  const totalPages = pageSize === 0 ? 1 : Math.ceil(filteredServers.length / pageSize);
+  const paginatedServers = useMemo(() => {
+    if (pageSize === 0) return filteredServers;
+    const start = (currentPage - 1) * pageSize;
+    return filteredServers.slice(start, start + pageSize);
+  }, [filteredServers, currentPage, pageSize]);
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Klaster Multi-Active Paralel (Auto-Rolling)</span>
-            </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <Network className="w-3.5 h-3.5" />
-              <span>Penyimpanan Transaksi Tersegmentasi Otomatis</span>
-            </span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Server Monitoring
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Status node server dan koneksi cluster database MongoDB.
-          </p>
-        </div>
-
-        {/* Global Action Buttons */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Auto Refresh Toggle */}
-          <button
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-              autoRefresh
-                ? "bg-emerald-50 border-emerald-300 text-emerald-700"
-                : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
-            }`}
-          >
-            <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
-            <span>Auto Refresh (10s): {autoRefresh ? "ON" : "OFF"}</span>
-          </button>
-
-          {/* Manual Refresh */}
-          <button
-            onClick={() => fetchServers()}
-            disabled={isRefreshing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-95 shadow-sm shadow-emerald-600/25 transition-all cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-            <span>Perbarui Data</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Auto-Rolling Cluster Explanation Banner */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-slate-900 to-emerald-950/20 border border-slate-800 text-white shadow-sm">
-        <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5">
-            <Network className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-bold text-sm text-white flex items-center gap-2">
-              <span>Distribusi Transaksi Otomatis (Rolling Segmentation)</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-extrabold uppercase">
-                100% Multi-Active
-              </span>
-            </h4>
-            <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              Seluruh node database MongoDB di setiap wilayah berjalan aktif secara paralel. Ketika pengguna mendaftar dan memilih wilayah server, sistem otomatis mengalokasikan node dengan beban terendah, dan setiap transaksi disimpan secara otomatis ke server MongoDB terkait tanpa perlu pemilihan server aktif manual.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 text-xs font-medium flex-shrink-0">
-          <div className="px-3.5 py-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-center">
-            <span className="text-slate-400 block text-[10px]">Total Node Aktif</span>
-            <span className="font-extrabold text-emerald-400 text-sm">{data?.stats.onlineCount ?? 0} Node</span>
-          </div>
-          <div className="px-3.5 py-2 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-center">
-            <span className="text-slate-400 block text-[10px]">Total Pengguna</span>
-            <span className="font-extrabold text-emerald-300 text-sm">{data?.stats.totalAssignedUsers ?? 0} User</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Global Stat KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Card 1: Total Nodes */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-slate-400 text-xs font-bold block mb-1">Total Database Node</span>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {data?.stats.totalServers || 45}
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1 font-medium">
-              Terdistribusi di <strong className="text-slate-800">{data?.stats.totalRegions || 9} Wilayah Global</strong>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-xs">
-            <Server className="w-6 h-6" />
-          </div>
-        </div>
-
-        {/* Card 2: Cluster Health */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-slate-400 text-xs font-bold block mb-1">Status Kesehatan Cluster</span>
-            <div className="text-3xl font-extrabold text-emerald-600 tracking-tight">
-              100%
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center gap-1.5">
-              <span className="text-emerald-600 font-bold">{data?.stats.onlineCount || 0} Online</span> &bull; 
-              <span className="text-slate-600 font-bold">Semua Node Aktif Paralel</span>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-xs">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-        </div>
-
-        {/* Card 3: Avg Global Latency */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-slate-400 text-xs font-bold block mb-1">Rata-rata Latensi Jaringan</span>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-baseline gap-1">
-              <span>{data?.stats.avgLatency || 38}</span>
-              <span className="text-sm font-bold text-slate-500">ms</span>
-            </div>
-            <div className="text-[11px] text-emerald-600 font-bold mt-1">
-              Cluster Responsif &bull; Jitter Rendah
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-100 text-cyan-600 flex items-center justify-center shadow-xs">
-            <Activity className="w-6 h-6" />
-          </div>
-        </div>
-
-        {/* Card 4: Throughput */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-slate-400 text-xs font-bold block mb-1">Total Throughput Trafik</span>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {data?.stats.totalThroughput.toLocaleString("id-ID") || "48.250"}
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1 font-medium">
-              Bandwidth: <strong className="text-slate-800">{data?.stats.totalBandwidth || 156.4} MB/s</strong>
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-xs">
-            <Zap className="w-6 h-6" />
-          </div>
-        </div>
-      </div>
-
-      {/* Region Selector Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-200">
-        <button
-          onClick={() => setSelectedRegion("ALL")}
-          className={`flex-shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-            selectedRegion === "ALL"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-          }`}
-        >
-          <span>Semua Wilayah ({data?.stats.totalServers ?? 0})</span>
-        </button>
-
-        {data?.regions.map((reg) => {
-          const isSelected = selectedRegion === reg.code;
-          return (
-            <button
-              key={reg.code}
-              onClick={() => setSelectedRegion(reg.code)}
-              className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                isSelected
-                  ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/25"
-                  : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-            >
-              <span>{reg.flag}</span>
-              <span>{reg.name}</span>
-              <span
-                className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
-                  isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+      {/* Unified Table Section Card */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        {/* Card Header Toolbar: Region Tabs, Controls & Search/Filters */}
+        <div className="p-4 sm:p-5 border-b border-slate-200 space-y-3.5 bg-white">
+          {/* Top Row: Region Selector Tabs + Action Buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            {/* Region Selector Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-thin scrollbar-thumb-slate-200">
+              <button
+                onClick={() => setSelectedRegion("ALL")}
+                className={`flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedRegion === "ALL"
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }`}
               >
-                {reg.serversCount}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <span>Semua Wilayah ({data?.stats.totalServers ?? 0})</span>
+              </button>
 
-      {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
-        {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <Search className="w-4 h-4" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari ID server (SG_1), cluster host..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none"
-          />
-        </div>
-
-        {/* Status Filter & View Toggle */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Status:</span>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:outline-none"
-            >
-              <option value="ALL">Semua Status</option>
-              <option value="online">Online</option>
-              <option value="standby">Standby</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
-          </div>
-
-          <div className="flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200/80">
-            <button
-              onClick={() => setViewMode("grid")}
-              title="Grid View"
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === "grid" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-400 hover:text-slate-700"
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setViewMode("table")}
-              title="Table View"
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === "table" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-400 hover:text-slate-700"
-              }`}
-            >
-              <TableIcon className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area: Loading / Empty / Server Display */}
-      {isLoading ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 mb-3" />
-          <p className="text-sm font-bold text-slate-700">Menghubungkan ke 45 Database Server Nodes...</p>
-          <p className="text-xs text-slate-400 mt-1">Mengambil status latensi, trafik, dan throughput realtime.</p>
-        </div>
-      ) : filteredServers.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center text-slate-400">
-          <Server className="w-10 h-10 mx-auto text-slate-300 mb-3" />
-          <p className="text-sm font-bold text-slate-700">Tidak ada server yang cocok</p>
-          <p className="text-xs text-slate-400 mt-1">Coba sesuaikan pencarian atau filter wilayah.</p>
-        </div>
-      ) : viewMode === "grid" ? (
-        /* GRID VIEW */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {filteredServers.map((server) => (
-            <div
-              key={server.id}
-              onClick={() => setDetailModal({ isOpen: true, server })}
-              className={`group relative p-5 rounded-3xl bg-white border transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 ${
-                server.isActive
-                  ? "border-emerald-300 ring-2 ring-emerald-500/20 shadow-md"
-                  : "border-slate-200/90 hover:border-slate-300"
-              }`}
-            >
-              {/* Card Header */}
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl shadow-xs group-hover:scale-105 transition-transform">
-                    <span>{server.flag}</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-base text-slate-900 group-hover:text-emerald-600 transition-colors">
-                        {server.id}
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        AKTIF
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium">
-                      {server.regionName} &bull; Node {server.serverIndex}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Status & Latency Badges */}
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    ONLINE
-                  </span>
-
-                  <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
-                      server.latencyMs < 50
-                        ? "bg-emerald-50 text-emerald-700"
-                        : server.latencyMs < 120
-                        ? "bg-amber-50 text-amber-700"
-                        : "bg-rose-50 text-rose-700"
+              {data?.regions.map((reg) => {
+                const isSelected = selectedRegion === reg.code;
+                return (
+                  <button
+                    key={reg.code}
+                    onClick={() => setSelectedRegion(reg.code)}
+                    className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-emerald-600 text-white shadow-xs"
+                        : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                   >
-                    {server.latencyMs} ms
-                  </span>
-                </div>
-              </div>
-
-              {/* Hostname info */}
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2 flex items-center justify-between text-xs">
-                <span className="font-mono text-slate-600 truncate text-[11px]">
-                  {server.host}
-                </span>
-                <button
-                  onClick={(e) => handleCopyUri(e, server.uri, server.id)}
-                  title="Salin URI Koneksi"
-                  className="p-1 rounded text-slate-400 hover:text-slate-800 transition-colors"
-                >
-                  {copiedId === server.id ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5" />
-                  )}
-                </button>
-              </div>
-
-              {/* Rolling User Segment Allocation */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/50 border border-emerald-100/80 mb-3 text-xs">
-                <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Segmen Beban Transaksi:</span>
-                </span>
-                <span className="font-extrabold text-emerald-900 text-xs">
-                  {server.assignedUsers ?? 0} Pengguna
-                </span>
-              </div>
-
-              {/* Resource Bars */}
-              <div className="space-y-2 mb-4">
-                {/* CPU */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[11px] font-bold">
-                    <span className="text-slate-500">CPU Compute</span>
-                    <span className="text-slate-800">{server.cpuPercent}%</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        server.cpuPercent > 70 ? "bg-amber-500" : "bg-emerald-500"
+                    <span>{reg.flag}</span>
+                    <span>{reg.name}</span>
+                    <span
+                      className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
+                        isSelected
+                          ? "bg-white/20 text-white"
+                          : "bg-white text-slate-500 border border-slate-200"
                       }`}
-                      style={{ width: `${server.cpuPercent}%` }}
-                    />
-                  </div>
-                </div>
+                    >
+                      {reg.serversCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
-                {/* RAM */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[11px] font-bold">
-                    <span className="text-slate-500">Memory (RAM)</span>
-                    <span className="text-slate-800">{server.memoryPercent}%</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-emerald-500 transition-all duration-300"
-                      style={{ width: `${server.memoryPercent}%` }}
-                    />
-                  </div>
-                </div>
+            {/* Action Buttons inside Card */}
+            <div className="flex items-center gap-2 flex-shrink-0 justify-end">
+              {/* Auto Refresh Toggle */}
+              <button
+                onClick={() => setAutoRefresh(!autoRefresh)}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  autoRefresh
+                    ? "bg-emerald-50 border-emerald-300 text-emerald-700"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                <span>Auto Refresh: {autoRefresh ? "ON" : "OFF"}</span>
+              </button>
+
+              {/* Manual Refresh */}
+              <button
+                onClick={() => fetchServers()}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-95 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+                <span>{isRefreshing ? "Menyegarkan..." : "Segarkan"}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search & Filter Row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
+            {/* Search */}
+            <div className="relative w-full sm:w-80">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <Search className="w-4 h-4" />
               </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari ID server (SG_1), cluster host, region..."
+                className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
+              />
+            </div>
 
-              {/* Traffic & Connection metrics */}
-              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-xs mb-4">
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Query Rate</span>
-                  <span className="font-extrabold text-slate-800">{server.qps.toLocaleString("id-ID")} QPS</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Connection Pool</span>
-                  <span className="font-extrabold text-slate-800">{server.activeConnections} / 100</span>
-                </div>
-              </div>
-
-              {/* Bottom Card Actions */}
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-                <button
-                  onClick={(e) => handleQuickPing(e, server.id)}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+            {/* Status Filter & Page Size Selector */}
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
+              {/* Status Select */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
+                <Filter className="w-3.5 h-3.5" />
+                <span>Status:</span>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:outline-none cursor-pointer"
                 >
-                  Uji Ping
-                </button>
+                  <option value="ALL">Semua Status</option>
+                  <option value="online">Online</option>
+                  <option value="standby">Standby</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
 
-                <div className="flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
-                    Aktif Paralel
-                  </span>
-                  <span className="inline-flex items-center text-xs font-bold text-slate-500 group-hover:text-emerald-600 transition-colors">
-                    Detail <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
-                  </span>
-                </div>
+              {/* Rows per page */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
+                <span>Tampilkan:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  className="px-2.5 py-1.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:outline-none cursor-pointer"
+                >
+                  <option value={10}>10 Baris</option>
+                  <option value={25}>25 Baris</option>
+                  <option value={50}>50 Baris</option>
+                  <option value={100}>100 Baris</option>
+                  <option value={0}>Semua Server</option>
+                </select>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      ) : (
-        /* TABLE VIEW */
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+
+        {/* Table Body / Loading / Empty */}
+        {isLoading ? (
+          <div className="p-16 text-center text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 mb-3" />
+            <p className="text-sm font-bold text-slate-700">Menghubungkan ke Node Database Server...</p>
+            <p className="text-xs text-slate-400 mt-1">Mengambil status latensi, trafik, dan alokasi realtime.</p>
+          </div>
+        ) : filteredServers.length === 0 ? (
+          <div className="p-16 text-center text-slate-400">
+            <Server className="w-10 h-10 mx-auto text-slate-300 mb-3" />
+            <p className="text-sm font-bold text-slate-700">Tidak ada server yang cocok</p>
+            <p className="text-xs text-slate-400 mt-1">Coba sesuaikan pencarian atau filter wilayah di atas.</p>
+          </div>
+        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                <tr className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                  <th className="py-3.5 px-3.5 text-center w-10">#</th>
                   <th className="py-3.5 px-4">Node Server</th>
-                  <th className="py-3.5 px-4">Wilayah &amp; Host</th>
+                  <th className="py-3.5 px-4">Wilayah &amp; Host Cluster</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4">Alokasi User</th>
-                  <th className="py-3.5 px-4">Latency</th>
+                  <th className="py-3.5 px-4">Latensi</th>
                   <th className="py-3.5 px-4">Throughput</th>
-                  <th className="py-3.5 px-4">CPU / RAM</th>
-                  <th className="py-3.5 px-4">Connection</th>
+                  <th className="py-3.5 px-4">Beban CPU / RAM</th>
+                  <th className="py-3.5 px-4">Koneksi</th>
                   <th className="py-3.5 px-4 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredServers.map((server) => (
-                  <tr
-                    key={server.id}
-                    onClick={() => setDetailModal({ isOpen: true, server })}
-                    className="hover:bg-slate-50/70 transition-colors cursor-pointer"
-                  >
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{server.flag}</span>
-                        <div>
-                          <span className="font-extrabold text-slate-900 block">{server.id}</span>
-                          <span className="text-[9px] font-bold text-emerald-600 uppercase">Aktif</span>
+                {paginatedServers.map((server, idx) => {
+                  const globalIndex = pageSize === 0 ? idx + 1 : (currentPage - 1) * pageSize + idx + 1;
+                  return (
+                    <tr
+                      key={server.id}
+                      onClick={() => setDetailModal({ isOpen: true, server })}
+                      className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${
+                        server.isActive ? "bg-emerald-50/20" : ""
+                      }`}
+                    >
+                      {/* # */}
+                      <td className="py-3 px-3.5 text-slate-400 font-mono text-[11px] text-center">
+                        {globalIndex}
+                      </td>
+
+                      {/* Node Server */}
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-xl shrink-0" role="img" aria-label={server.regionName}>
+                            {server.flag}
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-extrabold text-slate-900 text-xs font-mono">
+                                {server.id}
+                              </span>
+                              {server.isActive && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  AKTIF
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-medium block">
+                              Node #{server.serverIndex}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <p className="font-semibold text-slate-800">{server.regionName}</p>
-                      <p className="text-[10px] font-mono text-slate-400 truncate max-w-xs">{server.host}</p>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        ONLINE
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                        <Users className="w-3 h-3 text-emerald-500" />
-                        {server.assignedUsers ?? 0} User
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
-                      {server.latencyMs} ms
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-slate-800">{server.qps.toLocaleString("id-ID")} QPS</span>
-                      <span className="text-[10px] text-slate-400 block">{server.bandwidthMbps} MB/s</span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="text-slate-700">CPU: {server.cpuPercent}%</span>
-                      <span className="text-slate-400 block">RAM: {server.memoryPercent}%</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-800">
-                      {server.activeConnections} / 100
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={(e) => handleQuickPing(e, server.id)}
-                          className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-                        >
-                          Ping
-                        </button>
-                        <span className="text-slate-400 text-[11px] font-bold">
-                          Detail &rarr;
+                      </td>
+
+                      {/* Wilayah & Host */}
+                      <td className="py-3 px-4">
+                        <div className="font-semibold text-slate-800 text-xs">{server.regionName}</div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[11px] font-mono text-slate-500 truncate max-w-[180px] sm:max-w-[220px]" title={server.host}>
+                            {server.host}
+                          </span>
+                          <button
+                            onClick={(e) => handleCopyUri(e, server.uri, server.id)}
+                            title="Salin URI Koneksi"
+                            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                          >
+                            {copiedId === server.id ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {server.status === "online" ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            ONLINE
+                          </span>
+                        ) : server.status === "standby" ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            STANDBY
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            MAINTENANCE
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Alokasi User */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">
+                          <Users className="w-3 h-3 text-emerald-600" />
+                          <span>{server.assignedUsers?.toLocaleString("id-ID") ?? 0} User</span>
                         </span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+
+                      {/* Latensi */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span
+                          className={`font-mono text-xs font-bold px-2 py-0.5 rounded-md inline-block ${
+                            server.latencyMs < 50
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : server.latencyMs < 120
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200"
+                          }`}
+                        >
+                          {server.latencyMs} ms
+                        </span>
+                      </td>
+
+                      {/* Throughput */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="font-bold text-slate-800 text-xs">
+                          {server.qps.toLocaleString("id-ID")} QPS
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono">
+                          {server.bandwidthMbps} MB/s
+                        </div>
+                      </td>
+
+                      {/* Resource CPU & RAM */}
+                      <td className="py-3 px-4 min-w-[140px]">
+                        <div className="space-y-1.5">
+                          {/* CPU bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold mb-0.5">
+                              <span className="text-slate-400">CPU</span>
+                              <span className="text-slate-700">{server.cpuPercent}%</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  server.cpuPercent > 70 ? "bg-amber-500" : "bg-emerald-500"
+                                }`}
+                                style={{ width: `${Math.min(100, server.cpuPercent)}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* RAM bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold mb-0.5">
+                              <span className="text-slate-400">RAM</span>
+                              <span className="text-slate-700">{server.memoryPercent}%</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-teal-500 transition-all duration-300"
+                                style={{ width: `${Math.min(100, server.memoryPercent)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Connection Pool */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="font-mono text-xs font-bold text-slate-800">
+                          {server.activeConnections} <span className="text-slate-400 font-normal">/ 100</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          {server.iops} IOPS
+                        </div>
+                      </td>
+
+                      {/* Aksi */}
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => handleQuickPing(e, server.id)}
+                            title="Uji responsif ping server ini"
+                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                          >
+                            Ping
+                          </button>
+                          <button
+                            onClick={() => setDetailModal({ isOpen: true, server })}
+                            title="Lihat detail lengkap server"
+                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors cursor-pointer inline-flex items-center gap-1"
+                          >
+                            <Eye className="w-3 h-3" />
+                            <span>Detail</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+        )}
+
+        {/* Table Footer with Summary & Pagination */}
+        <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/50">
+            <div>
+              Menampilkan{" "}
+              <strong>
+                {filteredServers.length === 0
+                  ? 0
+                  : pageSize === 0
+                  ? 1
+                  : (currentPage - 1) * pageSize + 1}
+              </strong>{" "}
+              -{" "}
+              <strong>
+                {pageSize === 0
+                  ? filteredServers.length
+                  : Math.min(currentPage * pageSize, filteredServers.length)}
+              </strong>{" "}
+              dari <strong>{filteredServers.length}</strong> server
+              {selectedRegion !== "ALL" || selectedStatus !== "ALL" || searchQuery ? (
+                <span className="text-slate-400 ml-1">
+                  (difilter dari total {data?.stats.totalServers ?? 0} server)
+                </span>
+              ) : null}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer inline-flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Sebelumnya</span>
+                </button>
+
+                <div className="flex items-center gap-1 px-1">
+                  {Array.from({ length: totalPages }).map((_, i) => {
+                    const p = i + 1;
+                    // Show first, last, and current +/- 1 pages
+                    if (
+                      p === 1 ||
+                      p === totalPages ||
+                      (p >= currentPage - 1 && p <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            currentPage === p
+                              ? "bg-slate-900 text-white"
+                              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      );
+                    }
+                    if (p === currentPage - 2 || p === currentPage + 2) {
+                      return (
+                        <span key={p} className="text-slate-400 text-xs px-0.5">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer inline-flex items-center gap-1"
+                >
+                  <span>Berikutnya</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      )}
 
       {/* Detail Modal Component */}
       <ServerDetailModal

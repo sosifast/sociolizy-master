@@ -1,15 +1,12 @@
 import type { MetadataRoute } from "next";
+import { getBaseUrl } from "@/lib/base-url";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "https://www.sociolizy.com";
-
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = await getBaseUrl();
   const now = new Date();
 
   return [
-    // 1. Homepage
+    // 1. Beranda / Homepage
     {
       url: `${baseUrl}`,
       lastModified: now,
@@ -17,15 +14,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
 
-    // 2. Public Static & Service Pages (/page)
+    // 2. Halaman Publik Utama (Clean Public URLs)
     {
-      url: `${baseUrl}/service`,
+      url: `${baseUrl}/services`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/doc`,
+      url: `${baseUrl}/documentasi`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -55,18 +52,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
 
-    // 3. Auth Pages (/auth)
+    // 3. Halaman Autentikasi Pengguna
     {
       url: `${baseUrl}/auth/login`,
       lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/auth/register`,
       lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/auth/forgot-password`,
@@ -76,4 +73,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 }
-

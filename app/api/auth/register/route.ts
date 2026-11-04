@@ -7,7 +7,7 @@ import { allocateRollingServerNode } from "@/lib/mongodb";
 import { sendRegistrationEmail } from "@/lib/resend";
 
 /**
- * GET: Mengambil daftar server region yang aktif dan terdeteksi di .env
+ * GET: Retrieve active cluster regions detected in environment
  */
 export async function GET() {
   try {
@@ -28,34 +28,33 @@ export async function GET() {
   } catch (error) {
     console.error("GET /api/auth/register error:", error);
     return NextResponse.json(
-      { success: false, message: "Gagal memuat pilihan server cluster" },
+      { success: false, message: "Failed to load server cluster regions." },
       { status: 500 }
     );
   }
 }
 
 /**
- * POST: Mendaftarkan user baru dengan pilihan server area / region
+ * POST: Register new user with selected cluster region
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { username, email, password, confirmPassword, server_area, server_region } = body;
 
-    // Tentukan server area yang dipilih (fallback ke SG jika kosong)
     const selectedArea = (server_area || server_region || "SG").toUpperCase().trim();
 
-    // Validasi input
+    // Input validation
     if (!username || !email || !password) {
       return NextResponse.json(
-        { success: false, message: "Semua kolom wajib diisi" },
+        { success: false, message: "All required fields must be filled." },
         { status: 400 }
       );
     }
 
     if (username.length < 3) {
       return NextResponse.json(
-        { success: false, message: "Username minimal 3 karakter" },
+        { success: false, message: "Username must be at least 3 characters long." },
         { status: 400 }
       );
     }
@@ -63,26 +62,26 @@ export async function POST(request: Request) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { success: false, message: "Format email tidak valid" },
+        { success: false, message: "Invalid email address format." },
         { status: 400 }
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { success: false, message: "Password minimal 6 karakter" },
+        { success: false, message: "Password must be at least 6 characters long." },
         { status: 400 }
       );
     }
 
     if (confirmPassword && password !== confirmPassword) {
       return NextResponse.json(
-        { success: false, message: "Konfirmasi password tidak cocok" },
+        { success: false, message: "Passwords do not match." },
         { status: 400 }
       );
     }
 
-    // Cek apakah username sudah dipakai
+    // Check existing username or email
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -95,12 +94,12 @@ export async function POST(request: Request) {
     if (existingUser) {
       if (existingUser.username.toLowerCase() === username.trim().toLowerCase()) {
         return NextResponse.json(
-          { success: false, message: "Username sudah digunakan, silakan pilih yang lain" },
+          { success: false, message: "Username is already taken. Please choose another." },
           { status: 409 }
         );
       }
       return NextResponse.json(
-        { success: false, message: "Email sudah terdaftar, silakan gunakan email lain atau login" },
+        { success: false, message: "Email is already registered. Please log in or use another email." },
         { status: 409 }
       );
     }
@@ -108,14 +107,13 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate API Key unik untuk user
+    // Auto-generate unique API key
     const apiKey = `smm_${crypto.randomBytes(16).toString("hex")}`;
 
-    // Alokasikan server node MongoDB secara rolling otomatis berdasarkan wilayah yang dipilih
-    // untuk membagi beban transaksi (I/O, cache, storage) secara merata per pengguna
+    // Allocate MongoDB server node
     const { assignedNode } = await allocateRollingServerNode(selectedArea);
 
-    // Buat user baru dengan server node rolling otomatis
+    // Create user in PostgreSQL
     const newUser = await prisma.user.create({
       data: {
         username: username.trim(),
@@ -138,7 +136,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // Trigger realtime Pusher notification for admin
+    // Trigger Pusher notification
     try {
       const { pusherServer } = await import("@/lib/pusher");
       await pusherServer.trigger("admin-notifications", "user-registered", {
@@ -166,12 +164,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Akun berhasil dibuat! Silakan masuk.",
+      message: "Account created successfully! Please sign in.",
       data: newUser,
     });
   } catch (error) {
     console.error("Register Error:", error);
-    const message = error instanceof Error ? error.message : "Terjadi kesalahan internal server";
+    const message = error instanceof Error ? error.message : "An internal server error occurred.";
     return NextResponse.json(
       { success: false, message },
       { status: 500 }

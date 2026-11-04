@@ -27,74 +27,105 @@ export async function POST(request: Request) {
       }
     }
 
-    const tx = await prisma.cryptomusTransaction.findUnique({
-      where: { order_id },
+    const tx = await prisma.cryptomusTransaction.findFirst({
+      where: {
+        OR: [
+          { order_id: String(order_id) },
+          ...(body.uuid ? [{ uuid: String(body.uuid) }] : []),
+        ],
+      },
     });
 
     if (!tx) {
       return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
     }
 
-    const currentStatus = tx.payment_status;
     const newStatus = status ? String(status).toLowerCase() : "paid";
 
-    await prisma.cryptomusTransaction.update({
-      where: { order_id },
-      data: {
-        payment_status: newStatus,
-        txid: txid ? String(txid) : tx.txid,
-        raw_response: JSON.stringify(body),
-      },
-    });
+    // Calculate credited fiat amount (USD)
+    // payment_amount_usd: USD equivalent calculated by Cryptomus
+    // amount: original invoice amount in USD
+    // payment_amount: raw coin amount (e.g. 0.0001 BTC)
+    const depositFiatAmount = body.payment_amount_usd
+      ? parseFloat(String(body.payment_amount_usd))
+      : body.amount
+      ? parseFloat(String(body.amount))
+      : Number(tx.amount);
 
+    let isCreditedNow = false;
     let newBalance: number | null = null;
     let userUuid: string | null = null;
     let username: string = "";
+    let userEmail: string | null = null;
 
-    // If payment is paid and wasn't already paid, credit user's balance!
-    if ((newStatus === "paid" || newStatus === "paid_over") && currentStatus !== "paid" && currentStatus !== "paid_over") {
-      if (tx.user_id) {
-        const depositAmount = payment_amount ? parseFloat(payment_amount) : Number(tx.amount);
-        const updatedUser = await prisma.user.update({
-          where: { id: tx.user_id },
+    // Use atomic transaction to prevent double-crediting on concurrent webhook retries
+    await prisma.$transaction(async (txPrisma) => {
+      const currentTx = await txPrisma.cryptomusTransaction.findUnique({
+        where: { id: tx.id },
+      });
+
+      if (!currentTx) return;
+
+      const currentStatus = currentTx.payment_status.toLowerCase();
+      const willBePaid = newStatus === "paid" || newStatus === "paid_over";
+      const wasAlreadyPaid = currentStatus === "paid" || currentStatus === "paid_over";
+
+      await txPrisma.cryptomusTransaction.update({
+        where: { id: currentTx.id },
+        data: {
+          payment_status: newStatus,
+          txid: txid ? String(txid) : currentTx.txid,
+          crypto_amount: body.payment_amount ? String(body.payment_amount) : currentTx.crypto_amount,
+          crypto_currency: body.payer_currency ? String(body.payer_currency) : currentTx.crypto_currency,
+          raw_response: JSON.stringify(body),
+        },
+      });
+
+      // Credit balance only if changing to paid/paid_over for the first time
+      if (willBePaid && !wasAlreadyPaid && currentTx.user_id) {
+        const updatedUser = await txPrisma.user.update({
+          where: { id: currentTx.user_id },
           data: {
             balance: {
-              increment: depositAmount,
+              increment: depositFiatAmount,
             },
           },
           select: { uuid: true, username: true, email: true, balance: true },
         });
 
+        isCreditedNow = true;
         newBalance = Number(updatedUser.balance);
         userUuid = updatedUser.uuid;
         username = updatedUser.username;
-
-        // Send Deposit Success Email via Resend
-        if (updatedUser.email) {
-          try {
-            await sendDepositSuccessEmail({
-              email: updatedUser.email,
-              username: updatedUser.username,
-              orderId: tx.order_id,
-              amount: depositAmount,
-              currency: tx.currency,
-              newBalance,
-              txid: txid ? String(txid) : tx.txid,
-            });
-          } catch (emailErr) {
-            console.warn("[Resend] Failed to send deposit webhook email:", emailErr);
-          }
+        userEmail = updatedUser.email;
+      } else if (currentTx.user_id) {
+        const u = await txPrisma.user.findUnique({
+          where: { id: currentTx.user_id },
+          select: { uuid: true, username: true, email: true, balance: true },
+        });
+        if (u) {
+          userUuid = u.uuid;
+          username = u.username;
+          userEmail = u.email;
+          newBalance = Number(u.balance);
         }
       }
-    } else if (tx.user_id) {
-      const u = await prisma.user.findUnique({
-        where: { id: tx.user_id },
-        select: { uuid: true, username: true, balance: true },
-      });
-      if (u) {
-        userUuid = u.uuid;
-        username = u.username;
-        newBalance = Number(u.balance);
+    });
+
+    // Send Deposit Success Email via Resend if just credited
+    if (isCreditedNow && userEmail) {
+      try {
+        await sendDepositSuccessEmail({
+          email: userEmail,
+          username,
+          orderId: tx.order_id,
+          amount: depositFiatAmount,
+          currency: tx.currency,
+          newBalance: newBalance || 0,
+          txid: txid ? String(txid) : tx.txid,
+        });
+      } catch (emailErr) {
+        console.warn("[Resend] Failed to send deposit webhook email:", emailErr);
       }
     }
 

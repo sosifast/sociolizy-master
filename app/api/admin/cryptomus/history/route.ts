@@ -1,5 +1,14 @@
 import { NextResponse, connection } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { verifySessionToken } from "@/lib/auth";
+
+async function checkAdminAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("user_session")?.value;
+  const session = await verifySessionToken(token);
+  return session && session.level === "Admin";
+}
 
 export async function GET(request: Request) {
   await connection();
@@ -36,9 +45,35 @@ export async function GET(request: Request) {
       prisma.cryptomusTransaction.count({ where }),
     ]);
 
+    // Attach user information
+    const userIds = Array.from(
+      new Set(
+        transactions
+          .map((t) => t.user_id)
+          .filter((id): id is number => typeof id === "number")
+      )
+    );
+
+    const users =
+      userIds.length > 0
+        ? await prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, username: true, email: true, name: true, balance: true },
+          })
+        : [];
+
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
+    const enriched = transactions.map((t) => ({
+      ...t,
+      amount: Number(t.amount),
+      crypto_amount: t.crypto_amount ? Number(t.crypto_amount) : null,
+      user: t.user_id ? userMap.get(t.user_id) || null : null,
+    }));
+
     return NextResponse.json({
       success: true,
-      data: transactions,
+      data: enriched,
       pagination: {
         page,
         limit,
@@ -59,13 +94,8 @@ export async function PATCH(request: Request) {
   await connection();
 
   try {
-    const { cookies } = await import("next/headers");
-    const { verifySessionToken } = await import("@/lib/auth");
-    const cookieStore = await cookies();
-    const token = cookieStore.get("user_session")?.value;
-    const session = await verifySessionToken(token);
-
-    if (!session || session.level !== "Admin") {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
       return NextResponse.json({ success: false, message: "Akses ditolak" }, { status: 403 });
     }
 
@@ -100,7 +130,7 @@ export async function PATCH(request: Request) {
     let username: string = "";
 
     // If marked paid manually, credit user balance
-    if ((newStatus === "paid" || newStatus === "paid_over") && prevStatus !== "paid") {
+    if ((newStatus === "paid" || newStatus === "paid_over") && prevStatus !== "paid" && prevStatus !== "paid_over") {
       if (tx.user_id) {
         const updatedUser = await prisma.user.update({
           where: { id: tx.user_id },
@@ -166,3 +196,46 @@ export async function PATCH(request: Request) {
   }
 }
 
+export async function DELETE(request: Request) {
+  await connection();
+
+  try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ success: false, message: "Akses ditolak" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const order_id = searchParams.get("order_id");
+
+    if (!id && !order_id) {
+      return NextResponse.json(
+        { success: false, message: "ID atau order_id wajib disertakan" },
+        { status: 400 }
+      );
+    }
+
+    const txId = id ? parseInt(id, 10) : undefined;
+    const tx = txId && !isNaN(txId)
+      ? await prisma.cryptomusTransaction.findUnique({ where: { id: txId } })
+      : await prisma.cryptomusTransaction.findUnique({ where: { order_id: order_id || "" } });
+
+    if (!tx) {
+      return NextResponse.json({ success: false, message: "Transaksi tidak ditemukan" }, { status: 404 });
+    }
+
+    await prisma.cryptomusTransaction.delete({
+      where: { id: tx.id },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Transaksi deposit ${tx.order_id} berhasil dihapus`,
+    });
+  } catch (error) {
+    console.error("DELETE /api/admin/cryptomus/history error:", error);
+    const message = error instanceof Error ? error.message : "Error server";
+    return NextResponse.json({ success: false, message }, { status: 500 });
+  }
+}

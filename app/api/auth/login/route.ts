@@ -10,14 +10,14 @@ export async function POST(request: Request) {
 
     if (!identifier || !password) {
       return NextResponse.json(
-        { success: false, message: "Username/Email dan Password wajib diisi" },
+        { success: false, message: "Username/Email and Password are required." },
         { status: 400 }
       );
     }
 
     const cleanIdentifier = identifier.trim();
 
-    // Cari user berdasarkan username atau email
+    // Find user by username or email
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -29,26 +29,26 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: "Username atau Password salah" },
+        { success: false, message: "Invalid username/email or password." },
         { status: 401 }
       );
     }
 
-    // Verifikasi password
+    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { success: false, message: "Username atau Password salah" },
+        { success: false, message: "Invalid username/email or password." },
         { status: 401 }
       );
     }
 
-    // Tentukan url pengalihan berdasarkan level (Admin -> /admin, Member -> /member)
+    // Determine redirect destination based on role (Admin -> /admin, Member -> /member)
     const redirectUrl = user.level === "Admin" ? "/admin" : "/member";
 
     const response = NextResponse.json({
       success: true,
-      message: `Selamat datang kembali, ${user.username}!`,
+      message: `Welcome back, ${user.name || user.username}!`,
       data: {
         id: user.id,
         uuid: user.uuid,
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // Buat token session terenkripsi HMAC SHA-256
+    // Create encrypted session token HMAC SHA-256
     const sessionToken = await createSessionToken({
       id: user.id,
       uuid: user.uuid,
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     response.cookies.set("user_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 7 hari
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
       sameSite: "lax",
     });
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error("Login Error:", error);
-    const message = error instanceof Error ? error.message : "Terjadi kesalahan internal server";
+    const message = error instanceof Error ? error.message : "An internal server error occurred.";
     return NextResponse.json(
       { success: false, message },
       { status: 500 }

@@ -2,6 +2,9 @@ import { NextResponse, connection } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
+import { getCryptomusPaymentInfo } from "@/lib/cryptomus";
+import { sendDepositSuccessEmail } from "@/lib/resend";
+import { pusherServer } from "@/lib/pusher";
 
 export async function GET(
   request: Request,
@@ -61,6 +64,108 @@ export async function GET(
         rawData = JSON.parse(tx.raw_response);
       } catch {
         rawData = null;
+      }
+    }
+
+    // Fail-safe auto-sync: If status is still pending/check/process,
+    // automatically query Cryptomus status if last checked > 10 seconds ago
+    const isPending = ["pending", "check", "process", "confirm_check"].includes(
+      tx.payment_status.toLowerCase()
+    );
+    const secondsSinceUpdate = (Date.now() - new Date(tx.update_at).getTime()) / 1000;
+
+    if (isPending && secondsSinceUpdate > 10) {
+      const setting = await prisma.cryptomusSetting.findFirst({
+        orderBy: { id: "asc" },
+      });
+
+      if (setting?.merchant_id && setting?.payment_key) {
+        try {
+          const info = await getCryptomusPaymentInfo({
+            orderId: tx.order_id,
+            merchantId: setting.merchant_id,
+            paymentKey: setting.payment_key,
+          });
+
+          if (info.success && info.status) {
+            const newStatus = info.status.toLowerCase();
+            const willBePaid = newStatus === "paid" || newStatus === "paid_over";
+            const depositFiatAmount = info.amount || Number(tx.amount);
+
+            if (newStatus !== tx.payment_status.toLowerCase()) {
+              let newBalance = Number(user.balance);
+
+              await prisma.$transaction(async (txPrisma) => {
+                await txPrisma.cryptomusTransaction.update({
+                  where: { id: tx.id },
+                  data: {
+                    payment_status: newStatus,
+                    txid: info.txid ? String(info.txid) : tx.txid,
+                    crypto_amount:
+                      info.cryptoAmount !== undefined
+                        ? String(info.cryptoAmount)
+                        : tx.crypto_amount,
+                    raw_response: JSON.stringify(info.raw),
+                  },
+                });
+
+                if (willBePaid) {
+                  const updatedUser = await txPrisma.user.update({
+                    where: { id: user.id },
+                    data: { balance: { increment: depositFiatAmount } },
+                    select: { balance: true },
+                  });
+                  newBalance = Number(updatedUser.balance);
+                  user.balance = updatedUser.balance;
+
+                  if (user.email) {
+                    try {
+                      await sendDepositSuccessEmail({
+                        email: user.email,
+                        username: user.username,
+                        orderId: tx.order_id,
+                        amount: depositFiatAmount,
+                        currency: tx.currency,
+                        newBalance,
+                        txid: info.txid ? String(info.txid) : tx.txid,
+                      });
+                    } catch (e) {
+                      console.warn("[Resend] Invoice auto-sync email error:", e);
+                    }
+                  }
+                }
+              });
+
+              // Broadcast Pusher
+              try {
+                const payload = {
+                  order_id: tx.order_id,
+                  status: newStatus,
+                  payment_status: newStatus,
+                  amount: Number(tx.amount),
+                  currency: tx.currency,
+                  txid: info.txid || tx.txid,
+                  username: user.username,
+                  new_balance: newBalance,
+                };
+                await pusherServer.trigger(`member-${user.uuid}`, "deposit-status-updated", payload);
+                if (willBePaid) {
+                  await pusherServer.trigger(`member-${user.uuid}`, "balance-updated", {
+                    balance: newBalance,
+                  });
+                }
+              } catch (pErr) {
+                console.warn("[Pusher] Auto-sync broadcast error:", pErr);
+              }
+
+              tx.payment_status = newStatus;
+              if (info.txid) tx.txid = info.txid;
+              if (info.raw) rawData = info.raw;
+            }
+          }
+        } catch (syncErr) {
+          console.warn("[Auto-Sync] Error querying Cryptomus status:", syncErr);
+        }
       }
     }
 

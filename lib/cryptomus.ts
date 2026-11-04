@@ -41,6 +41,7 @@ export function generateCryptomusSignature(data: Record<string, any>, paymentKey
 /**
  * Verify incoming webhook signature from Cryptomus:
  * Takes the raw payload object, extracts 'sign', computes MD5 on the remaining fields, and compares.
+ * Handles both standard JSON and PHP json_encode (which escapes slashes \/ by default).
  */
 export function verifyCryptomusWebhookSignature(
   body: Record<string, any>,
@@ -51,8 +52,33 @@ export function verifyCryptomusWebhookSignature(
   }
 
   const { sign, ...dataWithoutSign } = body;
-  const calculatedSign = generateCryptomusSignature(dataWithoutSign, paymentKey);
-  return calculatedSign.toLowerCase() === String(sign).toLowerCase();
+  const receivedSign = String(sign).toLowerCase();
+
+  // Try 1: Standard JSON stringify
+  const jsonStandard = JSON.stringify(dataWithoutSign);
+  const hashStandard = crypto
+    .createHash("md5")
+    .update(Buffer.from(jsonStandard).toString("base64") + paymentKey)
+    .digest("hex")
+    .toLowerCase();
+
+  if (hashStandard === receivedSign) {
+    return true;
+  }
+
+  // Try 2: PHP json_encode style with escaped slashes (\/)
+  const jsonEscapedSlashes = jsonStandard.replace(/\//g, "\\/");
+  const hashEscaped = crypto
+    .createHash("md5")
+    .update(Buffer.from(jsonEscapedSlashes).toString("base64") + paymentKey)
+    .digest("hex")
+    .toLowerCase();
+
+  if (hashEscaped === receivedSign) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -165,6 +191,8 @@ export async function getCryptomusPaymentInfo({
   isFinal?: boolean;
   txid?: string;
   amount?: number;
+  cryptoAmount?: number;
+  paymentAmountUsd?: number;
   raw?: any;
   error?: string;
 }> {
@@ -192,12 +220,23 @@ export async function getCryptomusPaymentInfo({
       };
     }
 
+    // payment_amount_usd: USD equivalent calculated by Cryptomus
+    // amount: original invoice amount in invoice currency (USD)
+    // payment_amount: raw coin amount transferred on blockchain (e.g. 0.000105 BTC)
+    const fiatAmount = json.result.payment_amount_usd
+      ? parseFloat(json.result.payment_amount_usd)
+      : json.result.amount
+      ? parseFloat(json.result.amount)
+      : undefined;
+
     return {
       success: true,
       status: json.result.payment_status || json.result.status,
       isFinal: Boolean(json.result.is_final),
       txid: json.result.txid,
-      amount: json.result.payment_amount ? parseFloat(json.result.payment_amount) : undefined,
+      amount: fiatAmount,
+      cryptoAmount: json.result.payment_amount ? parseFloat(json.result.payment_amount) : undefined,
+      paymentAmountUsd: json.result.payment_amount_usd ? parseFloat(json.result.payment_amount_usd) : undefined,
       raw: json.result,
     };
   } catch (err: any) {

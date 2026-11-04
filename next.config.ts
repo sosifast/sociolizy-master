@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         destination: "/page/service",
       },
       {
+        source: "/service",
+        destination: "/page/service",
+      },
+      {
         source: "/privacy",
         destination: "/page/privacy",
       },
@@ -50,6 +54,10 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/docs",
+        destination: "/page/doc",
+      },
+      {
+        source: "/doc",
         destination: "/page/doc",
       },
     ];
