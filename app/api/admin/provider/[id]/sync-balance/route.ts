@@ -45,9 +45,9 @@ export async function POST(
       // Empty body is okay for query action
     }
 
-    // Jika request menyertakan opsi 'save' beserta 'balance' atau 'balance_idr', langsung update database
-    if (requestBody && requestBody.save && (requestBody.balance !== undefined || requestBody.balance_idr !== undefined)) {
-      const newBalance = Number(requestBody.balance ?? requestBody.balance_idr);
+    // Jika request menyertakan opsi 'save' beserta 'balance', langsung update database dengan saldo riil ($)
+    if (requestBody && requestBody.save && requestBody.balance !== undefined) {
+      const newBalance = Number(requestBody.balance);
       const updated = await prisma.apiProvider.update({
         where: { id: providerId },
         data: { balance: newBalance },
@@ -57,7 +57,7 @@ export async function POST(
 
       return NextResponse.json({
         success: true,
-        message: `Saldo provider "${provider.name}" berhasil disinkronkan ke database`,
+        message: `Saldo provider "${provider.name}" berhasil diperbarui menjadi $${newBalance.toFixed(2)}`,
         data: updated,
       });
     }
@@ -159,15 +159,29 @@ export async function POST(
       "USD"
     ).toUpperCase();
 
+    const numericBalance = parseFloat(String(rawBalance)) || 0;
+
+    // Langsung simpan saldo asli ($) ke database (default: true)
+    const shouldSave = requestBody?.auto_save !== false;
+    if (shouldSave) {
+      await prisma.apiProvider.update({
+        where: { id: providerId },
+        data: { balance: numericBalance },
+      });
+      invalidateCacheTag("providers", "stats");
+    }
+
     return NextResponse.json({
       success: true,
-      message: `Berhasil mendapatkan data saldo dari provider ${provider.name}`,
+      message: `Saldo provider "${provider.name}" berhasil diperbarui menjadi $${numericBalance.toFixed(2)}`,
       data: {
         provider_id: provider.id,
         provider_name: provider.name,
         current_db_balance: Number(provider.balance),
         balance: String(rawBalance),
+        numeric_balance: numericBalance,
         currency: currency,
+        is_saved: shouldSave,
         raw: jsonResponse,
       },
     });

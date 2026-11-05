@@ -19,7 +19,10 @@ export function initPostHogClient() {
   }
 
   const apiKey =
-    process.env.NEXT_PUBLIC_POSTHOG_KEY || config.apiKey || "";
+    process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ||
+    process.env.NEXT_PUBLIC_POSTHOG_KEY ||
+    config.apiKey ||
+    "";
   const host =
     process.env.NEXT_PUBLIC_POSTHOG_HOST || config.host || "https://us.i.posthog.com";
 
@@ -31,6 +34,7 @@ export function initPostHogClient() {
   try {
     posthog.init(apiKey, {
       api_host: host,
+      defaults: "2026-08-30",
       // Disable default pageview to avoid duplicate events on SPA navigation;
       // route transitions are tracked manually via PostHogRouteTracker
       capture_pageview: false,

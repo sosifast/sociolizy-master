@@ -19,7 +19,6 @@ import TablePagination from "@/app/admin/components/table-pagination";
 import ConfirmModal from "@/app/admin/components/confirm-modal";
 import { useToast } from "@/app/admin/components/toast-context";
 import { useCachedFetch } from "@/lib/client-cache";
-import SyncBalanceModal from "./sync-balance-modal";
 
 export default function AdminProviderPage() {
   const { toast } = useToast();
@@ -36,14 +35,9 @@ export default function AdminProviderPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // Sync Balance Modal State
-  const [syncModal, setSyncModal] = useState<{
-    isOpen: boolean;
-    provider: any | null;
-  }>({
-    isOpen: false,
-    provider: null,
-  });
+  // Direct balance update loading states
+  const [syncingId, setSyncingId] = useState<number | null>(null);
+  const [isSyncingAll, setIsSyncingAll] = useState(false);
 
   // Delete Confirmation Modal State
   const [deleteModal, setDeleteModal] = useState<{
@@ -57,6 +51,96 @@ export default function AdminProviderPage() {
     name: "",
     isDeleting: false,
   });
+
+  // Direct update balance from API without modal/form
+  const handleDirectSync = async (provider: any) => {
+    if (syncingId !== null) return;
+    setSyncingId(provider.id);
+
+    try {
+      const res = await fetch(`/api/admin/provider/${provider.id}/sync-balance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auto_save: true }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(
+          "Gagal Update Saldo",
+          json.message || `Tidak dapat mengambil saldo dari provider "${provider.name}".`
+        );
+        return;
+      }
+
+      const updatedBalance =
+        json.data?.numeric_balance ?? parseFloat(String(json.data?.balance || "0"));
+
+      mutate((prev) =>
+        prev
+          ? prev.map((p: any) =>
+              p.id === provider.id ? { ...p, balance: updatedBalance } : p
+            )
+          : []
+      );
+
+      toast.success(
+        "Saldo Berhasil Diupdate",
+        `Saldo "${provider.name}" langsung diupdate menjadi $${Number(updatedBalance).toFixed(2)}`
+      );
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Kesalahan Jaringan", "Gagal menghubungi server API provider.");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
+  // Direct update all providers balance
+  const handleSyncAll = async () => {
+    if (providers.length === 0 || isSyncingAll) return;
+    setIsSyncingAll(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const prov of providers) {
+      try {
+        const res = await fetch(`/api/admin/provider/${prov.id}/sync-balance`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ auto_save: true }),
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          const updatedBalance =
+            json.data?.numeric_balance ?? parseFloat(String(json.data?.balance || "0"));
+          mutate((prev) =>
+            prev
+              ? prev.map((p: any) =>
+                  p.id === prov.id ? { ...p, balance: updatedBalance } : p
+                )
+              : []
+          );
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setIsSyncingAll(false);
+    if (successCount > 0) {
+      toast.success(
+        "Sinkronisasi Selesai",
+        `${successCount} provider berhasil diperbarui saldo riilnya.`
+      );
+    }
+    if (failCount > 0) {
+      toast.error("Sebagian Gagal", `${failCount} provider gagal diupdate.`);
+    }
+  };
 
   const openDeleteModal = (id: number, name: string) => {
     setDeleteModal({
@@ -87,12 +171,6 @@ export default function AdminProviderPage() {
       toast.error("Kesalahan Jaringan", "Terjadi kesalahan saat menghapus data provider.");
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
     }
-  };
-
-  const handleSyncSuccess = (providerId: number, newBalance: number) => {
-    mutate((prev) =>
-      prev ? prev.map((p: any) => (p.id === providerId ? { ...p, balance: newBalance } : p)) : []
-    );
   };
 
   const filtered = providers.filter(
@@ -146,6 +224,17 @@ export default function AdminProviderPage() {
               title="Refresh Data"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-600" : ""}`} />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSyncAll}
+              disabled={isSyncingAll || isLoading || providers.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all shadow-2xs cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              title="Update saldo semua provider langsung dari API ($)"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingAll ? "animate-spin text-amber-600" : "text-amber-600"}`} />
+              <span>{isSyncingAll ? "Mengupdate..." : "Sync Semua Saldo"}</span>
             </button>
 
             <Link
@@ -219,12 +308,17 @@ export default function AdminProviderPage() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => setSyncModal({ isOpen: true, provider: p })}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-colors shadow-2xs cursor-pointer"
-                            title="Sync Saldo API & Konversi Kurs"
+                            onClick={() => handleDirectSync(p)}
+                            disabled={syncingId === p.id}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-all shadow-2xs cursor-pointer disabled:opacity-60"
+                            title="Langsung update saldo riil dari API provider ($)"
                           >
-                            <Coins className="w-3 h-3 text-amber-600" />
-                            <span>Sync</span>
+                            {syncingId === p.id ? (
+                              <Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                            ) : (
+                              <RefreshCw className="w-3 h-3 text-amber-600" />
+                            )}
+                            <span>{syncingId === p.id ? "Updating..." : "Update Saldo"}</span>
                           </button>
                         </div>
                       </td>
@@ -238,11 +332,16 @@ export default function AdminProviderPage() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
-                            onClick={() => setSyncModal({ isOpen: true, provider: p })}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
-                            title="Sinkronisasi Saldo & Kurs"
+                            onClick={() => handleDirectSync(p)}
+                            disabled={syncingId === p.id}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer disabled:opacity-50"
+                            title="Langsung update saldo riil dari API provider ($)"
                           >
-                            <Coins className="w-3.5 h-3.5" />
+                            {syncingId === p.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
+                            ) : (
+                              <Coins className="w-3.5 h-3.5" />
+                            )}
                           </button>
                           <Link
                             href={`/admin/provider/${p.id}/edit`}
@@ -296,14 +395,6 @@ export default function AdminProviderPage() {
         cancelText="Batal"
         type="danger"
         isLoading={deleteModal.isDeleting}
-      />
-
-      {/* Sync Balance & Currency Converter Modal */}
-      <SyncBalanceModal
-        isOpen={syncModal.isOpen}
-        onClose={() => setSyncModal({ isOpen: false, provider: null })}
-        provider={syncModal.provider}
-        onSuccess={handleSyncSuccess}
       />
     </div>
   );

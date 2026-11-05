@@ -1,6 +1,12 @@
 import React from "react";
 import type { Metadata } from "next";
 import GoogleTag from "@/app/components/google-tag";
+import posthog from 'posthog-js';
+
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    defaults: '2026-08-30'
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sociolizy.com"),
