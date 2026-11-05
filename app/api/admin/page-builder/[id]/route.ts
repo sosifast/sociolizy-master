@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
@@ -166,6 +167,12 @@ export async function PUT(req: NextRequest, props: RouteParams) {
       data: updateData,
     });
 
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/page/show");
+      revalidatePath(`/${updated.slug}`);
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: "Page updated successfully",
@@ -213,6 +220,12 @@ export async function DELETE(req: NextRequest, props: RouteParams) {
     await prisma.customPage.delete({
       where: { id: pageId },
     });
+
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/page/show");
+      revalidatePath(`/${existingPage.slug}`);
+    } catch {}
 
     return NextResponse.json({
       success: true,

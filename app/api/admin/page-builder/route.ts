@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
@@ -143,6 +144,12 @@ export async function POST(req: NextRequest) {
         meta_description: meta_description?.trim() || body.description?.trim() || null,
       },
     });
+
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/page/show");
+      revalidatePath(`/${finalSlug}`);
+    } catch {}
 
     return NextResponse.json({
       success: true,

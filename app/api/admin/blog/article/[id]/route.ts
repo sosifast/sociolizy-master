@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/auth";
@@ -160,6 +161,11 @@ export async function PUT(
     });
 
     invalidateCacheTag("blog", "categories");
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/blog");
+      revalidatePath(`/blog/${cleanSlug}`);
+    } catch {}
 
     return NextResponse.json({
       success: true,
@@ -210,6 +216,11 @@ export async function PATCH(
     });
 
     invalidateCacheTag("blog", "categories");
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/blog");
+      revalidatePath(`/blog/${updated.slug}`);
+    } catch {}
 
     return NextResponse.json({
       success: true,
@@ -245,6 +256,10 @@ export async function DELETE(
     });
 
     invalidateCacheTag("blog", "categories");
+    try {
+      revalidatePath("/sitemap.xml");
+      revalidatePath("/blog");
+    } catch {}
 
     return NextResponse.json({
       success: true,

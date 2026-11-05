@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 import { getBaseUrl } from "@/lib/base-url";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
+  await connection();
   const baseUrl = await getBaseUrl();
 
   return {
@@ -12,6 +14,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           "/",
           "/services",
           "/blog",
+          "/blog/*",
+          "/page/show",
           "/documentasi",
           "/about-us",
           "/contact-us",
@@ -26,7 +30,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           "/member/",
           "/api/",
           "/auth/reset-password",
-          "/page/",
         ],
       },
     ],
