@@ -210,3 +210,24 @@ model BlogArticle {
   @@index([category_id])
   @@map("blog_article")
 }
+
+model CustomPage {
+  id               Int      @id @default(autoincrement())
+  uuid             String   @unique @default(uuid())
+  title            String
+  slug             String   @unique
+  description      String?  @db.Text
+  blocks           Json     @default("[]")
+  styles           Json?
+  status           String   @default("PUBLISHED") // "DRAFT", "PUBLISHED"
+  meta_title       String?
+  meta_description String?  @db.Text
+  views            Int      @default(0)
+  create_at        DateTime @default(now())
+  update_at        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@map("custom_page")
+}
+

@@ -25,6 +25,7 @@ import {
   Wallet,
   ShieldCheck,
   BookOpen,
+  LayoutTemplate,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -103,6 +104,11 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Blog Categories",
           href: "/admin/blog/category",
           icon: FolderTree,
+        },
+        {
+          name: "Page Builder",
+          href: "/admin/page-builder",
+          icon: LayoutTemplate,
         },
       ],
     },
