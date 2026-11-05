@@ -4,10 +4,10 @@ import LoginForm from "./login-form";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Sign In to Member Dashboard | Sociolizy",
+    absolute: "SMM Panel : World's Best and Cheapest SMM Provider Services | Sociolizy",
   },
   description:
-    "Log in to your Sociolizy account to order high-speed SMM services, track orders, manage your balance, and access reseller APIs with 24/7 instant automated delivery.",
+    "Get the best and cheapest SMM Panel. The best reseller panel with global SMM services for all social media platforms.",
   keywords: [
     "sociolizy login",
     "smm panel login",
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     canonical: "https://sociolizy.com/auth/login",
   },
   openGraph: {
-    title: "Sign In to Member Dashboard | Sociolizy SMM Panel",
+    title: "SMM Panel : World's Best and Cheapest SMM Provider Services | Sociolizy SMM Panel",
     description:
-      "Log in to your Sociolizy account to order high-speed SMM services, track orders, manage your balance, and access reseller APIs with 24/7 instant automated delivery.",
+      "Get the best and cheapest SMM Panel. The best reseller panel with global SMM services for all social media platforms.",
     url: "https://sociolizy.com/auth/login",
     siteName: "Sociolizy",
     images: [
@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sign In to Member Dashboard | Sociolizy SMM Panel",
+    title: "SMM Panel : World's Best and Cheapest SMM Provider Services | Sociolizy",
     description:
-      "Log in to your Sociolizy account to order high-speed SMM services, track orders, and access reseller APIs.",
+      "Get the best and cheapest SMM Panel. The best reseller panel with global SMM services for all social media platforms.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -65,9 +65,9 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://sociolizy.com/auth/login#webpage",
       "url": "https://sociolizy.com/auth/login",
-      "name": "Sign In to Member Dashboard | Sociolizy SMM Panel",
+      "name": "SMM Panel : World's Best and Cheapest SMM Provider Services | Sociolizy",
       "description":
-        "Log in to your Sociolizy account to order high-speed SMM services, track orders, manage your balance, and access reseller APIs with 24/7 instant automated delivery.",
+        "Get the best and cheapest SMM Panel. The best reseller panel with global SMM services for all social media platforms.",
       "isPartOf": {
         "@type": "WebSite",
         "@id": "https://sociolizy.com/#website",

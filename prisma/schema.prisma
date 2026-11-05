@@ -30,6 +30,8 @@ model User {
   create_at          DateTime  @default(now())
   update_at          DateTime  @updatedAt
 
+  articles           BlogArticle[]
+
   @@map("user")
 }
 
@@ -162,4 +164,49 @@ model CryptomusTransaction {
   update_at       DateTime @updatedAt
 
   @@map("cryptomus_transaction")
+}
+
+model BlogCategory {
+  id          Int           @id @default(autoincrement())
+  uuid        String        @unique @default(uuid())
+  name        String
+  slug        String        @unique
+  description String?       @db.Text
+  color       String?       @default("emerald")
+  create_at   DateTime      @default(now())
+  update_at   DateTime      @updatedAt
+
+  articles    BlogArticle[]
+
+  @@map("blog_category")
+}
+
+model BlogArticle {
+  id               Int           @id @default(autoincrement())
+  uuid             String        @unique @default(uuid())
+  title            String
+  slug             String        @unique
+  excerpt          String?       @db.Text
+  content          String        @db.Text
+  cover_image      String?
+  category_id      Int?
+  author_id        Int?
+  author_name      String?       @default("Sociolizy Team")
+  status           String        @default("PUBLISHED") // "DRAFT", "PUBLISHED", "ARCHIVED"
+  views            Int           @default(0)
+  reading_time     Int           @default(3)
+  meta_title       String?
+  meta_description String?       @db.Text
+  tags             String?
+  is_featured      Boolean       @default(false)
+  published_at     DateTime?     @default(now())
+  create_at        DateTime      @default(now())
+  update_at        DateTime      @updatedAt
+
+  category         BlogCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  author           User?         @relation(fields: [author_id], references: [id], onDelete: SetNull)
+
+  @@index([status, published_at])
+  @@index([category_id])
+  @@map("blog_article")
 }

@@ -4,10 +4,10 @@ import RegisterForm from "./register-form";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Create Account - Register for Best Wholesale SMM Panel | Sociolizy",
+    absolute: "Best and Cheapest Smm Services in The World! | Sociolizy",
   },
   description:
-    "Join Sociolizy today. Create a free account to access wholesale rates on Instagram, TikTok, YouTube, Telegram & Facebook services with multi-region high-speed servers.",
+    "Sociolizy has the Cheapest SMM Panel and 100% High Quality for all social networks. Get the best Instagram panel today! ",
   keywords: [
     "sociolizy register",
     "smm panel registration",
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
     "sociolizy signup",
   ],
   alternates: {
-    canonical: "https://sociolizy.com/auth/register",
+    canonical: "https://www.sociolizy.com/auth/register",
   },
   openGraph: {
-    title: "Create Account - Register for Best Wholesale SMM Panel | Sociolizy",
+    title: "Best and Cheapest Smm Services in The World! | Sociolizy",
     description:
-      "Join Sociolizy today. Create a free account to access wholesale rates on Instagram, TikTok, YouTube, Telegram & Facebook services with multi-region high-speed servers.",
-    url: "https://sociolizy.com/auth/register",
+      "Sociolizy has the Cheapest SMM Panel and 100% High Quality for all social networks. Get the best Instagram panel today! ",
+    url: "https://www.sociolizy.com/auth/register",
     siteName: "Sociolizy",
     images: [
       {
@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Create Account - Register for Best Wholesale SMM Panel | Sociolizy",
+    title: "Best and Cheapest Smm Services in The World! | Sociolizy",
     description:
-      "Join Sociolizy today. Create a free account to access wholesale rates on social media growth services.",
+      "Sociolizy has the Cheapest SMM Panel and 100% High Quality for all social networks. Get the best Instagram panel today! ",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -63,34 +63,34 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "https://sociolizy.com/auth/register#webpage",
-      "url": "https://sociolizy.com/auth/register",
-      "name": "Create Account - Register for Best Wholesale SMM Panel | Sociolizy",
+      "@id": "https://www.sociolizy.com/auth/register#webpage",
+      "url": "https://www.sociolizy.com/auth/register",
+      "name": "Best and Cheapest Smm Services in The World! | Sociolizy",
       "description":
-        "Join Sociolizy today. Create a free account to access wholesale rates on Instagram, TikTok, YouTube, Telegram & Facebook services with multi-region high-speed servers.",
+        "Sociolizy has the Cheapest SMM Panel and 100% High Quality for all social networks. Get the best Instagram panel today! ",
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "https://sociolizy.com/#website",
-        "url": "https://sociolizy.com",
+        "@id": "https://www.sociolizy.com/#website",
+        "url": "https://www.sociolizy.com",
         "name": "Sociolizy",
       },
       "inLanguage": "en-US",
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://sociolizy.com/auth/register#breadcrumb",
+      "@id": "https://www.sociolizy.com/auth/register#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://sociolizy.com",
+          "item": "https://www.sociolizy.com",
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Register",
-          "item": "https://sociolizy.com/auth/register",
+          "item": "https://www.sociolizy.com/auth/register",
         },
       ],
     },

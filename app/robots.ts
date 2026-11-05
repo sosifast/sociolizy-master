@@ -11,6 +11,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         allow: [
           "/",
           "/services",
+          "/blog",
           "/documentasi",
           "/about-us",
           "/contact-us",

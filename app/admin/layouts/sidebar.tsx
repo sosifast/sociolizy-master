@@ -24,6 +24,7 @@ import {
   ShoppingCart,
   Wallet,
   ShieldCheck,
+  BookOpen,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -87,6 +88,21 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
           name: "Import Layanan",
           href: "/admin/import",
           icon: FileDown,
+        },
+      ],
+    },
+    {
+      title: "BLOG & CONTENT",
+      items: [
+        {
+          name: "Blog Articles",
+          href: "/admin/blog",
+          icon: BookOpen,
+        },
+        {
+          name: "Blog Categories",
+          href: "/admin/blog/category",
+          icon: FolderTree,
         },
       ],
     },

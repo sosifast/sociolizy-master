@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   description:
     "Explore 1,000+ automated SMM services for Instagram, TikTok, YouTube, Telegram & Facebook. Compare lowest rates per 1,000, speed, and refill guarantees.",
   alternates: {
-    canonical: "https://sociolizy.com/page/service",
+    canonical: "https://www.sociolizy.com/service",
   },
   openGraph: {
     title: "SMM Services List & Real-Time Wholesale Pricing | Sociolizy",
     description:
       "Explore 1,000+ automated SMM services for Instagram, TikTok, YouTube, Telegram & Facebook. Compare lowest rates per 1,000, speed, and refill guarantees.",
-    url: "https://sociolizy.com/page/service",
+    url: "https://www.sociolizy.com/service",
     siteName: "Sociolizy",
     images: [
       {

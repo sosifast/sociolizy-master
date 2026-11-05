@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   description:
     "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
   alternates: {
-    canonical: "https://sociolizy.com",
+    canonical: "https://www.sociolizy.com",
   },
   openGraph: {
     title: "World's #1 Cheapest & Best SMM Services Provider | Sociolizy",
     description:
       "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
-    url: "https://sociolizy.com",
+    url: "https://www.sociolizy.com",
     siteName: "Sociolizy",
     images: [
       {
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sociolizy - #1 Best & Cheapest SMM Panel for Resellers",
+    title: "World's #1 Cheapest & Best SMM Services Provider | Sociolizy",
     description:
       "Grow your social media presence with Sociolizy. The #1 cheapest automated SMM panel for Instagram, TikTok, YouTube, Telegram & Facebook with instant wholesale delivery.",
     images: ["/og-image.jpg"],
