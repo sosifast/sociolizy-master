@@ -26,6 +26,8 @@ import {
   ShieldCheck,
   BookOpen,
   LayoutTemplate,
+  Store,
+  ArrowDownToLine,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -33,132 +35,178 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+const MENU_SECTIONS = [
+  {
+    title: "RINGKASAN",
+    items: [
+      {
+        name: "Dashboard",
+        href: "/admin",
+        icon: LayoutDashboard,
+      },
+    ],
+  },
+  {
+    title: "TRANSAKSI & PESANAN",
+    items: [
+      {
+        name: "Riwayat Order",
+        href: "/admin/history-order",
+        icon: ShoppingCart,
+      },
+      {
+        name: "Riwayat Deposit",
+        href: "/admin/cryptomus/history",
+        icon: Receipt,
+      },
+      {
+        name: "Laporan & Profit",
+        href: "/admin/report",
+        icon: BarChart3,
+      },
+    ],
+  },
+  {
+    title: "PAYMENT GATEWAY MERCHANT",
+    items: [
+      {
+        name: "Transaksi Merchant",
+        href: "/admin/merchant/transactions",
+        icon: Receipt,
+      },
+      {
+        name: "Penarikan Saldo",
+        href: "/admin/merchant/withdrawals",
+        icon: ArrowDownToLine,
+      },
+      {
+        name: "Pengaturan & Fee Gateway",
+        href: "/admin/merchant/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "KATALOG LAYANAN",
+    items: [
+      {
+        name: "Platform",
+        href: "/admin/platform",
+        icon: Layers,
+      },
+      {
+        name: "Kategori",
+        href: "/admin/category",
+        icon: FolderTree,
+      },
+      {
+        name: "Daftar Layanan",
+        href: "/admin/service",
+        icon: PackageCheck,
+      },
+      {
+        name: "Import Layanan",
+        href: "/admin/import",
+        icon: FileDown,
+      },
+    ],
+  },
+  {
+    title: "BLOG & CONTENT",
+    items: [
+      {
+        name: "Blog Articles",
+        href: "/admin/blog",
+        icon: BookOpen,
+      },
+      {
+        name: "Blog Categories",
+        href: "/admin/blog/category",
+        icon: FolderTree,
+      },
+      {
+        name: "Page Builder",
+        href: "/admin/page-builder",
+        icon: LayoutTemplate,
+      },
+    ],
+  },
+  {
+    title: "PENGGUNA & BANTUAN",
+    items: [
+      {
+        name: "Kelola Pengguna",
+        href: "/admin/user",
+        icon: Users,
+      },
+      {
+        name: "Tiket Dukungan",
+        href: "/admin/ticket",
+        icon: MessageSquare,
+      },
+    ],
+  },
+  {
+    title: "INTEGRASI & SISTEM",
+    items: [
+      {
+        name: "API Provider",
+        href: "/admin/provider",
+        icon: Server,
+      },
+      {
+        name: "Monitoring Server",
+        href: "/admin/server",
+        icon: Activity,
+      },
+      {
+        name: "Setup Cryptomus",
+        href: "/admin/cryptomus/setup",
+        icon: Coins,
+      },
+      {
+        name: "Pengaturan Sistem",
+        href: "/admin/setting",
+        icon: Settings,
+      },
+    ],
+  },
+];
+
 export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
-  const menuSections = [
-    {
-      title: "RINGKASAN",
-      items: [
-        {
-          name: "Dashboard",
-          href: "/admin",
-          icon: LayoutDashboard,
-        },
-      ],
-    },
-    {
-      title: "TRANSAKSI & PESANAN",
-      items: [
-        {
-          name: "Riwayat Order",
-          href: "/admin/history-order",
-          icon: ShoppingCart,
-        },
-        {
-          name: "Riwayat Deposit",
-          href: "/admin/cryptomus/history",
-          icon: Receipt,
-        },
-        {
-          name: "Laporan & Profit",
-          href: "/admin/report",
-          icon: BarChart3,
-        },
-      ],
-    },
-    {
-      title: "KATALOG LAYANAN",
-      items: [
-        {
-          name: "Platform",
-          href: "/admin/platform",
-          icon: Layers,
-        },
-        {
-          name: "Kategori",
-          href: "/admin/category",
-          icon: FolderTree,
-        },
-        {
-          name: "Daftar Layanan",
-          href: "/admin/service",
-          icon: PackageCheck,
-        },
-        {
-          name: "Import Layanan",
-          href: "/admin/import",
-          icon: FileDown,
-        },
-      ],
-    },
-    {
-      title: "BLOG & CONTENT",
-      items: [
-        {
-          name: "Blog Articles",
-          href: "/admin/blog",
-          icon: BookOpen,
-        },
-        {
-          name: "Blog Categories",
-          href: "/admin/blog/category",
-          icon: FolderTree,
-        },
-        {
-          name: "Page Builder",
-          href: "/admin/page-builder",
-          icon: LayoutTemplate,
-        },
-      ],
-    },
-    {
-      title: "PENGGUNA & BANTUAN",
-      items: [
-        {
-          name: "Kelola Pengguna",
-          href: "/admin/user",
-          icon: Users,
-        },
-        {
-          name: "Tiket Dukungan",
-          href: "/admin/ticket",
-          icon: MessageSquare,
-        },
-      ],
-    },
-    {
-      title: "INTEGRASI & SISTEM",
-      items: [
-        {
-          name: "API Provider",
-          href: "/admin/provider",
-          icon: Server,
-        },
-        {
-          name: "Monitoring Server",
-          href: "/admin/server",
-          icon: Activity,
-        },
-        {
-          name: "Setup Cryptomus",
-          href: "/admin/cryptomus/setup",
-          icon: Coins,
-        },
-        {
-          name: "Pengaturan Sistem",
-          href: "/admin/setting",
-          icon: Settings,
-        },
-      ],
-    },
-  ];
-
   const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin";
+    const currentPath = pathname?.replace(/\/$/, "") || "";
+    const targetHref = href.replace(/\/$/, "");
+
+    // Dashboard hanya aktif ketika benar-benar berada di /admin
+    if (targetHref === "/admin") {
+      return currentPath === "/admin";
     }
-    return pathname.startsWith(href);
+
+    // Jika path sama persis
+    if (currentPath === targetHref) {
+      return true;
+    }
+
+    // Jika path saat ini adalah sub-rute dari href (misal /admin/blog/article atau /admin/service/create)
+    if (currentPath.startsWith(targetHref + "/")) {
+      // Pastikan tidak ada menu item lain yang memiliki URL lebih spesifik dan cocok
+      // Contoh: saat di /admin/blog/category, "Blog Articles" (/admin/blog) tidak boleh aktif karena "Blog Categories" (/admin/blog/category) lebih spesifik
+      const hasMoreSpecificMatch = MENU_SECTIONS.some((section) =>
+        section.items.some(
+          (otherItem) =>
+            otherItem.href !== href &&
+            otherItem.href.startsWith(targetHref + "/") &&
+            (currentPath === otherItem.href.replace(/\/$/, "") ||
+              currentPath.startsWith(otherItem.href.replace(/\/$/, "") + "/"))
+        )
+      );
+      return !hasMoreSpecificMatch;
+    }
+
+    return false;
   };
 
   return (
@@ -193,7 +241,7 @@ export default function AdminSidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation Menu */}
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 bg-white">
-          {menuSections.map((section, idx) => (
+          {MENU_SECTIONS.map((section, idx) => (
             <div key={idx} className="space-y-1">
               <h3 className="px-3 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
                 {section.title}

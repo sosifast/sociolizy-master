@@ -36,8 +36,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. PROTEKSI ROUTE MEMBER (/member & /member/*)
-  if (pathname.startsWith("/member")) {
+  // 2. PROTEKSI ROUTE MEMBER (/member & /member/*) & MERCHANT (/merchant & /merchant/*)
+  if (pathname.startsWith("/member") || pathname.startsWith("/merchant")) {
     // Jika belum login, redirect ke /auth/login
     if (!session) {
       const loginUrl = getTargetUrl("/auth/login", request);
@@ -89,6 +89,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/member/:path*",
+    "/merchant/:path*",
     "/api/admin/:path*",
     "/auth/login",
     "/auth/register",

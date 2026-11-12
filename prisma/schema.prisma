@@ -32,6 +32,11 @@ model User {
 
   articles           BlogArticle[]
 
+  merchantWallet             MerchantWallet?
+  merchantAccounts           MerchantAccount[]
+  merchantWithdrawals        MerchantWithdrawal[]
+  merchantWithdrawalSetting  MerchantWithdrawalSetting?
+
   @@map("user")
 }
 
@@ -230,4 +235,167 @@ model CustomPage {
   @@index([status])
   @@map("custom_page")
 }
+
+// ==========================================
+// MERCHANT PAYMENT GATEWAY MODELS
+// ==========================================
+
+model MerchantWallet {
+  id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default(uuid())
+  userId          Int      @unique
+  balance         Decimal  @default(0) @db.Decimal(15, 4)
+  lockedBalance   Decimal  @default(0) @db.Decimal(15, 4)
+  totalEarned     Decimal  @default(0) @db.Decimal(15, 4)
+  totalWithdrawn  Decimal  @default(0) @db.Decimal(15, 4)
+  currency        String   @default("USD")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_wallet")
+}
+
+model MerchantWithdrawalSetting {
+  id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default(uuid())
+  userId          Int      @unique
+  coin            String   @default("USDT")
+  network         String   @default("tron")
+  address         String
+  autoWithdraw    Boolean  @default(false)
+  threshold       Decimal  @default(50.00) @db.Decimal(15, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_withdrawal_setting")
+}
+
+model MerchantAccount {
+  id           Int                  @id @default(autoincrement())
+  uuid         String               @unique @default(uuid())
+  userId       Int
+  name         String
+  slug         String               @unique
+  description  String?              @db.Text
+  status       String               @default("ACTIVE") // ACTIVE, SUSPENDED
+  allowedCoins Json?                @default("[\"USDT_TRC20\",\"USDT_BSC\",\"BTC\",\"ETH\",\"TON\",\"SOL\",\"LTC\",\"TRX\"]")
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  websites     MerchantWebsite[]
+  transactions MerchantTransaction[]
+  withdrawals  MerchantWithdrawal[]
+
+  @@index([userId])
+  @@map("merchant_account")
+}
+
+model MerchantWebsite {
+  id          Int                   @id @default(autoincrement())
+  uuid        String                @unique @default(uuid())
+  merchantId  Int
+  name        String
+  domain      String
+  apiKey      String                @unique
+  secretKey   String
+  webhookUrl  String?
+  returnUrl   String?
+  status      String                @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  merchant    MerchantAccount       @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  transactions MerchantTransaction[]
+
+  @@index([merchantId])
+  @@map("merchant_website")
+}
+
+model MerchantTransaction {
+  id                      Int              @id @default(autoincrement())
+  uuid                    String           @unique @default(uuid())
+  orderId                 String           // Merchant's external order ID
+  merchantId              Int
+  websiteId               Int?
+  amountUsd               Decimal          @db.Decimal(15, 4)
+  adminFee                Decimal          @default(0) @db.Decimal(15, 4)
+  netAmountUsd            Decimal          @db.Decimal(15, 4)
+  cryptoCurrency          String?          // e.g. USDT
+  cryptoNetwork           String?          // e.g. tron
+  cryptoAmount            Decimal?         @db.Decimal(24, 8)
+  payAddress              String?
+  paymentStatus           String           @default("PENDING") // PENDING, PAID, EXPIRED, FAILED, CANCELLED
+  txid                    String?
+  cryptomusOrderId        String?          @unique
+  merchantWebhookStatus   String?          @default("PENDING") // PENDING, SENT, FAILED
+  merchantWebhookAttempts Int              @default(0)
+  merchantWebhookResponse String?          @db.Text
+  description             String?
+  customerEmail           String?
+  returnUrl               String?
+  callbackUrl             String?
+  expiresAt               DateTime?
+  paidAt                  DateTime?
+  rawPayload              String?          @db.Text
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  merchant                MerchantAccount  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  website                 MerchantWebsite? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+
+  @@index([merchantId])
+  @@index([websiteId])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@map("merchant_transaction")
+}
+
+model MerchantWithdrawal {
+  id                Int              @id @default(autoincrement())
+  uuid              String           @unique @default(uuid())
+  userId            Int
+  merchantId        Int?
+  amountUsd         Decimal          @db.Decimal(15, 4)
+  feeAdmin          Decimal          @default(0) @db.Decimal(15, 4)
+  netAmountUsd      Decimal          @db.Decimal(15, 4)
+  coin              String           // e.g. USDT
+  network           String           // e.g. tron
+  address           String
+  status            String           @default("PENDING") // PENDING, PROCESSING, COMPLETED, REJECTED, FAILED
+  isAuto            Boolean          @default(false)
+  txid              String?
+  cryptomusPayoutId String?
+  errorMessage      String?          @db.Text
+  processedAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant          MerchantAccount? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("merchant_withdrawal")
+}
+
+model MerchantGatewaySetting {
+  id                    Int      @id @default(autoincrement())
+  adminFeePercent       Decimal  @default(1.0) @db.Decimal(5, 2)
+  adminFeeFixed         Decimal  @default(0.10) @db.Decimal(15, 4)
+  minWithdrawal         Decimal  @default(10.00) @db.Decimal(15, 2)
+  maxWithdrawal         Decimal  @default(50000.00) @db.Decimal(15, 2)
+  autoWithdrawalEnabled Boolean  @default(true)
+  allowedCoins          Json?    @default("[\"USDT\",\"BTC\",\"ETH\",\"TON\",\"SOL\",\"LTC\",\"TRX\"]")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("merchant_gateway_setting")
+}
+
 

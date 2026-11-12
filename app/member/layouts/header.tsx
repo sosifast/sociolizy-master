@@ -20,6 +20,7 @@ import {
   CreditCard,
   MessageSquare,
   Code2,
+  Store,
 } from "lucide-react";
 import { MemberUserData } from "./topbar";
 import MemberNotificationsDropdown from "../components/member-notifications-dropdown";
@@ -81,6 +82,12 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
       name: "Tickets",
       href: "/member/ticket",
       icon: MessageSquare,
+      exact: false,
+    },
+    {
+      name: "Merchant Gateway",
+      href: "/merchant",
+      icon: Store,
       exact: false,
     },
   ];

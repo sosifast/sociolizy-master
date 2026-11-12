@@ -87,15 +87,6 @@ export default function Footer() {
               <li>
                 <span className="text-slate-500">24/7 Automated Dispatch</span>
               </li>
-              <li className="pt-2">
-                <span className="block text-slate-500 text-[11px]">Support Email:</span>
-                <a
-                  href="mailto:info@smmfollowom.com"
-                  className="text-emerald-600 hover:text-emerald-700 text-xs font-medium transition-colors"
-                >
-                  info@smmfollowom.com
-                </a>
-              </li>
             </ul>
           </div>
 
