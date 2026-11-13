@@ -2,13 +2,31 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { createSessionToken } from "@/lib/auth";
+import { traceUserActivity, extractClientIp } from "@/lib/trace-logger";
 
 export async function POST(request: Request) {
+  const startTime = Date.now();
+  const ip = extractClientIp(request);
+  const userAgent = request.headers.get("user-agent");
+
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { identifier, password } = body;
 
     if (!identifier || !password) {
+      traceUserActivity({
+        action: "AUTH_LOGIN",
+        status: "FAILED",
+        status_code: 400,
+        username: identifier || null,
+        ip,
+        user_agent: userAgent,
+        endpoint: "/api/auth/login",
+        method: "POST",
+        error_message: "Username/Email and Password are required.",
+        latency_ms: Date.now() - startTime,
+      });
+
       return NextResponse.json(
         { success: false, message: "Username/Email and Password are required." },
         { status: 400 }
@@ -28,6 +46,19 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
+      traceUserActivity({
+        action: "AUTH_LOGIN",
+        status: "FAILED",
+        status_code: 401,
+        username: cleanIdentifier,
+        ip,
+        user_agent: userAgent,
+        endpoint: "/api/auth/login",
+        method: "POST",
+        error_message: "User not found or invalid credentials.",
+        latency_ms: Date.now() - startTime,
+      });
+
       return NextResponse.json(
         { success: false, message: "Invalid username/email or password." },
         { status: 401 }
@@ -37,6 +68,20 @@ export async function POST(request: Request) {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      traceUserActivity({
+        action: "AUTH_LOGIN",
+        status: "FAILED",
+        status_code: 401,
+        user_id: user.id,
+        username: user.username,
+        ip,
+        user_agent: userAgent,
+        endpoint: "/api/auth/login",
+        method: "POST",
+        error_message: "Incorrect password.",
+        latency_ms: Date.now() - startTime,
+      });
+
       return NextResponse.json(
         { success: false, message: "Invalid username/email or password." },
         { status: 401 }
@@ -79,10 +124,37 @@ export async function POST(request: Request) {
       sameSite: "lax",
     });
 
+    traceUserActivity({
+      action: "AUTH_LOGIN",
+      status: "SUCCESS",
+      status_code: 200,
+      user_id: user.id,
+      username: user.username,
+      ip,
+      user_agent: userAgent,
+      endpoint: "/api/auth/login",
+      method: "POST",
+      response_payload: { level: user.level, redirectUrl },
+      latency_ms: Date.now() - startTime,
+    });
+
     return response;
   } catch (error) {
     console.error("Login Error:", error);
     const message = error instanceof Error ? error.message : "An internal server error occurred.";
+
+    traceUserActivity({
+      action: "AUTH_LOGIN",
+      status: "FAILED",
+      status_code: 500,
+      ip,
+      user_agent: userAgent,
+      endpoint: "/api/auth/login",
+      method: "POST",
+      error_message: message,
+      latency_ms: Date.now() - startTime,
+    });
+
     return NextResponse.json(
       { success: false, message },
       { status: 500 }

@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { getDiscoveredRegions, getActiveClusterConfig } from "@/lib/server-db";
 import { allocateRollingServerNode } from "@/lib/mongodb";
 import { sendRegistrationEmail } from "@/lib/resend";
+import { traceUserActivity, extractClientIp } from "@/lib/trace-logger";
 
 /**
  * GET: Retrieve active cluster regions detected in environment
@@ -38,14 +39,31 @@ export async function GET() {
  * POST: Register new user with selected cluster region
  */
 export async function POST(request: Request) {
+  const startTime = Date.now();
+  const ip = extractClientIp(request);
+  const userAgent = request.headers.get("user-agent");
+
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { username, email, password, confirmPassword, server_area, server_region } = body;
 
     const selectedArea = (server_area || server_region || "SG").toUpperCase().trim();
 
     // Input validation
     if (!username || !email || !password) {
+      traceUserActivity({
+        action: "AUTH_REGISTER",
+        status: "FAILED",
+        status_code: 400,
+        username: username || email || null,
+        ip,
+        user_agent: userAgent,
+        endpoint: "/api/auth/register",
+        method: "POST",
+        error_message: "All required fields must be filled.",
+        latency_ms: Date.now() - startTime,
+      });
+
       return NextResponse.json(
         { success: false, message: "All required fields must be filled." },
         { status: 400 }
