@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 
 export type ToastType = "success" | "error" | "warning" | "info";
@@ -86,16 +86,24 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     }
   }, [showToast]);
 
-  const toastHelpers = {
-    success: (title: string, message?: string) => showToast(title, message, "success"),
-    error: (title: string, message?: string) => showToast(title, message, "error"),
-    warning: (title: string, message?: string) => showToast(title, message, "warning"),
-    info: (title: string, message?: string) => showToast(title, message, "info"),
-    setFlash,
-  };
+  const toastHelpers = useMemo(
+    () => ({
+      success: (title: string, message?: string) => showToast(title, message, "success"),
+      error: (title: string, message?: string) => showToast(title, message, "error"),
+      warning: (title: string, message?: string) => showToast(title, message, "warning"),
+      info: (title: string, message?: string) => showToast(title, message, "info"),
+      setFlash,
+    }),
+    [showToast, setFlash]
+  );
+
+  const contextValue = useMemo(
+    () => ({ showToast, toast: toastHelpers, removeToast }),
+    [showToast, toastHelpers, removeToast]
+  );
 
   return (
-    <ToastContext.Provider value={{ showToast, toast: toastHelpers, removeToast }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
 
       {/* Floating Toast Container */}

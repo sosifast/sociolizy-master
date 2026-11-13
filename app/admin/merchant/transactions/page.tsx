@@ -10,9 +10,6 @@ import {
   DollarSign,
   TrendingUp,
   Percent,
-  CheckCircle2,
-  Clock,
-  XCircle,
   X,
   Copy,
   Check,
@@ -85,80 +82,68 @@ export default function AdminMerchantTransactionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Riwayat Transaksi Merchant (B.1)
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Transaksi Merchant
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Pantau seluruh arus pembayaran pelanggan pada semua merchant & website terdaftar.
-          </p>
         </div>
 
         <button
           onClick={fetchTransactions}
-          className="self-start sm:self-auto px-3.5 py-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
+          className="self-start sm:self-auto px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs font-medium"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>Refresh Data</span>
+          <span>Refresh</span>
         </button>
       </div>
 
       {/* Aggregate Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider">Total Volume Pembayaran</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+        <div className="spectrum-card p-5">
+          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
+            <span className="font-semibold uppercase tracking-wider text-slate-700">Total Volume Transaksi</span>
+            <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-white">
+          <div className="text-2xl font-black text-slate-900">
             ${Number(stats.totalVolumeUsd).toFixed(2)}{" "}
             <span className="text-xs font-normal text-slate-400">USD</span>
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">
-            Semua transaksi status PAID
-          </span>
         </div>
 
-        <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span className="font-semibold text-emerald-400 uppercase tracking-wider">
-              Fee Gateway Masuk (Admin Profit)
+        <div className="spectrum-card-green p-5">
+          <div className="flex items-center justify-between text-emerald-800 text-xs mb-1">
+            <span className="font-bold uppercase tracking-wider">
+              Total Fee Platform (Profit)
             </span>
-            <Percent className="w-4 h-4 text-emerald-400" />
+            <Percent className="w-4 h-4 text-emerald-700" />
           </div>
-          <div className="text-2xl font-black text-emerald-400">
+          <div className="text-2xl font-black text-emerald-950">
             +${Number(stats.totalAdminFeeUsd).toFixed(2)}{" "}
-            <span className="text-xs font-normal text-slate-400">USD</span>
+            <span className="text-xs font-semibold text-emerald-700">USD</span>
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">
-            Fee komisi platform yang didapatkan
-          </span>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span className="font-semibold uppercase tracking-wider">Net Masuk ke Merchant</span>
-            <TrendingUp className="w-4 h-4 text-blue-400" />
+        <div className="spectrum-card p-5">
+          <div className="flex items-center justify-between text-slate-500 text-xs mb-1">
+            <span className="font-semibold uppercase tracking-wider text-slate-700">Net Merchant</span>
+            <TrendingUp className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="text-2xl font-black text-white">
+          <div className="text-2xl font-black text-slate-900">
             ${Number(stats.totalMerchantNetUsd).toFixed(2)}{" "}
             <span className="text-xs font-normal text-slate-400">USD</span>
           </div>
-          <span className="text-[11px] text-slate-500 mt-1 block">
-            Saldo bersih yang dikreditkan ke member
-          </span>
         </div>
       </div>
 
       {/* Filter & Search */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="spectrum-card p-4 flex flex-col md:flex-row items-center justify-between gap-3">
         <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari Order ID, TxID, Merchant, User..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500"
+            className="spectrum-input w-full bg-white pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400"
           />
         </form>
 
@@ -173,8 +158,8 @@ export default function AdminMerchantTransactionsPage() {
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 status === s
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                  : "bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold"
+                  : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
               }`}
             >
               {s === "ALL" ? "Semua Status" : s}
@@ -184,28 +169,28 @@ export default function AdminMerchantTransactionsPage() {
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
+      <div className="spectrum-card overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-            <RefreshCw className="w-8 h-8 animate-spin text-emerald-400 mb-2" />
-            <span className="text-xs">Memuat riwayat transaksi merchant...</span>
+            <RefreshCw className="w-8 h-8 animate-spin text-emerald-600 mb-2" />
+            <span className="text-xs font-medium text-slate-500">Memuat transaksi...</span>
           </div>
         ) : error ? (
-          <div className="p-6 text-center text-xs text-rose-300">{error}</div>
+          <div className="p-6 text-center text-xs text-rose-600">{error}</div>
         ) : transactions.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 text-xs">
-            Tidak ada transaksi merchant ditemukan.
+          <div className="py-16 text-center text-slate-400 text-xs">
+            Tidak ada transaksi ditemukan.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+            <table className="w-full text-left text-xs text-slate-700">
+              <thead className="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-4">Invoice / Order ID</th>
                   <th className="py-3 px-4">Member Pemilik</th>
                   <th className="py-3 px-4">Merchant & Website</th>
                   <th className="py-3 px-4 text-right">Gross (USD)</th>
-                  <th className="py-3 px-4 text-right">Fee Admin</th>
+                  <th className="py-3 px-4 text-right">Fee Platform</th>
                   <th className="py-3 px-4 text-right">Net Merchant</th>
                   <th className="py-3 px-4">Crypto Transfer</th>
                   <th className="py-3 px-4 text-center">Status</th>
@@ -213,76 +198,76 @@ export default function AdminMerchantTransactionsPage() {
                   <th className="py-3 px-4 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {transactions.map((tx) => {
                   const isPaid = tx.paymentStatus === "PAID";
                   const isPending = tx.paymentStatus === "PENDING";
                   return (
-                    <tr key={tx.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="font-bold text-white">#{tx.orderId}</div>
-                        <span className="font-mono text-[10px] text-slate-500">
+                    <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-slate-900">#{tx.orderId}</div>
+                        <span className="font-mono text-[10px] text-slate-400">
                           {tx.uuid.substring(0, 10)}...
                         </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-white">
+                      <td className="py-3.5 px-4">
+                        <div className="font-semibold text-slate-800">
                           @{tx.merchant?.user?.username || "unknown"}
                         </div>
                         <div className="text-[10px] text-slate-500 truncate max-w-[120px]">
                           {tx.merchant?.user?.email}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-slate-200">{tx.merchant?.name}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                      <td className="py-3.5 px-4">
+                        <div className="font-semibold text-slate-800">{tx.merchant?.name}</div>
+                        <div className="text-[11px] text-slate-500 font-mono">
                           {tx.website?.domain || "-"}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right font-medium text-slate-200">
+                      <td className="py-3.5 px-4 text-right font-medium text-slate-700">
                         ${Number(tx.amountUsd).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-emerald-400">
+                      <td className="py-3.5 px-4 text-right font-bold text-emerald-600">
                         +${Number(tx.adminFee).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-semibold text-slate-300">
+                      <td className="py-3.5 px-4 text-right font-semibold text-slate-800">
                         ${Number(tx.netAmountUsd).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 font-mono text-xs">
+                      <td className="py-3.5 px-4 font-mono text-xs">
                         {tx.cryptoAmount ? (
                           <div>
-                            <span className="text-white font-medium">{tx.cryptoAmount}</span>{" "}
-                            <span className="text-emerald-400">{tx.cryptoCurrency}</span>{" "}
-                            <span className="text-[10px] text-slate-500 uppercase">
+                            <span className="text-slate-900 font-semibold">{tx.cryptoAmount}</span>{" "}
+                            <span className="text-emerald-600 font-semibold">{tx.cryptoCurrency}</span>{" "}
+                            <span className="text-[10px] text-slate-400 uppercase">
                               ({tx.cryptoNetwork})
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-500">-</span>
+                          <span className="text-slate-400">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-3.5 px-4 text-center">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                             isPaid
-                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : isPending
-                              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                              : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200"
                           }`}
                         >
                           {tx.paymentStatus}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-slate-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
                         {new Date(tx.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-3.5 px-4 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button
                             type="button"
                             onClick={() => setDetailTx(tx)}
-                            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
                             title="Detail"
                           >
                             <Eye className="w-4 h-4" />
@@ -291,7 +276,7 @@ export default function AdminMerchantTransactionsPage() {
                             href={`/pay/${tx.uuid}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg"
+                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                             title="Buka Checkout"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -308,7 +293,7 @@ export default function AdminMerchantTransactionsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
             <span>
               Total {totalCount} transaksi (Halaman {page} dari {totalPages})
             </span>
@@ -317,7 +302,7 @@ export default function AdminMerchantTransactionsPage() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40"
+                className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-2xs font-medium cursor-pointer"
               >
                 Sebelumnya
               </button>
@@ -325,7 +310,7 @@ export default function AdminMerchantTransactionsPage() {
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40"
+                className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 shadow-2xs font-medium cursor-pointer"
               >
                 Selanjutnya
               </button>
@@ -336,11 +321,11 @@ export default function AdminMerchantTransactionsPage() {
 
       {/* DETAIL MODAL */}
       {detailTx && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-slate-900">
                   Invoice #{detailTx.orderId}
                 </h3>
                 <span className="text-[11px] font-mono text-slate-400">{detailTx.uuid}</span>
@@ -348,55 +333,55 @@ export default function AdminMerchantTransactionsPage() {
               <button
                 type="button"
                 onClick={() => setDetailTx(null)}
-                className="p-1 text-slate-400 hover:text-white"
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="mt-4 space-y-4 text-xs">
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div className="mt-4 space-y-3.5 text-xs">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Member:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-slate-500">Member:</span>
+                  <span className="font-semibold text-slate-900">
                     @{detailTx.merchant?.user?.username} ({detailTx.merchant?.user?.email})
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Merchant Store:</span>
-                  <span className="text-white font-medium">{detailTx.merchant?.name}</span>
+                  <span className="text-slate-500">Merchant:</span>
+                  <span className="text-slate-800 font-medium">{detailTx.merchant?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Website:</span>
-                  <span className="font-mono text-slate-300">{detailTx.website?.domain || "-"}</span>
+                  <span className="text-slate-500">Website:</span>
+                  <span className="font-mono text-slate-700">{detailTx.website?.domain || "-"}</span>
                 </div>
               </div>
 
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Gross Invoice:</span>
-                  <span className="font-bold text-white">${Number(detailTx.amountUsd).toFixed(2)} USD</span>
+                  <span className="text-slate-500">Gross Invoice:</span>
+                  <span className="font-bold text-slate-900">${Number(detailTx.amountUsd).toFixed(2)} USD</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Fee Admin (Platform Profit):</span>
-                  <span className="text-emerald-400 font-bold">+${Number(detailTx.adminFee).toFixed(2)} USD</span>
+                  <span className="text-slate-500">Fee Platform:</span>
+                  <span className="text-emerald-700 font-bold">+${Number(detailTx.adminFee).toFixed(2)} USD</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Net Merchant:</span>
-                  <span className="text-white font-semibold">${Number(detailTx.netAmountUsd).toFixed(2)} USD</span>
+                <div className="flex justify-between pt-1.5 border-t border-slate-200">
+                  <span className="text-slate-700 font-semibold">Net Merchant:</span>
+                  <span className="text-slate-900 font-bold">${Number(detailTx.netAmountUsd).toFixed(2)} USD</span>
                 </div>
               </div>
 
               {detailTx.payAddress && (
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                  <div className="text-slate-400 font-semibold mb-1">Alamat Pembayaran:</div>
-                  <div className="font-mono text-[11px] text-slate-200 break-all select-all bg-slate-900 p-2 rounded-lg">
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                  <div className="text-slate-600 font-semibold mb-1">Alamat Pembayaran:</div>
+                  <div className="font-mono text-[11px] text-slate-800 break-all select-all bg-white p-2 rounded-lg border border-slate-200/90 shadow-2xs font-medium">
                     {detailTx.payAddress}
                   </div>
                   {detailTx.txid && (
                     <div>
-                      <div className="text-slate-400 font-semibold mb-1">Blockchain TxID:</div>
-                      <div className="font-mono text-[11px] text-slate-200 break-all select-all bg-slate-900 p-2 rounded-lg">
+                      <div className="text-slate-600 font-semibold mb-1">Blockchain TxID:</div>
+                      <div className="font-mono text-[11px] text-slate-800 break-all select-all bg-white p-2 rounded-lg border border-slate-200/90 shadow-2xs font-medium">
                         {detailTx.txid}
                       </div>
                     </div>
@@ -405,11 +390,11 @@ export default function AdminMerchantTransactionsPage() {
               )}
             </div>
 
-            <div className="mt-5 pt-3 border-t border-slate-800 text-right">
+            <div className="mt-5 pt-3 border-t border-slate-100 text-right">
               <button
                 type="button"
                 onClick={() => setDetailTx(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl cursor-pointer"
               >
                 Tutup
               </button>
@@ -420,4 +405,3 @@ export default function AdminMerchantTransactionsPage() {
     </div>
   );
 }
-

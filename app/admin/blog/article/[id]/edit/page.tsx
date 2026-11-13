@@ -267,9 +267,6 @@ export default function EditBlogArticlePage() {
                 </Link>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Update markdown content, cover image, tags, and Google SEO settings.
-            </p>
           </div>
         </div>
 

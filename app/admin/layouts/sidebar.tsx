@@ -28,6 +28,7 @@ import {
   LayoutTemplate,
   Store,
   ArrowDownToLine,
+  FileText,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -37,7 +38,7 @@ interface SidebarProps {
 
 const MENU_SECTIONS = [
   {
-    title: "RINGKASAN",
+    title: "DASHBOARD",
     items: [
       {
         name: "Dashboard",
@@ -47,7 +48,7 @@ const MENU_SECTIONS = [
     ],
   },
   {
-    title: "TRANSAKSI & PESANAN",
+    title: "PESANAN",
     items: [
       {
         name: "Riwayat Order",
@@ -55,39 +56,39 @@ const MENU_SECTIONS = [
         icon: ShoppingCart,
       },
       {
-        name: "Riwayat Deposit",
+        name: "Deposit",
         href: "/admin/cryptomus/history",
         icon: Receipt,
       },
       {
-        name: "Laporan & Profit",
+        name: "Laporan",
         href: "/admin/report",
         icon: BarChart3,
       },
     ],
   },
   {
-    title: "PAYMENT GATEWAY MERCHANT",
+    title: "GATEWAY MERCHANT",
     items: [
       {
-        name: "Transaksi Merchant",
+        name: "Transaksi",
         href: "/admin/merchant/transactions",
         icon: Receipt,
       },
       {
-        name: "Penarikan Saldo",
+        name: "Penarikan",
         href: "/admin/merchant/withdrawals",
         icon: ArrowDownToLine,
       },
       {
-        name: "Pengaturan & Fee Gateway",
+        name: "Pengaturan",
         href: "/admin/merchant/settings",
         icon: Settings,
       },
     ],
   },
   {
-    title: "KATALOG LAYANAN",
+    title: "LAYANAN",
     items: [
       {
         name: "Platform",
@@ -100,9 +101,14 @@ const MENU_SECTIONS = [
         icon: FolderTree,
       },
       {
-        name: "Daftar Layanan",
+        name: "Layanan",
         href: "/admin/service",
         icon: PackageCheck,
+      },
+      {
+        name: "Data Detail",
+        href: "/admin/data-detail",
+        icon: FileText,
       },
       {
         name: "Import Layanan",
@@ -112,15 +118,15 @@ const MENU_SECTIONS = [
     ],
   },
   {
-    title: "BLOG & CONTENT",
+    title: "KONTEN",
     items: [
       {
-        name: "Blog Articles",
+        name: "Artikel Blog",
         href: "/admin/blog",
         icon: BookOpen,
       },
       {
-        name: "Blog Categories",
+        name: "Kategori Blog",
         href: "/admin/blog/category",
         icon: FolderTree,
       },
@@ -132,40 +138,40 @@ const MENU_SECTIONS = [
     ],
   },
   {
-    title: "PENGGUNA & BANTUAN",
+    title: "PENGGUNA",
     items: [
       {
-        name: "Kelola Pengguna",
+        name: "Pengguna",
         href: "/admin/user",
         icon: Users,
       },
       {
-        name: "Tiket Dukungan",
+        name: "Tiket",
         href: "/admin/ticket",
         icon: MessageSquare,
       },
     ],
   },
   {
-    title: "INTEGRASI & SISTEM",
+    title: "SISTEM",
     items: [
       {
-        name: "API Provider",
+        name: "Provider API",
         href: "/admin/provider",
         icon: Server,
       },
       {
-        name: "Monitoring Server",
+        name: "Server",
         href: "/admin/server",
         icon: Activity,
       },
       {
-        name: "Setup Cryptomus",
+        name: "Kredensial Gateway",
         href: "/admin/cryptomus/setup",
         icon: Coins,
       },
       {
-        name: "Pengaturan Sistem",
+        name: "Pengaturan",
         href: "/admin/setting",
         icon: Settings,
       },

@@ -443,10 +443,6 @@ export default function AdminDashboardPage() {
               </span>
             </div>
           </div>
-
-          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-            Monitoring live cluster multi-server MongoDB, agregasi pesanan, saldo gateway provider, dan analitik profit.
-          </p>
         </div>
 
         {/* Realtime Controls & Quick Buttons */}
@@ -751,11 +747,8 @@ export default function AdminDashboardPage() {
           <div>
             <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-600" />
-              Pipeline & Alur Status Pesanan
+              Status Pesanan
             </h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Distribusi status seluruh pesanan SMM pada cluster database multi-shard.
-            </p>
           </div>
 
           <Link
@@ -868,11 +861,8 @@ export default function AdminDashboardPage() {
               <div>
                 <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight flex items-center gap-2">
                   <Server className="w-4 h-4 text-emerald-600" />
-                  Saldo Gateway API Provider
+                  Saldo Provider
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Konektivitas langsung ke supplier & sinkronisasi saldo riil ($)
-                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -1003,9 +993,6 @@ export default function AdminDashboardPage() {
                   <HardDrive className="w-4 h-4 text-emerald-600" />
                   Cluster Database Node
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Monitoring latensi dan beban server multi-shard
-                </p>
               </div>
 
               <Link
@@ -1107,15 +1094,9 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-2">
               <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight flex items-center gap-2">
                 <Database className="w-4 h-4 text-emerald-600" />
-                Aliran Pesanan Realtime (Live Orders Stream)
+                Pesanan Terbaru
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase">
-                Live Feed
-              </span>
             </div>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Pesanan pengguna terbaru yang masuk dan diproses secara otomatis oleh sistem.
-            </p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -1266,9 +1247,8 @@ export default function AdminDashboardPage() {
               <div>
                 <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight flex items-center gap-2">
                   <Layers className="w-4 h-4 text-violet-600" />
-                  Katalog & Platform
+                  Platform
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">Platform sosial media yang didukung</p>
               </div>
 
               <Link
@@ -1318,9 +1298,6 @@ export default function AdminDashboardPage() {
                   <Users className="w-4 h-4 text-emerald-600" />
                   Pengguna Terdaftar Terbaru
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Akun member yang baru saja mendaftar di situs
-                </p>
               </div>
 
               <Link

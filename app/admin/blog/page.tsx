@@ -233,9 +233,6 @@ export default function AdminBlogPage() {
               {totalItems} Posts
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage, write, and optimize educational articles and SMM growth guides.
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

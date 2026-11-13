@@ -161,16 +161,11 @@ export default function AdminTicketListPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <h1 className="text-xl font-bold text-slate-900">Kelola Tiket Bantuan</h1>
+        <div className="flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <MessageSquare className="w-5 h-5" />
           </div>
-          <p className="text-xs text-slate-500">
-            Pusat manajemen bantuan member. Tersimpan di klaster database MongoDB dan diperbarui realtime via Pusher.
-          </p>
+          <h1 className="text-xl font-bold text-slate-900">Kelola Tiket Bantuan</h1>
         </div>
 
         <div className="flex items-center gap-2">

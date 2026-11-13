@@ -58,6 +58,7 @@ export async function POST(request: Request) {
       url_image_kit,
       imagekit_api,
       imagekit_secret,
+      gemini_api,
     } = body;
 
     let setting = await prisma.setting.findFirst({
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
           ...(url_image_kit !== undefined && { url_image_kit: url_image_kit ? url_image_kit.trim() : null }),
           ...(imagekit_api !== undefined && { imagekit_api: imagekit_api ? imagekit_api.trim() : null }),
           ...(imagekit_secret !== undefined && { imagekit_secret: imagekit_secret ? imagekit_secret.trim() : null }),
+          ...(gemini_api !== undefined && { gemini_api: gemini_api ? gemini_api.trim() : null }),
         },
       });
     } else {
@@ -99,6 +101,7 @@ export async function POST(request: Request) {
           url_image_kit: url_image_kit ? url_image_kit.trim() : null,
           imagekit_api: imagekit_api ? imagekit_api.trim() : null,
           imagekit_secret: imagekit_secret ? imagekit_secret.trim() : null,
+          gemini_api: gemini_api ? gemini_api.trim() : null,
         },
       });
     }

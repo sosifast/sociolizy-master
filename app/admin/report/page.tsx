@@ -45,9 +45,6 @@ export default function AdminReportPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Laporan &amp; Analitik
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Ringkasan omset, laba bersih, dan riwayat pesanan.
-          </p>
         </div>
 
         <button className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-emerald-400 hover:text-emerald-600 transition-colors shadow-xs self-start sm:self-auto cursor-pointer">
@@ -61,22 +58,16 @@ export default function AdminReportPage() {
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
           <span className="text-xs font-bold text-slate-400 uppercase">Omset Bulan Ini</span>
           <div className="text-2xl font-extrabold text-slate-900 mt-1">$128,450.00</div>
-          <div className="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+14.8% dari bulan lalu</span>
-          </div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
           <span className="text-xs font-bold text-slate-400 uppercase">Estimasi Laba Bersih</span>
           <div className="text-2xl font-extrabold text-emerald-600 mt-1">$42,180.00</div>
-          <div className="text-xs text-slate-500 mt-1">Rata-rata margin: 32.8%</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
           <span className="text-xs font-bold text-slate-400 uppercase">Total Pesanan</span>
           <div className="text-2xl font-extrabold text-slate-900 mt-1">26,480 Pesanan</div>
-          <div className="text-xs text-emerald-600 font-semibold mt-1">Tingkat sukses: 99.3%</div>
         </div>
       </div>
 

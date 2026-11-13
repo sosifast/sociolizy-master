@@ -8,6 +8,8 @@ import { verifySessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countOrdersInMongo } from "@/lib/mongodb";
 
+export const instant = false;
+
 export default async function MemberDashboardPage() {
   await connection();
   const cookieStore = await cookies();

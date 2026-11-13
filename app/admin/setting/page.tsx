@@ -15,6 +15,9 @@ import {
   Send,
   Share2,
   ImageIcon,
+  Sparkles,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useToast } from "@/app/admin/components/toast-context";
 import { useCachedFetch, clientCache } from "@/lib/client-cache";
@@ -34,6 +37,8 @@ export default function AdminSettingPage() {
   const [urlImageKit, setUrlImageKit] = useState("");
   const [imagekitApi, setImagekitApi] = useState("");
   const [imagekitSecret, setImagekitSecret] = useState("");
+  const [geminiApi, setGeminiApi] = useState("");
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: settingData, isLoading } = useCachedFetch<any>("/api/admin/setting", {
@@ -53,6 +58,7 @@ export default function AdminSettingPage() {
         if (data.url_image_kit) setUrlImageKit(data.url_image_kit);
         if (data.imagekit_api) setImagekitApi(data.imagekit_api);
         if (data.imagekit_secret) setImagekitSecret(data.imagekit_secret);
+        if (data.gemini_api) setGeminiApi(data.gemini_api);
       }
     },
   });
@@ -72,6 +78,7 @@ export default function AdminSettingPage() {
       if (settingData.url_image_kit) setUrlImageKit(settingData.url_image_kit);
       if (settingData.imagekit_api) setImagekitApi(settingData.imagekit_api);
       if (settingData.imagekit_secret) setImagekitSecret(settingData.imagekit_secret);
+      if (settingData.gemini_api) setGeminiApi(settingData.gemini_api);
     }
   }, [settingData]);
 
@@ -97,6 +104,7 @@ export default function AdminSettingPage() {
           url_image_kit: urlImageKit,
           imagekit_api: imagekitApi,
           imagekit_secret: imagekitSecret,
+          gemini_api: geminiApi,
         }),
       });
 
@@ -116,6 +124,7 @@ export default function AdminSettingPage() {
           url_image_kit: urlImageKit,
           imagekit_api: imagekitApi,
           imagekit_secret: imagekitSecret,
+          gemini_api: geminiApi,
         });
         toast.success("Pengaturan Disimpan", json.message || "Pengaturan website berhasil diperbarui.");
       } else {
@@ -137,9 +146,6 @@ export default function AdminSettingPage() {
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Pengaturan Sistem
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Konfigurasi identitas situs dan API master.
-          </p>
         </div>
       </div>
 
@@ -353,6 +359,43 @@ export default function AdminSettingPage() {
                   placeholder="private_..."
                   className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Google Gemini API Configuration */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span>Google Gemini API</span>
+              </h3>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Gemini API Key (gemini_api)
+              </label>
+              <div className="relative">
+                <input
+                  type={showGeminiKey ? "text" : "password"}
+                  value={geminiApi}
+                  onChange={(e) => setGeminiApi(e.target.value)}
+                  placeholder="AIzaSy..."
+                  className="w-full pl-3.5 pr-11 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 font-mono font-medium focus:bg-white focus:border-emerald-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowGeminiKey(!showGeminiKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                  title={showGeminiKey ? "Sembunyikan API Key" : "Tampilkan API Key"}
+                >
+                  {showGeminiKey ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
           </div>

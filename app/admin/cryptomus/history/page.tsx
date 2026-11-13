@@ -258,11 +258,8 @@ export default function AdminCryptomusHistoryPage() {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Riwayat Deposit Cryptomus
+              Riwayat Deposit
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              Daftar seluruh faktur, status transaksi, aksi detail, edit, dan hapus
-            </p>
           </div>
         </div>
 

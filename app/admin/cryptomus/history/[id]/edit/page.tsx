@@ -170,9 +170,6 @@ export default function EditCryptomusTransactionPage() {
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Edit Transaksi #{orderId}
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Perbarui status, nominal, TXID, atau pengguna deposit Cryptomus
-            </p>
           </div>
         </div>
       </div>

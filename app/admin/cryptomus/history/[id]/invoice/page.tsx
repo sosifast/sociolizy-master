@@ -213,9 +213,6 @@ export default function AdminCryptomusInvoiceViewPage() {
             <h1 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               <span>Faktur Pembayaran #{invoice.order_id}</span>
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Pratinjau faktur deposit resmi internal website
-            </p>
           </div>
         </div>
 
@@ -265,12 +262,9 @@ export default function AdminCryptomusInvoiceViewPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-black text-slate-900 tracking-tight">MASTER SMM</h2>
-                  <p className="text-[11px] font-semibold text-slate-400">Cryptomus Gateway Deposit</p>
+                  <p className="text-[11px] font-semibold text-slate-400">Payment Gateway Deposit</p>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
-                Faktur resmi bukti pengisian saldo otomatis akun melalui jaringan kripto terdesentralisasi.
-              </p>
             </div>
 
             <div className="sm:text-right space-y-1">

@@ -215,9 +215,6 @@ export default function AdminBlogArticleTablePage() {
               {totalItems} Posts
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Detailed list view for quick filtering, bulk status inspection, and management.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">

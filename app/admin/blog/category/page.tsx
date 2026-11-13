@@ -215,9 +215,6 @@ export default function AdminBlogCategoryPage() {
                 {categories.length} Categories
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Organize blog posts into topic categories such as Instagram Growth, TikTok Viral, or Reseller Tips.
-            </p>
           </div>
         </div>
 

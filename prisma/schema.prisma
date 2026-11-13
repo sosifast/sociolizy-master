@@ -81,10 +81,23 @@ model Category {
   create_at   DateTime  @default(now())
   update_at   DateTime  @updatedAt
 
-  platform    Platform  @relation(fields: [id_platform], references: [id], onDelete: Cascade)
-  services    Service[]
+  platform     Platform     @relation(fields: [id_platform], references: [id], onDelete: Cascade)
+  services     Service[]
+  data_details DataDetail[]
 
   @@map("category")
+}
+
+model DataDetail {
+  id          Int      @id @default(autoincrement())
+  id_category Int
+  conteks     String   @db.Text
+  create_at   DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  category    Category @relation(fields: [id_category], references: [id], onDelete: Cascade)
+
+  @@map("data_detail")
 }
 
 model Service {
@@ -124,6 +137,7 @@ model Setting {
   url_image_kit   String?
   imagekit_api    String?
   imagekit_secret String?
+  gemini_api      String?
   create_at       DateTime @default(now())
   update_at       DateTime @updatedAt
 

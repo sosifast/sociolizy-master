@@ -67,7 +67,7 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
       exact: true,
     },
     {
-      name: "New Order",
+      name: "Order",
       href: "/member/order",
       icon: ShoppingCart,
       exact: false,
@@ -85,7 +85,7 @@ export default function MemberHeader({ user }: MemberHeaderProps) {
       exact: false,
     },
     {
-      name: "Merchant Gateway",
+      name: "Merchant",
       href: "/merchant",
       icon: Store,
       exact: false,

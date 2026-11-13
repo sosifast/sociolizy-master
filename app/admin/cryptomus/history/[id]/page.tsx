@@ -196,9 +196,6 @@ export default function CryptomusHistoryDetailPage() {
               </h1>
               {renderStatusBadge(tx.payment_status)}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Detail transaksi deposit gateway Cryptomus
-            </p>
           </div>
         </div>
 

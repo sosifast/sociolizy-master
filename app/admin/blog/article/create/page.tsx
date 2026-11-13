@@ -214,9 +214,6 @@ export default function CreateBlogArticlePage() {
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Create New Article
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Draft or publish new educational guides and SMM marketing tutorials.
-            </p>
           </div>
         </div>
 
@@ -664,9 +661,6 @@ Social media is essential for growth in 2026...
             <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
               Summary / Excerpt
             </h2>
-            <p className="text-[11px] text-slate-500">
-              Short teaser text displayed on blog card previews.
-            </p>
             <textarea
               rows={4}
               value={excerpt}

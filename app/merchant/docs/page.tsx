@@ -83,59 +83,65 @@ echo json_encode(['status' => 'OK']);
     <div className="space-y-8 max-w-5xl">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] uppercase font-bold tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="spectrum-badge-green text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">
             API Documentation & Developer Guide
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
           Merchant Payment Gateway Integration
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Integrate instant cryptocurrency checkouts into your websites, Telegram bots, or applications in minutes.
         </p>
       </div>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
-          <Terminal className="w-5 h-5 text-emerald-400 mb-2" />
-          <h3 className="text-sm font-bold text-white mb-1">RESTful JSON API</h3>
-          <p className="text-xs text-slate-400">
+        <div className="spectrum-card p-5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 border border-emerald-100">
+            <Terminal className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 mb-1">RESTful JSON API</h3>
+          <p className="text-xs text-slate-500">
             Standard HTTP POST and GET requests with clean, predictable JSON responses.
           </p>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
-          <ShieldCheck className="w-5 h-5 text-amber-400 mb-2" />
-          <h3 className="text-sm font-bold text-white mb-1">Header Authentication</h3>
-          <p className="text-xs text-slate-400">
-            Pass <code className="text-emerald-400 font-mono">x-api-key</code> and <code className="text-amber-400 font-mono">x-secret-key</code> in every API call.
+        <div className="spectrum-card p-5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 border border-emerald-100">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 mb-1">Header Authentication</h3>
+          <p className="text-xs text-slate-500">
+            Pass <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded font-mono text-[11px]">x-api-key</code> and <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded font-mono text-[11px]">x-secret-key</code> in every API call.
           </p>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
-          <Zap className="w-5 h-5 text-cyan-400 mb-2" />
-          <h3 className="text-sm font-bold text-white mb-1">100% White-Label Direct Checkout</h3>
-          <p className="text-xs text-slate-400">
-            Hosted entirely on your domain without third-party redirection or branding.
+        <div className="spectrum-card p-5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 border border-emerald-100">
+            <Zap className="w-5 h-5 text-emerald-600" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 mb-1">100% White-Label Direct Checkout</h3>
+          <p className="text-xs text-slate-500">
+            Hosted entirely on your domain without third-party redirection or external logos.
           </p>
         </div>
       </div>
 
       {/* Section 1: Create Invoice */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="spectrum-card p-6 sm:p-7 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs px-2 py-0.5 rounded">
+              <span className="spectrum-badge-green font-mono font-bold text-xs px-2 py-0.5">
                 POST
               </span>
-              <span className="font-mono text-sm text-white font-semibold">
+              <span className="font-mono text-sm text-slate-900 font-bold">
                 /api/v1/gateway/invoices/create
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Create a new payment invoice and generate an instant direct checkout URL.
             </p>
           </div>
@@ -143,10 +149,10 @@ echo json_encode(['status' => 'OK']);
           <button
             type="button"
             onClick={() => copyCode(curlCreateInvoice, "curl")}
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
+            className="p-2 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer font-medium transition-colors"
           >
             {copiedSection === "curl" ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
@@ -155,20 +161,20 @@ echo json_encode(['status' => 'OK']);
         </div>
 
         {/* Code display */}
-        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 overflow-x-auto">
-          <pre className="text-xs text-slate-200 font-mono leading-relaxed">
+        <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 overflow-x-auto shadow-inner">
+          <pre className="text-xs text-emerald-300 font-mono leading-relaxed">
             {curlCreateInvoice}
           </pre>
         </div>
 
         {/* Parameters Table */}
-        <div>
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2">
+        <div className="pt-2">
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">
             Request Body Parameters (JSON)
           </h4>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase font-semibold">
+          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+            <table className="w-full text-left text-xs text-slate-700">
+              <thead className="bg-slate-50 text-slate-500 text-[10px] uppercase font-semibold border-b border-slate-200">
                 <tr>
                   <th className="p-2.5">Field</th>
                   <th className="p-2.5">Type</th>
@@ -176,42 +182,42 @@ echo json_encode(['status' => 'OK']);
                   <th className="p-2.5">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+              <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
                 <tr>
-                  <td className="p-2.5 text-emerald-400">order_id</td>
-                  <td className="p-2.5">string</td>
-                  <td className="p-2.5 text-amber-400">Yes</td>
-                  <td className="p-2.5 font-sans">Your internal unique order ID</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">order_id</td>
+                  <td className="p-2.5 text-slate-600">string</td>
+                  <td className="p-2.5 text-amber-600 font-semibold font-sans">Yes</td>
+                  <td className="p-2.5 font-sans text-slate-600">Your internal unique order ID</td>
                 </tr>
                 <tr>
-                  <td className="p-2.5 text-emerald-400">amount</td>
-                  <td className="p-2.5">number | string</td>
-                  <td className="p-2.5 text-amber-400">Yes</td>
-                  <td className="p-2.5 font-sans">Invoice charge amount in USD</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">amount</td>
+                  <td className="p-2.5 text-slate-600">number | string</td>
+                  <td className="p-2.5 text-amber-600 font-semibold font-sans">Yes</td>
+                  <td className="p-2.5 font-sans text-slate-600">Invoice charge amount in USD</td>
                 </tr>
                 <tr>
-                  <td className="p-2.5 text-emerald-400">to_currency</td>
-                  <td className="p-2.5">string</td>
-                  <td className="p-2.5 text-slate-500">Optional</td>
-                  <td className="p-2.5 font-sans">Specific cryptocurrency to lock payment into (e.g. USDT, BTC)</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">to_currency</td>
+                  <td className="p-2.5 text-slate-600">string</td>
+                  <td className="p-2.5 text-slate-400 font-sans">Optional</td>
+                  <td className="p-2.5 font-sans text-slate-600">Specific cryptocurrency to lock payment into (e.g. USDT, BTC)</td>
                 </tr>
                 <tr>
-                  <td className="p-2.5 text-emerald-400">network</td>
-                  <td className="p-2.5">string</td>
-                  <td className="p-2.5 text-slate-500">Optional</td>
-                  <td className="p-2.5 font-sans">Blockchain network (tron, bsc, polygon, sol, ton)</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">network</td>
+                  <td className="p-2.5 text-slate-600">string</td>
+                  <td className="p-2.5 text-slate-400 font-sans">Optional</td>
+                  <td className="p-2.5 font-sans text-slate-600">Blockchain network (tron, bsc, polygon, sol, ton)</td>
                 </tr>
                 <tr>
-                  <td className="p-2.5 text-emerald-400">callback_url</td>
-                  <td className="p-2.5">string (URL)</td>
-                  <td className="p-2.5 text-slate-500">Optional</td>
-                  <td className="p-2.5 font-sans">Custom IPN Webhook URL for this specific invoice</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">callback_url</td>
+                  <td className="p-2.5 text-slate-600">string (URL)</td>
+                  <td className="p-2.5 text-slate-400 font-sans">Optional</td>
+                  <td className="p-2.5 font-sans text-slate-600">Custom IPN Webhook URL for this specific invoice</td>
                 </tr>
                 <tr>
-                  <td className="p-2.5 text-emerald-400">return_url</td>
-                  <td className="p-2.5">string (URL)</td>
-                  <td className="p-2.5 text-slate-500">Optional</td>
-                  <td className="p-2.5 font-sans">Customer redirection URL upon successful payment</td>
+                  <td className="p-2.5 text-emerald-700 font-bold">return_url</td>
+                  <td className="p-2.5 text-slate-600">string (URL)</td>
+                  <td className="p-2.5 text-slate-400 font-sans">Optional</td>
+                  <td className="p-2.5 font-sans text-slate-600">Customer redirection URL upon successful payment</td>
                 </tr>
               </tbody>
             </table>
@@ -220,19 +226,19 @@ echo json_encode(['status' => 'OK']);
       </div>
 
       {/* Section 2: Node.js Example */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="spectrum-card p-6 sm:p-7 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
-            <h3 className="text-sm font-bold text-white">Node.js / Next.js Implementation Example</h3>
-            <p className="text-xs text-slate-400">Using native fetch on your backend server</p>
+            <h3 className="text-sm font-bold text-slate-900">Node.js / Next.js Implementation Example</h3>
+            <p className="text-xs text-slate-500">Using native fetch on your backend server</p>
           </div>
           <button
             type="button"
             onClick={() => copyCode(nodeJsExample, "node")}
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
+            className="p-2 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer font-medium transition-colors"
           >
             {copiedSection === "node" ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
@@ -240,31 +246,31 @@ echo json_encode(['status' => 'OK']);
           </button>
         </div>
 
-        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 overflow-x-auto">
-          <pre className="text-xs text-slate-200 font-mono leading-relaxed">
+        <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 overflow-x-auto shadow-inner">
+          <pre className="text-xs text-emerald-300 font-mono leading-relaxed">
             {nodeJsExample}
           </pre>
         </div>
       </div>
 
       {/* Section 3: Webhook Verification */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="spectrum-card p-6 sm:p-7 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
-            <h3 className="text-sm font-bold text-white">
+            <h3 className="text-sm font-bold text-slate-900">
               Webhook IPN Processing & Signature Verification (PHP)
             </h3>
-            <p className="text-xs text-slate-400">
-              Inbound notifications are delivered via HTTP POST with header <code className="text-emerald-400 font-mono">x-signature</code> (HMAC SHA-256).
+            <p className="text-xs text-slate-500">
+              Inbound notifications are delivered via HTTP POST with header <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded font-mono text-[11px]">x-signature</code> (HMAC SHA-256).
             </p>
           </div>
           <button
             type="button"
             onClick={() => copyCode(phpWebhookVerify, "php")}
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
+            className="p-2 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer font-medium transition-colors"
           >
             {copiedSection === "php" ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
@@ -272,8 +278,8 @@ echo json_encode(['status' => 'OK']);
           </button>
         </div>
 
-        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 overflow-x-auto">
-          <pre className="text-xs text-slate-200 font-mono leading-relaxed">
+        <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 overflow-x-auto shadow-inner">
+          <pre className="text-xs text-emerald-300 font-mono leading-relaxed">
             {phpWebhookVerify}
           </pre>
         </div>

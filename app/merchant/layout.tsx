@@ -44,15 +44,15 @@ export default async function MerchantLayout({
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-[#fafbfc] text-slate-900 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       <MerchantNavbar
         user={dbUser}
         siteName={siteSetting?.site_name || "Payment Gateway"}
         logo={siteSetting?.logo || "/logo/logo.png"}
       />
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

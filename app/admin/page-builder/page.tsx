@@ -173,9 +173,6 @@ export default function AdminPageBuilderIndex() {
               {totalItems} Pages
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Build high-converting landing pages, promotional events, and service showcases with drag and drop.
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

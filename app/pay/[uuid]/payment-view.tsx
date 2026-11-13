@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   RefreshCw,
   QrCode,
+  Lock,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -188,9 +189,9 @@ export default function PaymentView({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-[#fafbfc] text-slate-800 flex flex-col justify-between selection:bg-emerald-500 selection:text-white font-sans">
       {/* Top Navbar with Matched Logo */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-20">
+      <header className="border-b border-slate-200/90 bg-white/90 backdrop-blur-md sticky top-0 z-20 shadow-2xs">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
@@ -201,13 +202,13 @@ export default function PaymentView({
               className="h-8 w-auto object-contain"
               priority
             />
-            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
-              Secure Direct Checkout
+            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
+              Direct Checkout
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-3 py-1.5 rounded-full">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1.5 rounded-full">
+            <Lock className="w-3.5 h-3.5 text-emerald-600" />
             <span>256-bit Encrypted</span>
           </div>
         </div>
@@ -217,30 +218,30 @@ export default function PaymentView({
       <main className="max-w-3xl w-full mx-auto px-4 py-8 flex-1">
         {/* SUCCESS STATE */}
         {paymentData.status === "PAID" ? (
-          <div className="bg-slate-900/90 border border-emerald-500/30 rounded-3xl p-8 sm:p-12 text-center shadow-2xl shadow-emerald-500/10 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-500">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-500/10 animate-bounce">
+          <div className="spectrum-card p-8 sm:p-12 text-center shadow-xl border-emerald-200 bg-white animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-500/10 animate-bounce border border-emerald-200">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
               Payment Confirmed!
             </h1>
-            <p className="text-slate-400 text-sm max-w-md mx-auto mb-8">
-              Your payment for order <span className="text-white font-medium">#{initialTx.orderId}</span> has been confirmed on the blockchain and credited successfully.
+            <p className="text-slate-500 text-sm max-w-md mx-auto mb-8">
+              Your payment for order <span className="text-slate-900 font-semibold">#{initialTx.orderId}</span> has been confirmed on the blockchain and credited successfully.
             </p>
 
-            <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 max-w-sm mx-auto mb-8 text-left text-xs space-y-2">
-              <div className="flex justify-between text-slate-400">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 max-w-sm mx-auto mb-8 text-left text-xs space-y-2.5">
+              <div className="flex justify-between text-slate-600">
                 <span>Merchant:</span>
-                <span className="text-white font-medium">{initialTx.merchantName}</span>
+                <span className="text-slate-900 font-semibold">{initialTx.merchantName}</span>
               </div>
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-slate-600">
                 <span>Total Paid:</span>
-                <span className="text-emerald-400 font-semibold">${Number(initialTx.amountUsd).toFixed(2)} USD</span>
+                <span className="text-emerald-700 font-bold">${Number(initialTx.amountUsd).toFixed(2)} USD</span>
               </div>
               {paymentData.cryptoAmount && (
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-slate-600">
                   <span>Crypto Asset:</span>
-                  <span className="text-white">
+                  <span className="text-slate-900 font-medium">
                     {paymentData.cryptoAmount} {paymentData.cryptoCurrency} ({paymentData.cryptoNetwork?.toUpperCase()})
                   </span>
                 </div>
@@ -250,31 +251,31 @@ export default function PaymentView({
             {paymentData.returnUrl ? (
               <a
                 href={paymentData.returnUrl}
-                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm"
+                className="spectrum-btn-primary inline-flex items-center gap-2 font-bold px-8 py-3.5 text-sm cursor-pointer shadow-md"
               >
                 <span>Return to Merchant Store</span>
                 <ChevronRight className="w-4 h-4" />
               </a>
             ) : (
-              <div className="text-slate-400 text-xs">
+              <div className="text-slate-500 text-xs">
                 You may now safely close this window. Thank you!
               </div>
             )}
           </div>
         ) : paymentData.status === "EXPIRED" ? (
           /* EXPIRED STATE */
-          <div className="bg-slate-900/90 border border-rose-500/30 rounded-3xl p-8 sm:p-12 text-center shadow-2xl backdrop-blur-xl">
-            <div className="w-16 h-16 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-6">
+          <div className="spectrum-card p-8 sm:p-12 text-center shadow-xl border-rose-200 bg-white">
+            <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-6 border border-rose-200">
               <Clock className="w-10 h-10" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Invoice Expired</h1>
-            <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Invoice Expired</h1>
+            <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
               The payment window for this invoice has expired. Please initiate a new order at the merchant store.
             </p>
             {paymentData.returnUrl && (
               <a
                 href={paymentData.returnUrl}
-                className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-colors"
+                className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-6 py-3 rounded-xl text-sm transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Return to Merchant</span>
@@ -285,36 +286,36 @@ export default function PaymentView({
           /* ACTIVE PAYMENT SCREEN */
           <div className="space-y-6">
             {/* Order Summary Card */}
-            <div className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 sm:p-6 backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="spectrum-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">
                   {initialTx.merchantName}
                 </div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-lg font-bold text-slate-900">
                   {initialTx.description || `Invoice #${initialTx.orderId}`}
                 </h2>
-                <div className="text-xs text-slate-400 mt-0.5">
-                  Order ID: <span className="font-mono text-slate-300">{initialTx.orderId}</span>
+                <div className="text-xs text-slate-500 mt-0.5">
+                  Order ID: <span className="font-mono text-slate-700 font-semibold">{initialTx.orderId}</span>
                 </div>
               </div>
 
-              <div className="text-right flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-800">
-                <span className="text-xs text-slate-400">Total Due</span>
-                <span className="text-2xl font-black text-white">
+              <div className="text-right flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
+                <span className="text-xs text-slate-500">Total Due</span>
+                <span className="text-2xl font-black text-slate-900">
                   ${Number(initialTx.amountUsd).toFixed(2)}{" "}
-                  <span className="text-xs font-medium text-slate-400">USD</span>
+                  <span className="text-xs font-semibold text-slate-500">USD</span>
                 </span>
               </div>
             </div>
 
             {/* Currency Selector (Requirement A.8) */}
-            <div className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 sm:p-6 backdrop-blur-sm">
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            <div className="spectrum-card p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-3.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                   Select Cryptocurrency & Network
                 </label>
-                <div className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-950/40 border border-amber-800/40 px-2.5 py-1 rounded-full">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-full font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
                   <span>Time left: {formatSeconds(timeLeft)}</span>
                 </div>
               </div>
@@ -333,15 +334,15 @@ export default function PaymentView({
                       disabled={isLoadingCoin}
                       className={`flex flex-col items-start p-3 rounded-xl border text-left transition-all ${
                         isSelected
-                          ? "bg-emerald-500/10 border-emerald-500 text-white shadow-md shadow-emerald-500/10 ring-1 ring-emerald-500"
-                          : "bg-slate-950/40 border-slate-800/80 hover:border-slate-700 text-slate-300 hover:bg-slate-800/40"
+                          ? "bg-emerald-50/90 border-emerald-500 text-slate-900 shadow-xs ring-2 ring-emerald-500/20"
+                          : "bg-white border-slate-200/90 hover:border-slate-300 text-slate-700 hover:bg-slate-50/80 shadow-2xs"
                       } ${isLoadingCoin ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center justify-between w-full mb-1">
-                        <span className="font-bold text-sm">{coin.symbol}</span>
-                        {isSelected && <Check className="w-4 h-4 text-emerald-400" />}
+                        <span className="font-bold text-sm text-slate-900">{coin.symbol}</span>
+                        {isSelected && <Check className="w-4 h-4 text-emerald-600" />}
                       </div>
-                      <span className="text-[11px] text-slate-400 uppercase tracking-wide">
+                      <span className="text-[11px] text-slate-500 uppercase tracking-wide font-medium">
                         {coin.network}
                       </span>
                     </button>
@@ -350,7 +351,7 @@ export default function PaymentView({
               </div>
 
               {errorMsg && (
-                <div className="mt-4 p-3 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs flex items-center gap-2">
+                <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -358,18 +359,18 @@ export default function PaymentView({
             </div>
 
             {/* Payment Details & QR Code (Requirement A.7 Direct Transaction) */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden">
+            <div className="spectrum-card p-6 sm:p-8 relative overflow-hidden">
               {isLoadingCoin && (
-                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center z-10">
-                  <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mb-2" />
-                  <span className="text-xs text-slate-300">Generating direct payment address...</span>
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center z-10">
+                  <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mb-2" />
+                  <span className="text-xs font-semibold text-slate-700">Generating direct payment address...</span>
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 {/* QR Code Section */}
                 <div className="md:col-span-5 flex flex-col items-center justify-center text-center">
-                  <div className="bg-white p-3.5 rounded-2xl shadow-xl shadow-black/40 ring-4 ring-slate-800">
+                  <div className="bg-white p-3.5 rounded-2xl shadow-lg border border-slate-200/90 ring-4 ring-emerald-50">
                     {paymentData.qrCodeUrl ? (
                       <img
                         src={paymentData.qrCodeUrl}
@@ -377,14 +378,14 @@ export default function PaymentView({
                         className="w-48 h-48 sm:w-52 sm:h-52 object-contain"
                       />
                     ) : (
-                      <div className="w-48 h-48 sm:w-52 sm:h-52 flex flex-col items-center justify-center text-slate-400 bg-slate-100 rounded-xl">
+                      <div className="w-48 h-48 sm:w-52 sm:h-52 flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-xl">
                         <QrCode className="w-12 h-12 text-slate-400 mb-2" />
                         <span className="text-xs text-slate-500">Select a coin above</span>
                       </div>
                     )}
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-3">
-                    Scan using your mobile crypto wallet
+                  <span className="text-[11px] text-slate-500 font-medium mt-3">
+                    Scan with your mobile crypto wallet
                   </span>
                 </div>
 
@@ -392,15 +393,15 @@ export default function PaymentView({
                 <div className="md:col-span-7 space-y-4">
                   {/* Amount to Send */}
                   <div>
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
                       Exact Amount to Transfer
                     </label>
-                    <div className="flex items-center justify-between bg-slate-950/80 border border-slate-800 rounded-xl p-3 px-4">
-                      <div className="font-mono text-lg sm:text-xl font-bold text-emerald-400 tracking-tight">
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 px-4 shadow-2xs">
+                      <div className="font-mono text-lg sm:text-xl font-black text-emerald-700 tracking-tight">
                         {paymentData.cryptoAmount !== null && paymentData.cryptoAmount !== undefined
                           ? paymentData.cryptoAmount
                           : "---"}{" "}
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-bold text-slate-800">
                           {paymentData.cryptoCurrency || selectedCoin?.symbol}
                         </span>
                       </div>
@@ -409,11 +410,11 @@ export default function PaymentView({
                         onClick={() =>
                           copyToClipboard(String(paymentData.cryptoAmount || ""), "amount")
                         }
-                        className="p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-slate-500 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200/80 rounded-lg transition-colors cursor-pointer shadow-2xs"
                         title="Copy Amount"
                       >
                         {copiedField === "amount" ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-4 h-4 text-emerald-600" />
                         ) : (
                           <Copy className="w-4 h-4" />
                         )}
@@ -424,15 +425,15 @@ export default function PaymentView({
                   {/* Payment Address */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                         Destination Address ({paymentData.cryptoNetwork?.toUpperCase() || selectedCoin?.network.toUpperCase()})
                       </label>
-                      <span className="text-[11px] text-emerald-400 font-medium">
+                      <span className="text-[11px] text-emerald-700 font-semibold">
                         Network: {paymentData.cryptoNetwork || selectedCoin?.network}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-slate-950/80 border border-slate-800 rounded-xl p-3 px-4 gap-2">
-                      <span className="font-mono text-xs sm:text-sm text-slate-200 break-all select-all">
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/90 rounded-xl p-3 px-4 gap-2 shadow-2xs">
+                      <span className="font-mono text-xs sm:text-sm text-slate-800 break-all select-all font-medium">
                         {paymentData.payAddress || "Generating address..."}
                       </span>
                       <button
@@ -440,11 +441,11 @@ export default function PaymentView({
                         onClick={() =>
                           copyToClipboard(paymentData.payAddress || "", "address")
                         }
-                        className="p-2 shrink-0 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 shrink-0 text-slate-500 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-slate-200/80 rounded-lg transition-colors cursor-pointer shadow-2xs"
                         title="Copy Address"
                       >
                         {copiedField === "address" ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-4 h-4 text-emerald-600" />
                         ) : (
                           <Copy className="w-4 h-4" />
                         )}
@@ -453,19 +454,19 @@ export default function PaymentView({
                   </div>
 
                   {/* Payment Tips */}
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 space-y-1">
-                    <div className="flex items-start gap-1.5">
-                      <span className="text-emerald-400 font-bold">•</span>
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 text-xs text-slate-600 space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">•</span>
                       <span>
                         Send strictly via the{" "}
-                        <strong className="text-white">
+                        <strong className="text-slate-900 font-bold">
                           {paymentData.cryptoNetwork?.toUpperCase() || selectedCoin?.network.toUpperCase()}
                         </strong>{" "}
                         network.
                       </span>
                     </div>
-                    <div className="flex items-start gap-1.5">
-                      <span className="text-emerald-400 font-bold">•</span>
+                    <div className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">•</span>
                       <span>
                         Transactions confirm automatically within 1-3 blockchain blocks.
                       </span>
@@ -473,8 +474,8 @@ export default function PaymentView({
                   </div>
 
                   {/* Status Indicator */}
-                  <div className="flex items-center justify-center gap-2 py-2 text-xs text-slate-400">
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                  <div className="flex items-center justify-center gap-2 py-1 text-xs text-slate-500 font-medium">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
                     <span>Awaiting incoming blockchain transfer...</span>
                   </div>
                 </div>
@@ -485,10 +486,10 @@ export default function PaymentView({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500 bg-white">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span>&copy; {new Date().getFullYear()} {siteName || "Payment Gateway"}. All rights reserved.</span>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-4 text-slate-400 font-medium">
             <span>Direct White-Label Gateway</span>
             <span>•</span>
             <span>Instant Settlement</span>

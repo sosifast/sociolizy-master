@@ -111,9 +111,6 @@ export default function CreateCustomPageBuilder() {
               New
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Configure initial details and select a starter template to fast-track your design.
-          </p>
         </div>
 
         <Link
